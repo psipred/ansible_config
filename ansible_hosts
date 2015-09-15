@@ -1,3 +1,11 @@
+[local]
+127.0.0.1
+
+
+[travisserver]
+127.0.0.1
+
+[dbserver]
 127.0.0.1
 
 [webservers]
