@@ -1,5 +1,5 @@
 ---
-
+# ansible-playbook -i staging site.yml -f 10
 - name: Apply the rabbit_mq configuration
   hosts: rabbit_mq
   user: dbuchan
