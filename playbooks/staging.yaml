@@ -1,0 +1,26 @@
+---
+- hosts: rabbit_mq
+  remote_user: dbuchan
+
+  tasks:
+    - name: install erlang
+      yum:
+        pkg: erlang
+        state: latest
+      sudo: yes
+
+  handlers:
+    - include: handlers/handlers.yaml
+    # - name: install rabbit_mq
+    #   yum:
+    #     pkg: rabbitmq
+    #     state: latest
+    #   sudo: yes
+
+  # notify:
+  #   - restart rabbit_mq
+
+
+# - handlers:
+#   - name: restart rabbit_mq
+#     service: name=rabbitmq start=restarted
