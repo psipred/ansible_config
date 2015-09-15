@@ -1,1 +1,8 @@
 ---
+
+- name: Apply the rabbit_mq configuration
+  hosts: rabbit_mq
+  user: dbuchan
+  sudo: yes
+  roles:
+    - rabbitmq
