@@ -1,0 +1,10 @@
+---
+- hosts: rabbit_mq
+  remote_user: dbuchan
+
+  tasks:
+    - name: install erlang
+      yum:
+        pkg: erlang
+        state: latest
+      sudo: yes
