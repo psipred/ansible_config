@@ -7,4 +7,4 @@
   roles:
     - rabbitmq
   vars_files:
-    - /cs/researchhjhj/bioinf/home1/green/dbuchan/ansible_config/staging_secrets.yaml
+    - /cs/research/bioinf/home1/green/dbuchan/ansible_config/staging_secrets.yaml

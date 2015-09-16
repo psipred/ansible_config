@@ -1,6 +1,6 @@
 ---
 
-  - name: "install erlang {{ rabbit }}"
+  - name: "install erlang {{ rabbit_user }}"
     yum:
       pkg: erlang
       state: latest
