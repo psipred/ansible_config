@@ -54,8 +54,8 @@
     # restart of the webserver AND the workers
 
   - name: "Create {{ a_a_db }} db"
-      postgresql_db:
-        name: "{{ a_a_db }}"
+    postgresql_db:
+      name: "{{ a_a_db }}"
 
   - name: "Add {{ a_a_user }} to postgres"
     postgresql_user:
