@@ -13,21 +13,21 @@
   # we switched to using wget as get_url: has no adjustable timeout and is
   # fixed to 10secs!?!?
   - name: Check if we have the rabbitMQ tarball already
-    stat: "path=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    stat: "path=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
     register: rabbit_tarball_exist
 
   - name: Download rabbitMQ tarball
     # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbit_mq_version }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
     when: rabbit_tarball_exist.stat.exists == False
     become_user: "{{ rabbit_user }}"
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == 1
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     retries: 2
     delay: 10
 
   - name: untar the tarball
-    shell: "cd /home/{{ rabbit_user }}; tar -zxvf /home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    shell: "cd /home/{{ rabbit_user }}; tar -zxvf /home/{{ rabbit_user }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
     become_user: "{{ rabbit_user }}"
     when: get_url_result.changed
 
