@@ -12,12 +12,12 @@
 
   - name: Download rabbitMQ tarball
     get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    become_user: {{ rabbit_user }}
+    become_user: "{{ rabbit_user }}"
     register: get_url_result
 
   - name: untar the tarball
     shell: "cd /home/{{ rabbit_user }}; tar -zxvf /home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    become_user: {{ rabbit_user }}
+    become_user: "{{ rabbit_user }}"
     when: get_url_result.changed
 
   - name: Get the current firewalld rules
@@ -47,4 +47,4 @@
 
   - name: Start rabbitMQ
     command: "/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4/sbin/rabbitmq-server --detached"
-    become_user: {{ rabbit_user }}
+    become_user: "{{ rabbit_user }}"
