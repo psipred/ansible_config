@@ -10,9 +10,9 @@
     user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
     sudo: yes
 
-  # we switched to using wget as get_url: has no adjustable timeout and is 
+  # we switched to using wget as get_url: has no adjustable timeout and is
   # fixed to 10secs!?!?
-  -name: Check if we have the rabbitMQ tarball already
+  - name: Check if we have the rabbitMQ tarball already
     stat: "path=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
     register: rabbit_tarball_exist
 
