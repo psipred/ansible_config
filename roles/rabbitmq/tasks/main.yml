@@ -18,7 +18,7 @@
 
   - name: Download rabbitMQ tarball
     # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbit_mq_version }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbit_mq_version }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
     when: rabbit_tarball_exist.stat.exists == False
     become_user: "{{ rabbit_user }}"
     register: get_url_result
@@ -57,5 +57,5 @@
     sudo: true
 
   - name: Start rabbitMQ
-    command: "/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4/sbin/rabbitmq-server --detached"
+    command: "/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}/sbin/rabbitmq-server --detached"
     become_user: "{{ rabbit_user }}"
