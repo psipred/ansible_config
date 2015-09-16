@@ -1,6 +1,6 @@
 ---
 # ansible-playbook -i staging site.yml -f 10
-- name: 'Apply the rabbit_mq configuration {{ rabbit }}'
+- name: 'Apply the rabbit_mq configuration {{ staging_secrets.rabbit }}'
   hosts: rabbit_mq
   user: dbuchan
   sudo: yes
