@@ -1,6 +1,6 @@
 ---
 
-  - name: install erlang
+  - name: "install erlang {{ staging_secrets.rabbit }}"
     yum:
       pkg: erlang
       state: latest
