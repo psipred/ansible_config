@@ -7,10 +7,10 @@
     sudo: yes
 
   - name: Check if postgresDB location exists
-      stat: "path={{ postgres_db_path }}"
-      register: postgresDB_exist
+    stat: "path={{ postgres_db_path }}"
+    register: postgresDB_exist
 
   - name: Initialise postgresDB
-    shell: "initdb -D {{ postgres_db_path }}"
+    shell: "/bin/initdb -D {{ postgres_db_path }}"
     become_user: "{{ postgres_user }}"
     when: postgresDB_exist.stat.exists == False
