@@ -16,7 +16,7 @@
 
   - name: Give postgres ownership of db
     file:
-      path: {{ postgres_db_path }}
+      path: "{{ postgres_db_path }}"
       state: directory
       recurse: yes
-      owner: {{ postgres_user }}
+      owner: "{{ postgres_user }}"
