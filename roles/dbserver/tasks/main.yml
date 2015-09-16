@@ -43,7 +43,7 @@
     shell: "pg_ctl start -D {{ postgres_db_path }}"
     register: postgres_started
     become_user: "{{ postgres_user }}"
-    when: postgres_running.stdout.find("/usr/bin/postgres") == True
+    when: postgres_running.stdout.find("/usr/bin/postgres") == -1
 
   - name: Restart postgresDB
     shell: "pg_ctl restart -D {{ postgres_db_path }}"
