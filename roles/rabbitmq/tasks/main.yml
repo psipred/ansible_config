@@ -10,12 +10,20 @@
     user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
     sudo: yes
 
+  # we switched to using wget as get_url: has no adjustable timeout and is 
+  # fixed to 10secs!?!?
+  -name: Check if we have the rabbitMQ tarball already
+    stat: "path=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    register: rabbit_tarball_exist
+
   - name: Download rabbitMQ tarball
-    get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    shell: "chdir=/home/{{ rabbit_user }} wget https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    when: rabbit_tarball_exists.stat.exists == False
     become_user: "{{ rabbit_user }}"
     register: get_url_result
     until: get_url_result
-    retries: 100
+    retries: 2
     delay: 5
 
   - name: untar the tarball
