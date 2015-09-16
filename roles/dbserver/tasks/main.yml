@@ -42,7 +42,7 @@
     copy:
       src: files/web_server_postgresql.conf
       dest: "{{  postgres_db_path }}/postgresql.conf"
-      owner: {{ postgres_user }}
+      owner: "{{ postgres_user }}"
     when: postgresDB_exist.stat.exists == False
 
   - name: Check postgres status
