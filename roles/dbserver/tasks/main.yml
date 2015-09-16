@@ -47,8 +47,20 @@
 
   - name: Restart postgresDB
     shell: "pg_ctl restart -D {{ postgres_db_path }}"
-    register: postgres_started
+    register: postgres_restarted
     become_user: "{{ postgres_user }}"
     when: postgres_installed.changed == True
     # if this is run it should trigger a
     # restart of the webserver AND the workers
+
+  - name: "Create {{ a_a_db }} db"
+      postgresql_db:
+        name: "{{ a_a_db }}"
+
+  - name: "Add {{ a_a_user }} to postgres"
+    postgresql_user:
+      name: "{{ a_a_user }}"
+      password: "{{ a_a_password }}"
+      role_attr_flags: CREATEDB
+      db: "{{ a_a_db }}"
+      priv: ALL
