@@ -38,10 +38,17 @@
     become_user: "{{ postgres_user }}"
     when: postgresDB_exist.stat.exists == False
 
-  - name:
+  - name: Copy postgres config
     copy:
       src: files/web_server_postgresql.conf
       dest: "{{  postgres_db_path }}/postgresql.conf"
+      owner: "{{ postgres_user }}"
+    when: postgresDB_exist.stat.exists == False
+
+  - name: Copy hba config
+    copy:
+      src: files/web_server_pg_hba.conf
+      dest: "{{  postgres_db_path }}/pg_hba.conf"
       owner: "{{ postgres_user }}"
     when: postgresDB_exist.stat.exists == False
 
