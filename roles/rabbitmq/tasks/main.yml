@@ -13,6 +13,7 @@
   - name: Download rabbitMQ tarball
     get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
     become_user: "{{ rabbit_user }}"
+    timeout: 120
     register: get_url_result
 
   - name: untar the tarball
