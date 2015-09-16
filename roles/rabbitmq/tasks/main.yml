@@ -14,5 +14,6 @@
     shell: tar -zxvf /home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
     when: get_url_result.changed
 
-  - name: "add {{ rabbit_ user }}"
-    user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
+  - name: "add {{ rabbit_user }}"
+    user: name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
+    sudo: yes
