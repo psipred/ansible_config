@@ -18,6 +18,10 @@
     sudo: yes
     when: firewalldrules.stdout.find("5432/tcp") == -1
 
+  - name: Reload firewalld
+    command: firewall-cmd --reload
+    sudo: true
+
   - name: Check if postgresDB location exists
     stat: "path={{ postgres_db_path }}"
     register: postgresDB_exist

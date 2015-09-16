@@ -48,9 +48,9 @@
     when: firewalldrules.stdout.find("25672/tcp") == -1
 
   - name: Add AMQP firewalld rules
-    command: firewall-cmd --zone=public --add-port=567-5672/tcp --permanent
+    command: firewall-cmd --zone=public --add-port=5671-5672/tcp --permanent
     sudo: yes
-    when: firewalldrules.stdout.find("25672/tcp") == -1
+    when: firewalldrules.stdout.find("5671-5672/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
