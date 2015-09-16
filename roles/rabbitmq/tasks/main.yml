@@ -6,7 +6,7 @@
       state: latest
     sudo: yes
 
-  - name: download rabbitMQ tarball
+  - name: Download rabbitMQ tarball
     get_url: url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
     register: get_url_result
 
@@ -14,6 +14,25 @@
     shell: tar -zxvf /home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
     when: get_url_result.changed
 
-  - name: "add {{ rabbit_user }}"
+  - name: "Add {{ rabbit_user }}"
     user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
     sudo: yes
+
+  - name: Get the current iptables rules
+    shell: iptables -L
+    register: iptablesrules
+    always_run: yes
+    sudo: yes
+
+  - name: Add Rabbit rules
+    command: /sbin/iptables -I INPUT 1 -p tcp --dport 4369 -j ACCEPT -m comment --comment "RabbitMQ"
+    sudo: yes
+    when: iptablesrules.stdout.find("RabbitMQ") == -1
+
+  # - name: Save iptables
+  #   command: iptables-save
+  #   sudo: true
+
+  - name: Restart iptables
+    service: name=iptables state=restarted
+    sudo: true
