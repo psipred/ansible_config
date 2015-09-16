@@ -6,17 +6,19 @@
       state: latest
     sudo: yes
 
-  - name: Download rabbitMQ tarball
-    get_url: url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
-    register: get_url_result
-
-  - name: untar the tarball
-    shell: tar -zxvf /home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
-    when: get_url_result.changed
-
   - name: "Add {{ rabbit_user }}"
     user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
     sudo: yes
+
+  - name: Download rabbitMQ tarball
+    get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    become_user: {{ rabbit_user }}
+    register: get_url_result
+
+  - name: untar the tarball
+    shell: "cd /home/{{ rabbit_user }}; tar -zxvf /home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+    become_user: {{ rabbit_user }}
+    when: get_url_result.changed
 
   - name: Get the current firewalld rules
     shell: firewall-cmd --list-all
@@ -42,3 +44,7 @@
   - name: Reload firewalld
     command: firewall-cmd --reload
     sudo: true
+
+  - name: Start rabbitMQ
+    command: "/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4/sbin/rabbitmq-server --detached"
+    become_user: {{ rabbit_user }}
