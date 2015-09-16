@@ -15,5 +15,5 @@
     when: get_url_result.changed
 
   - name: "add {{ rabbit_user }}"
-    user: name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
+    user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
     sudo: yes
