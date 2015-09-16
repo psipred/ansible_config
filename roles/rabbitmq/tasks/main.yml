@@ -18,21 +18,27 @@
     user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
     sudo: yes
 
-  - name: Get the current iptables rules
-    shell: iptables -L
-    register: iptablesrules
+  - name: Get the current firewalld rules
+    shell: firewall-cmd --list-all
+    register: firewalldrules
     always_run: yes
     sudo: yes
 
-  - name: Add Rabbit rules
-    command: /sbin/iptables -I INPUT 1 -p tcp --dport 4369 -j ACCEPT -m comment --comment "RabbitMQ"
+  - name: Add Rabbit firewalld rules
+    command: firewall-cmd --zone=public --add-port=4369/tcp --permanent
     sudo: yes
-    when: iptablesrules.stdout.find("RabbitMQ") == -1
+    when: firewalldrules.stdout.find("4369/tcp") == -1
 
-  # - name: Save iptables
-  #   command: iptables-save
-  #   sudo: true
+  - name: Add Erlang firewalld rules
+    command: firewall-cmd --zone=public --add-port=25672/tcp --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("25672/tcp") == -1
 
-  - name: Restart iptables
-    service: name=iptables state=restarted
+  - name: Add AMQP firewalld rules
+    command: firewall-cmd --zone=public --add-port=567-5672/tcp --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("25672/tcp") == -1
+
+  - name: Reload firewalld
+    command: firewall-cmd --reload
     sudo: true
