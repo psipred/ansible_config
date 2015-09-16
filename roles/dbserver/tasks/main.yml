@@ -15,6 +15,7 @@
       path: /var/postgres/
       state: directory
       owner: "{{ postgres_user }}"
+    when: postgresDB_exist.stat.exists == False
 
   - name: Initialise postgresDB
     shell: "/bin/initdb -D {{ postgres_db_path }}"
