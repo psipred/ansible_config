@@ -1,15 +1,20 @@
 ---
 
-  - name: "install erlang {{ rabbit_user }}"
+  - name: "install erlang"
     yum:
       pkg: erlang
       state: latest
     sudo: yes
 
   - name: download rabbitMQ tarball
-    get_url: url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-3.5.4.tar.gz dest=/home/dbuchan/rabbitmq-server-3.5.4.tar.gz
+    get_url: url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
     register: get_url_result
 
   - name: untar the tarball
     shell: tar -zxvf /home/dbuchan/rabbitmq-server-3.5.4.tar.gz
     when: get_url_result.changed
+
+  - name: "add {{ rabbit_ user }}"
+    user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
+
+  
