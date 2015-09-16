@@ -8,3 +8,12 @@
     - rabbitmq
   vars_files:
     - /cs/research/bioinf/home1/green/dbuchan/ansible_config/staging_secrets.yaml
+
+- name: Apply the postgres configuration
+  hosts: dbserver
+  user: dbuchan
+  sudo: yes
+  roles:
+    - dbserver
+  vars_files:
+    - /cs/research/bioinf/home1/green/dbuchan/ansible_config/staging_secrets.yaml

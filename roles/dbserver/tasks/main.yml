@@ -1,0 +1,7 @@
+---
+
+  - name: Instal postgreSQL
+    yum:
+      pkg: postgre
+      state: latest
+    sudo: yes
