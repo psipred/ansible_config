@@ -57,5 +57,5 @@
     sudo: true
 
   - name: Start rabbitMQ
-    command: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmq-server --detached"
+    command: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmq-server -detached"
     become_user: "{{ rabbit_user }}"
