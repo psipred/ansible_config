@@ -11,10 +11,8 @@
     register: get_url_result
 
   - name: untar the tarball
-    shell: tar -zxvf /home/dbuchan/rabbitmq-server-3.5.4.tar.gz
+    shell: tar -zxvf /home/dbuchan/rabbitmq-server-generic-unix-3.5.4.tar.gz
     when: get_url_result.changed
 
   - name: "add {{ rabbit_ user }}"
     user: "name={{ rabbit_user }} password={{ rabbit_hashed_password }}"
-
-  
