@@ -19,7 +19,7 @@
   - name: Download rabbitMQ tarball
     # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
     shell: "chdir=/home/{{ rabbit_user }} wget https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    when: rabbit_tarball_exists.stat.exists == False
+    when: rabbit_tarball_exist.stat.exists == False
     become_user: "{{ rabbit_user }}"
     register: get_url_result
     until: get_url_result
