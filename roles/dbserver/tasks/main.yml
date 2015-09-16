@@ -10,13 +10,13 @@
     stat: "path={{ postgres_db_path }}"
     register: postgresDB_exist
 
+  - name: Make postgres db directory
+    file:
+      path: /var/postgres/
+      state: directory
+      owner: "{{ postgres_user }}"
+
   - name: Initialise postgresDB
     shell: "/bin/initdb -D {{ postgres_db_path }}"
+    become_user: "{{ postgres_user }}"
     when: postgresDB_exist.stat.exists == False
-
-  - name: Give postgres ownership of db
-    file:
-      path: "{{ postgres_db_path }}"
-      state: directory
-      recurse: yes
-      owner: "{{ postgres_user }}"
