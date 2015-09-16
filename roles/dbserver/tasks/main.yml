@@ -38,6 +38,8 @@
     become_user: "{{ postgres_user }}"
     when: postgresDB_exist.stat.exists == False
 
+  # Instead of only doing this once set up we could copy the files whenever
+  # theu change and then restart postgres
   - name: Copy postgres config
     copy:
       src: files/web_server_postgresql.conf
