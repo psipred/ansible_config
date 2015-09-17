@@ -1,19 +1,29 @@
 ---
 # ansible-playbook -i staging site.yml -f 10
-- name: Apply the rabbit_mq configuration
-  hosts: rabbit_mq
-  user: dbuchan
-  sudo: yes
-  roles:
-    - rabbitmq
-  vars_files:
-    - staging_secrets.yaml
+# - name: Apply the rabbit_mq configuration
+#   hosts: rabbit_mq
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - rabbitmq
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+#
+# - name: Apply the postgres configuration
+#   hosts: dbserver
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - dbserver
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
-- name: Apply the postgres configuration
-  hosts: dbserver
+
+- name: Apply Analytics Automated configuration
+  hosts: aa_head
   user: dbuchan
   sudo: yes
   roles:
-    - dbserver
+    - aahead
   vars_files:
-    - staging_secrets.yaml
+    - secrets/staging_secrets.yaml

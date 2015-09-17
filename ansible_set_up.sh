@@ -1,6 +1,3 @@
-# switch to the relevant virtualenv
-# source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate.csh
-
 sudo easy_install pip
 sudo pip install paramiko PyYAML Jinja2 httplib2 six
 git clone git://github.com/ansible/ansible.git --recursive
@@ -17,4 +14,5 @@ export ANSIBLE_INVENTORY=~/ansible_hosts
 
 # ssh-agent bash
 # ssh-add ~/.ssh/id_rsa
-thisisit
+# switch to the relevant virtualenv
+# source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate

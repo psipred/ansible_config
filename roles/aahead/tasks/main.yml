@@ -1,0 +1,88 @@
+---
+
+  - name: Get the current firewalld rules
+    shell: firewall-cmd --list-all
+    register: firewalldrules
+    always_run: yes
+    sudo: yes
+
+  - name: Add Rabbit firewalld rules
+    command: firewall-cmd --zone=public --add-service=http --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("http") == -1
+
+  - name: Reload firewalld
+    command: firewall-cmd --reload
+    sudo: true
+
+  - name: "Add {{ django_aa_user }}"
+    user: "name={{ django_aa_user }} password={{ django_aa_hashed_password }}"
+    sudo: yes
+
+  - name: Install Python 3
+    yum:
+      pkg: python34
+      state: latest
+    sudo: yes
+
+  - name: Install Python-devel
+    yum:
+      pkg: python-devel
+      state: latest
+    sudo: yes
+
+  - name: Install Python34-devel
+    yum:
+      pkg: python34-devel
+      state: latest
+    sudo: yes
+
+  - name: Install VirtualEnv
+    yum:
+      pkg: python-virtualenv
+      state: latest
+    sudo: yes
+
+  - name: Install virtualenvwrapper
+    yum:
+      pkg: python-virtualenvwrapper
+      state: latest
+    sudo: yes
+
+  - name: Download get-pip.py
+    shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+    become_user: "{{ django_aa_user }}"
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 2
+    delay: 10
+
+  - name: Install pip
+    shell: "chdir={{ django_aa_home }} /bin/python3.4 get-pip.py"
+
+  # The virtualenv installed above is broken so we update it here
+  - name: Upgrade virtualenv
+    shell: pip install --upgrade virtualenv
+
+  - name: Create the initial virtualenv
+    become_user: "{{ django_aa_user }}"
+    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_aa_home }}aa_env"
+
+  - name : Check Out AA from git
+    become_user: "{{ django_aa_user }}"
+    git:
+      repo: https://github.com/AnalyticsAutomated/analytics_automated.git
+      dest: "{{ django_aa_home }}analytics_automated"
+      clone: yes
+
+  - name: Install requirements
+    pip:
+      chdir: "{{ django_aa_home }}"
+      virtualenv: "{{ django_aa_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{  django_aa_home }}aa_env/bin/python"
+      requirements: "{{ django_aa_home }}analytics_automated/requirements/staging.txt"
+
+  # - name : Copy Staging config
+  #
+  # - name : Start server
