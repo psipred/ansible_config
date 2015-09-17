@@ -15,7 +15,7 @@
     command: firewall-cmd --reload
     sudo: true
 
-  - name: "Add {{ django_aa_user }}"
+  - name: "Add {{ django_aa_user }} user"
     user: "name={{ django_aa_user }} password={{ django_aa_hashed_password }}"
     sudo: yes
 
@@ -74,15 +74,46 @@
       repo: https://github.com/AnalyticsAutomated/analytics_automated.git
       dest: "{{ django_aa_home }}analytics_automated"
       clone: yes
+      force: yes
 
   - name: Install requirements
     pip:
       chdir: "{{ django_aa_home }}"
       virtualenv: "{{ django_aa_home }}aa_env"
       virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{  django_aa_home }}aa_env/bin/python"
+      virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
       requirements: "{{ django_aa_home }}analytics_automated/requirements/staging.txt"
 
-  # - name : Copy Staging config
-  #
+  - name: Copy aa staging_conf
+    copy:
+      src: secrets/staging.py
+      dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
+      owner: "{{ django_aa_user }}"
+
+  - name: Copy aa staging secrets
+    copy:
+      src: secrets/staging_secrets.json
+      dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
+      owner: "{{ django_aa_user }}"
+
+  - name: Copy aa base secrets
+    copy:
+      src: secrets/base_secrets.json
+      dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
+      owner: "{{ django_aa_user }}"
+
+  - name: Make aa logging dir
+    file:
+      path: "{{ django_aa_home }}/analytics_automated/logs"
+      state: directory
+      owner: "{{ django_aa_user }}"
+
+  - name: Run Django migrations
+    become_user: "{{ django_aa_user }}"
+    django_manage:
+      command: migrate
+      virtualenv: "{{ django_aa_home }}aa_env/"
+      settings: analytics_automated_project.settings.staging
+      app_path: "{{ django_aa_home }}/analytics_automated/"
+
   # - name : Start server
