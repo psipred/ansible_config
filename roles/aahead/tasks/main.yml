@@ -131,11 +131,11 @@
       name: mod_wsgi
       version: 4.4.13
 
-  - name: Copy aa base secrets
+  - name: Copy Apache mpm event conf
     copy:
       src: files/00-mpm.conf
       dest: "/etc/httpd/conf.modules.d"
-      sudo: yes
+    sudo: yes
 
 
   # - name: Write Apache config
