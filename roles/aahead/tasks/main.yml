@@ -228,6 +228,13 @@
       group: apache
       mode: "g+rw"
 
+  - name: Let {{ django_aa_user }} rwx /run/httpd
+    sudo: yes
+    file:
+      path: /run/httpd
+      group: apache
+      state: directory
+      mode: "g+rwx"
 
   # - name : Start AA/Apache
       # mod_wsgi-express start-server
