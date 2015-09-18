@@ -179,16 +179,41 @@
       state: directory
       mode: "g+rwx"
 
-  - name: Let {{ django_aa_user }} rw httpd logs
+  - name: Let {{ django_aa_user }} rw httpd access_log
     sudo: yes
     file:
-      path: /var/log/httpd/*
+      path: /var/log/httpd/access_log
       group: apache
       mode: "g+rw"
 
+  - name: Let {{ django_aa_user }} rw httpd error_log
+    sudo: yes
+    file:
+      path: /var/log/httpd/error_log
+      group: apache
+      mode: "g+rw"
 
-  # - name: Write Apache config
-  #
+  - name: Let {{ django_aa_user }} rw httpd ssl_access_log
+    sudo: yes
+    file:
+      path: /var/log/httpd/ssl_access_log
+      group: apache
+      mode: "g+rw"
+
+  - name: Let {{ django_aa_user }} rw httpd ssl_error_log
+    sudo: yes
+    file:
+      path: /var/log/httpd/ssl_error_log
+      group: apache
+      mode: "g+rw"
+
+  - name: Let {{ django_aa_user }} rw httpd ssl_request_log
+    sudo: yes
+    file:
+      path: /var/log/httpd/ssl_request_log
+      group: apache
+      mode: "g+rw"
+
   # - name : Start AA/Apache
       # mod_wsgi-express start-server
       # become_user: {{ django_aa_user }}
