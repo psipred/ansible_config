@@ -28,6 +28,7 @@
   - name: "Add {{ django_aa_user }} user"
     user: "name={{ django_aa_user }} password={{ django_aa_hashed_password }}"
     sudo: yes
+    group: apache
 
   - name: Install Python 3
     yum:
