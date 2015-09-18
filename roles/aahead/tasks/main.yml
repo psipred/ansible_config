@@ -152,24 +152,7 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
       name: mod_wsgi-httpd
-
-  - name: Copy Apache mpm event conf
-    copy:
-      src: files/00-mpm.conf
-      dest: "/etc/httpd/conf.modules.d"
-    sudo: yes
-
-  - name: Copy Apache conf
-    copy:
-      src: files/httpd.conf
-      dest: "/etc/httpd/conf"
-    sudo: yes
-
-  - name: Copy Apache ssl.conf
-    copy:
-      src: files/ssl.conf
-      dest: "/etc/httpd/conf.d"
-    sudo: yes
+      version: 2.4.12.6
 
   - name: stat php.conf
     stat: path=/etc/httpd/conf.d/php.conf
