@@ -171,13 +171,22 @@
     command: mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf~
     when: php_stat.stat.exists
 
-  - name: Let {{ django_aa_user }} rw /var/log/httpd
+  - name: Let {{ django_aa_user }} rwx /var/log/httpd
     sudo: yes
     file:
       path: /var/log/httpd
       group: apache
       state: directory
       mode: "g+rwx"
+
+  - name: Let {{ django_aa_user }} rw httpd logs
+    sudo: yes
+    file:
+      path: /var/log/httpd/*
+      group: apache
+      mode: "g+rw"
+
+
   # - name: Write Apache config
   #
   # - name : Start AA/Apache
