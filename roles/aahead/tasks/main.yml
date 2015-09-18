@@ -144,8 +144,8 @@
   #   become_user: "{{ django_aa_user }}"
   #   when: mod_wsgi_exist.stat.exists == False
 
-  - name: Compile mod_wsgi
-    when: mod_wsgi_exist.stat.exists == False
+  # - name: Compile mod_wsgi
+  #   when: mod_wsgi_exist.stat.exists == False
 
   # - name: Write Apache config
   #
