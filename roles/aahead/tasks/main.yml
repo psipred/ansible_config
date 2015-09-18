@@ -221,6 +221,14 @@
       group: apache
       mode: "g+rw"
 
+  - name: Give django_aa private_key access
+    sudo: yes
+    file:
+      path: /etc/pki/tls/private/localhost.key
+      group: apache
+      mode: "g+rw"
+
+
   # - name : Start AA/Apache
       # mod_wsgi-express start-server
       # become_user: {{ django_aa_user }}
