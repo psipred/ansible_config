@@ -102,6 +102,8 @@
       dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
       owner: "{{ django_aa_user }}"
 
+  # - name: Copy aa wsgi.py
+
   - name: Make aa logging dir
     file:
       path: "{{ django_aa_home }}/analytics_automated/logs"
@@ -116,4 +118,35 @@
       settings: analytics_automated_project.settings.staging
       app_path: "{{ django_aa_home }}/analytics_automated/"
 
-  # - name : Start server
+  - name: Install mod_wsgi
+    pip:
+      chdir: "{{ django_aa_home }}"
+      virtualenv: "{{ django_aa_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
+      name: mod_wsgi
+
+  # - name: Test existence of mod_wsgi tarball
+  #   stat: "path=/home/{{ django_aa_user }}/{{ mod_wsgi_version }.tar.gz"
+  #   register: mod_wsgi_exist
+  #
+  # - name: Get mod_wsgi
+  #   shell: "chdir=/home/{{ django_aa_user }} wget --timeout 120 https://github.com/GrahamDumpleton/mod_wsgi/archive/{{ mod_wsgi_version }.tar.gz -O {{ mod_wsgi_version }.tar.gz"
+  #   when: mod_wsgi_exist.stat.exists == False
+  #   become_user: "{{ django_aa_user }}"
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 2
+  #   delay: 10
+  #
+  # - name : Untar mod_wsgi
+  #   shell: "cd /home/{{ django_aa_user }}; tar -zxvf {{ mod_wsgi_version }.tar.gz"
+  #   become_user: "{{ django_aa_user }}"
+  #   when: mod_wsgi_exist.stat.exists == False
+
+  - name: Compile mod_wsgi
+    when: mod_wsgi_exist.stat.exists == False
+
+  # - name: Write Apache config
+  #
+  # - name : Start AA/Apache
