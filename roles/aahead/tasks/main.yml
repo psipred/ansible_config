@@ -21,6 +21,11 @@
     sudo: yes
     when: firewalldrules.stdout.find("http") == -1
 
+  - name: Portforward 443 to 4433
+    command: firewall-cmd --zone=public --add-forward-port=port=443:proto=tcp:toport=4433 --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("http") == -1
+
   - name: Reload firewalld
     command: firewall-cmd --reload
     sudo: true
@@ -150,6 +155,12 @@
     copy:
       src: files/httpd.conf
       dest: "/etc/httpd/conf"
+    sudo: yes
+
+  - name: Copy Apache ssl.conf
+    copy:
+      src: files/ssl.conf
+      dest: "/etc/httpd/conf.d"
     sudo: yes
 
   - name: stat php.conf
