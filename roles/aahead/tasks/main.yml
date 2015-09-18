@@ -11,9 +11,15 @@
     sudo: yes
     when: firewalldrules.stdout.find("http") == -1
 
-# add 80 to 8000 portforward rule
-# firewall-cmd --zone=public --add-masquerade --permanent
-# firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8000 --permanent
+  - name: Enable firewalld port forwarding
+    command: firewall-cmd --zone=public --add-masquerade --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("http") == -1
+
+  - name: Portforward 80 to 8000
+    command: firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8000 --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("http") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
