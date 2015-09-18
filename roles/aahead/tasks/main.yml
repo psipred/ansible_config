@@ -162,7 +162,7 @@
     command: mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf~
     when: php_stat.stat.exists
 
-  - name: Get the current firewalld rules
+  - name: Get the current list of processes
     shell: ps aux | grep httpd
     register: aa_running
     always_run: yes
@@ -172,4 +172,4 @@
     shell: "chdir={{ django_aa_home }}analytics_automated source {{ django_aa_home}}aa_env/bin/activate; python manage.py runmodwsgi --threads=10 --processes=4 --settings=analytics_automated_project.settings.staging &"
     become_user: "{{ django_aa_user }}"
     register: aa_started
-    when: firewalldrules.stdout.find("httpd (mod_wsgi-express)") == -1
+    when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
