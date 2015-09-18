@@ -145,6 +145,14 @@
       name: mod_wsgi
       version: 4.4.13
 
+  - name: Install mod_wsgi-httpd
+    pip:
+      chdir: "{{ django_aa_home }}"
+      virtualenv: "{{ django_aa_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
+      name: mod_wsgi-httpd
+
   - name: Copy Apache mpm event conf
     copy:
       src: files/00-mpm.conf
@@ -170,71 +178,6 @@
   - name: Move php.conf
     command: mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf~
     when: php_stat.stat.exists
-
-  - name: Let {{ django_aa_user }} rwx /var/log/httpd
-    sudo: yes
-    file:
-      path: /var/log/httpd
-      group: apache
-      state: directory
-      mode: "g-rwx"
-
-  - name: Let {{ django_aa_user }} rw httpd access_log
-    sudo: yes
-    file:
-      path: /var/log/httpd/access_log
-      group: apache
-      mode: "g-w"
-
-  - name: Let {{ django_aa_user }} rw httpd error_log
-    sudo: yes
-    file:
-      path: /var/log/httpd/error_log
-      group: apache
-      mode: "g-w"
-
-  - name: Let {{ django_aa_user }} rw httpd ssl_access_log
-    sudo: yes
-    file:
-      path: /var/log/httpd/ssl_access_log
-      group: apache
-      mode: "g-w"
-
-  - name: Let {{ django_aa_user }} rw httpd ssl_error_log
-    sudo: yes
-    file:
-      path: /var/log/httpd/ssl_error_log
-      group: apache
-      mode: "g-w"
-
-  - name: Let {{ django_aa_user }} rw httpd ssl_request_log
-    sudo: yes
-    file:
-      path: /var/log/httpd/ssl_request_log
-      group: apache
-      mode: "g-w"
-
-  - name: Give django_aa localhost.crt access
-    sudo: yes
-    file:
-      path: /etc/pki/tls/certs/localhost.crt
-      group: apache
-      mode: "g-rw"
-
-  - name: Give django_aa private_key access
-    sudo: yes
-    file:
-      path: /etc/pki/tls/private/localhost.key
-      group: apache
-      mode: "g-rw"
-
-  - name: Let {{ django_aa_user }} rwx /run/httpd
-    sudo: yes
-    file:
-      path: /run/httpd
-      group: apache
-      state: directory
-      mode: "g-rw"
 
   # - name : Start AA/Apache
       # mod_wsgi-express start-server
