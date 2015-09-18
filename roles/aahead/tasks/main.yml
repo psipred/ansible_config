@@ -6,10 +6,14 @@
     always_run: yes
     sudo: yes
 
-  - name: Add Rabbit firewalld rules
+  - name: Add http firewalld rules
     command: firewall-cmd --zone=public --add-service=http --permanent
     sudo: yes
     when: firewalldrules.stdout.find("http") == -1
+
+# add 80 to 8000 portforward rule
+# firewall-cmd --zone=public --add-masquerade --permanent
+# firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8000 --permanent
 
   - name: Reload firewalld
     command: firewall-cmd --reload
@@ -125,28 +129,17 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
       name: mod_wsgi
+      version: 4.4.13
 
-  # - name: Test existence of mod_wsgi tarball
-  #   stat: "path=/home/{{ django_aa_user }}/{{ mod_wsgi_version }.tar.gz"
-  #   register: mod_wsgi_exist
-  #
-  # - name: Get mod_wsgi
-  #   shell: "chdir=/home/{{ django_aa_user }} wget --timeout 120 https://github.com/GrahamDumpleton/mod_wsgi/archive/{{ mod_wsgi_version }.tar.gz -O {{ mod_wsgi_version }.tar.gz"
-  #   when: mod_wsgi_exist.stat.exists == False
-  #   become_user: "{{ django_aa_user }}"
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 2
-  #   delay: 10
-  #
-  # - name : Untar mod_wsgi
-  #   shell: "cd /home/{{ django_aa_user }}; tar -zxvf {{ mod_wsgi_version }.tar.gz"
-  #   become_user: "{{ django_aa_user }}"
-  #   when: mod_wsgi_exist.stat.exists == False
+  - name: Copy aa base secrets
+    copy:
+      src: files/00-mpm.conf
+      dest: "/etc/httpd/conf.modules.d"
+      sudo: yes
 
-  # - name: Compile mod_wsgi
-  #   when: mod_wsgi_exist.stat.exists == False
 
   # - name: Write Apache config
   #
   # - name : Start AA/Apache
+      # mod_wsgi-express start-server
+      # become_user: {{ django_aa_user }}
