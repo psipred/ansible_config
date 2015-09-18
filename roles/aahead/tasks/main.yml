@@ -214,6 +214,13 @@
       group: apache
       mode: "g+rw"
 
+  - name: Give django_aa localhost.crt access
+    sudo: yes
+    file:
+      path: /etc/pki/tls/certs/localhost.crt
+      group: apache
+      mode: "g+rw"
+
   # - name : Start AA/Apache
       # mod_wsgi-express start-server
       # become_user: {{ django_aa_user }}
