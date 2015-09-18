@@ -177,56 +177,56 @@
       path: /var/log/httpd
       group: apache
       state: directory
-      mode: "g+rwx"
+      mode: "g-rwx"
 
   - name: Let {{ django_aa_user }} rw httpd access_log
     sudo: yes
     file:
       path: /var/log/httpd/access_log
       group: apache
-      mode: "g+rw"
+      mode: "g-w"
 
   - name: Let {{ django_aa_user }} rw httpd error_log
     sudo: yes
     file:
       path: /var/log/httpd/error_log
       group: apache
-      mode: "g+rw"
+      mode: "g-w"
 
   - name: Let {{ django_aa_user }} rw httpd ssl_access_log
     sudo: yes
     file:
       path: /var/log/httpd/ssl_access_log
       group: apache
-      mode: "g+rw"
+      mode: "g-w"
 
   - name: Let {{ django_aa_user }} rw httpd ssl_error_log
     sudo: yes
     file:
       path: /var/log/httpd/ssl_error_log
       group: apache
-      mode: "g+rw"
+      mode: "g-w"
 
   - name: Let {{ django_aa_user }} rw httpd ssl_request_log
     sudo: yes
     file:
       path: /var/log/httpd/ssl_request_log
       group: apache
-      mode: "g+rw"
+      mode: "g-w"
 
   - name: Give django_aa localhost.crt access
     sudo: yes
     file:
       path: /etc/pki/tls/certs/localhost.crt
       group: apache
-      mode: "g+rw"
+      mode: "g-rw"
 
   - name: Give django_aa private_key access
     sudo: yes
     file:
       path: /etc/pki/tls/private/localhost.key
       group: apache
-      mode: "g+rw"
+      mode: "g-rw"
 
   - name: Let {{ django_aa_user }} rwx /run/httpd
     sudo: yes
@@ -234,7 +234,7 @@
       path: /run/httpd
       group: apache
       state: directory
-      mode: "g+rwx"
+      mode: "g-rw"
 
   # - name : Start AA/Apache
       # mod_wsgi-express start-server
