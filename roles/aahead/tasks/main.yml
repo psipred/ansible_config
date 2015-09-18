@@ -137,7 +137,13 @@
       dest: "/etc/httpd/conf.modules.d"
     sudo: yes
 
+  - name: stat php.conf
+    stat: path=/etc/httpd/conf.d/php.conf
+    register: php_stat
 
+  - name: Move php.conf
+    command: mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf~
+    when: php_stat.stat.exists
   # - name: Write Apache config
   #
   # - name : Start AA/Apache
