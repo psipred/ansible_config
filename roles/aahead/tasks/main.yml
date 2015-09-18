@@ -146,6 +146,12 @@
       dest: "/etc/httpd/conf.modules.d"
     sudo: yes
 
+  - name: Copy Apache conf
+    copy:
+      src: files/httpd.conf
+      dest: "/etc/httpd/conf"
+    sudo: yes
+
   - name: stat php.conf
     stat: path=/etc/httpd/conf.d/php.conf
     register: php_stat
