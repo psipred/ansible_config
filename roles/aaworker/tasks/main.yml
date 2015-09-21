@@ -51,27 +51,33 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
       requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
-  #
-  # - name: Copy aa staging_conf
-  #   copy:
-  #     src: secrets/staging.py
-  #     dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
-  #     owner: "{{ django_aa_user }}"
-  #
-  # - name: Copy aa staging secrets
-  #   copy:
-  #     src: secrets/staging_secrets.json
-  #     dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
-  #     owner: "{{ django_aa_user }}"
-  #
-  # - name: Copy aa base secrets
-  #   copy:
-  #     src: secrets/base_secrets.json
-  #     dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
-  #     owner: "{{ django_aa_user }}"
-  #
-  # - name: Make aa logging dir
-  #   file:
-  #     path: "{{ django_aa_home }}/analytics_automated/logs"
-  #     state: directory
-  #     owner: "{{ django_aa_user }}"
+
+  - name: Copy aa staging_conf
+    copy:
+      src: secrets/staging.py
+      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
+      owner: "{{ django_worker_user }}"
+
+  - name: Copy aa staging secrets
+    copy:
+      src: secrets/staging_worker_secrets.json
+      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
+      owner: "{{ django_worker_user }}"
+
+  - name: Copy aa base secrets
+    copy:
+      src: secrets/base_secrets.json
+      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
+      owner: "{{ django_worker_user }}"
+
+  - name: Make aa logging dir
+    file:
+      path: "{{ django_worker_home }}/analytics_automated/logs"
+      state: directory
+      owner: "{{ django_worker_user }}"
+
+# Here we skip running the django migrations as they are only run by aahead
+# AND this role MUST come after aahead installation runs
+
+# start celery pointing at the rabbitMQ on stage1
+#celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery

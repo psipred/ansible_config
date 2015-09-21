@@ -31,6 +31,16 @@
     become_user: "{{ rabbit_user }}"
     when: get_url_result.changed
 
+  - name: add external rabbit user
+    shell: /home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl add_user {{ external_rabbit_user }} {{ external_rabbit_password }}
+    become_user: "{{ rabbit_user }}"
+#    when: get_url_result.changed
+
+  - name: set external rabbit user details
+    shell: /home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl  set_permissions -p / {{ external_rabbit_user }} ".*" ".*" ".*"
+    become_user: "{{ rabbit_user }}"
+  #  when: get_url_result.changed
+
   - name: Get the current firewalld rules
     shell: firewall-cmd --list-all
     register: firewalldrules
