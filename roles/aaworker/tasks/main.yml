@@ -1,11 +1,11 @@
 ---
 
-    - name: "Add {{ django_worker_user }} user"
-      user:
-        name: "{{ django_worker_user }}"
-        password: "{{ django_worker_hashed_password }}"
-        group: apache
-      sudo: yes
+  - name: "Add {{ django_worker_user }} user"
+    user:
+      name: "{{ django_worker_user }}"
+      password: "{{ django_worker_hashed_password }}"
+      group: apache
+    sudo: yes
 
   - name: Create worker virtualenv
     become_user: "{{ django_aa_user }}"
