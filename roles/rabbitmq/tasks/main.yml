@@ -37,20 +37,20 @@
     always_run: yes
     sudo: yes
 
-  - name: Add Rabbit firewalld rules
+  - name: Add Erlang
     command: firewall-cmd --zone=public --add-port=4369/tcp --permanent
     sudo: yes
     when: firewalldrules.stdout.find("4369/tcp") == -1
 
-  - name: Add Erlang firewalld rules
+  - name: Add Rabbit firewalld rules
     command: firewall-cmd --zone=public --add-port=25672/tcp --permanent
     sudo: yes
     when: firewalldrules.stdout.find("25672/tcp") == -1
 
   - name: Add AMQP firewalld rules
-    command: firewall-cmd --zone=public --add-port=15671-15672/tcp --permanent
+    command: firewall-cmd --zone=public --add-port=25671-25672/tcp --permanent
     sudo: yes
-    when: firewalldrules.stdout.find("15671-15672/tcp") == -1
+    when: firewalldrules.stdout.find("25671-25672/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
