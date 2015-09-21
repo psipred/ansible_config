@@ -18,8 +18,15 @@
     retries: 2
     delay: 10
 
+  - name: Check pip install
+    shell: pip --version
+    register: pip_install
+    always_run: yes
+    sudo: yes
+
   - name: Install pip
     shell: "chdir={{ django_aa_home }} /bin/python3.4 get-pip.py"
+    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") = -1
 
   # The virtualenv installed above is broken so we update it here
   - name: Upgrade virtualenv
