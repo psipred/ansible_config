@@ -54,8 +54,8 @@
 
   - name: Copy aa staging_conf
     copy:
-      src: secrets/staging.py
-      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
+      src: secrets/staging_worker.py
+      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/staging.py"
       owner: "{{ django_worker_user }}"
 
   - name: Copy aa staging secrets
@@ -70,6 +70,12 @@
       dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
       owner: "{{ django_worker_user }}"
 
+  - name: Copy celery conf
+    copy:
+      src: files/celery_staging.py
+      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/celery.py"
+      owner: "{{ django_worker_user }}"
+
   - name: Make aa logging dir
     file:
       path: "{{ django_worker_home }}/analytics_automated/logs"
@@ -79,5 +85,7 @@
 # Here we skip running the django migrations as they are only run by aahead
 # AND this role MUST come after aahead installation runs
 
-# start celery pointing at the rabbitMQ on stage1
+  - name: Start the aa_workers
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery"
+    become_user: "{{ django_worker_user }}"
 #celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
