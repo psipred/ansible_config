@@ -32,6 +32,10 @@
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
 
+  - name: Create the aa head virtualenv
+    become_user: "{{ django_worker_user }}"
+    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_worker_home }}aa_env"
+
   - name : Check Out AA from git
     become_user: "{{ django_worker_user }}"
     git:
@@ -47,3 +51,27 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
       requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
+  #
+  # - name: Copy aa staging_conf
+  #   copy:
+  #     src: secrets/staging.py
+  #     dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
+  #     owner: "{{ django_aa_user }}"
+  #
+  # - name: Copy aa staging secrets
+  #   copy:
+  #     src: secrets/staging_secrets.json
+  #     dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
+  #     owner: "{{ django_aa_user }}"
+  #
+  # - name: Copy aa base secrets
+  #   copy:
+  #     src: secrets/base_secrets.json
+  #     dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
+  #     owner: "{{ django_aa_user }}"
+  #
+  # - name: Make aa logging dir
+  #   file:
+  #     path: "{{ django_aa_home }}/analytics_automated/logs"
+  #     state: directory
+  #     owner: "{{ django_aa_user }}"

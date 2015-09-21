@@ -6,10 +6,6 @@
       group: apache
     sudo: yes
 
-  - name: Create the aa head virtualenv
-    become_user: "{{ django_aa_user }}"
-    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_aa_home }}aa_env"
-
   - name: Download get-pip.py
     shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
     become_user: "{{ django_aa_user }}"
@@ -31,6 +27,10 @@
   # The virtualenv installed above is broken so we update it here
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
+
+  - name: Create the aa head virtualenv
+    become_user: "{{ django_aa_user }}"
+    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_aa_home }}aa_env"
 
   - name : Check Out AA from git
     become_user: "{{ django_aa_user }}"
