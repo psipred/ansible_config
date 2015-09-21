@@ -6,7 +6,7 @@
       group: apache
     sudo: yes
 
-  - name: Create the initial virtualenv
+  - name: Create the aa head virtualenv
     become_user: "{{ django_aa_user }}"
     command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_aa_home }}aa_env"
 

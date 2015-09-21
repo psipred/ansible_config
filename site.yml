@@ -18,13 +18,22 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-
-- name: Apply Analytics Automated configuration
+- name: Apply Analytics Automated head node configuration
   hosts: aa_head
   user: dbuchan
   sudo: yes
   roles:
     - djangomachine
     - aahead
+  vars_files:
+    - secrets/staging_secrets.yaml
+
+- name: Apply Analytics Automated worker node configuration
+  hosts: aa_workers
+  user: dbuchan
+  sudo: yes
+  roles:
+    - djangomachine
+    - aaworker
   vars_files:
     - secrets/staging_secrets.yaml

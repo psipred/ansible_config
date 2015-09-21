@@ -1,0 +1,27 @@
+---
+
+    - name: "Add {{ django_worker_user }} user"
+      user:
+        name: "{{ django_worker_user }}"
+        password: "{{ django_worker_hashed_password }}"
+        group: apache
+      sudo: yes
+
+  - name: Create worker virtualenv
+    become_user: "{{ django_aa_user }}"
+    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_worker_home }}aa_env"
+
+ name: Download get-pip.py
+  shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+  become_user: "{{ django_worker_user }}"
+  register: get_url_result
+  until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  retries: 2
+  delay: 10
+
+- name: Install pip
+  shell: "chdir={{ django_worker_home }} /bin/python3.4 get-pip.py"
+
+# The virtualenv installed above is broken so we update it here
+- name: Upgrade virtualenv
+  shell: pip install --upgrade virtualenv
