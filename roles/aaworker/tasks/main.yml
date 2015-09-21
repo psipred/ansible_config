@@ -1,5 +1,4 @@
 ---
-
   - name: "Add {{ django_worker_user }} user"
     user:
       name: "{{ django_worker_user }}"
@@ -19,9 +18,9 @@
     retries: 2
     delay: 10
 
-  - name: Install pip
-    shell: "chdir={{ django_worker_home }} /bin/python3.4 get-pip.py"
-
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
+  # - name: Install pip
+  #   shell: "chdir={{ django_worker_home }} /bin/python3.4 get-pip.py"
+  #
+  # # The virtualenv installed above is broken so we update it here
+  # - name: Upgrade virtualenv
+  #   shell: pip install --upgrade virtualenv
