@@ -24,6 +24,7 @@
   user: dbuchan
   sudo: yes
   roles:
+    - djangomachine
     - aahead
   vars_files:
     - secrets/staging_secrets.yaml
