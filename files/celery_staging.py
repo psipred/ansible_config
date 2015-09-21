@@ -9,7 +9,6 @@ from django.conf import settings
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'analytics_automated_project.settings.staging')
 
-
 # logger = get_task_logger(__name__)
 app = Celery('backend_tasks')
 # Using a string here means the worker will not have to
