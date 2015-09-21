@@ -52,6 +52,24 @@
       virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
       requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
 
+  - name: Install mod_wsgi
+    pip:
+      chdir: "{{ django_worker_home }}"
+      virtualenv: "{{ django_worker_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
+      name: mod_wsgi
+      version: 4.4.13
+
+  - name: Install mod_wsgi-httpd
+    pip:
+      chdir: "{{ django_worker_home }}"
+      virtualenv: "{{ django_worker_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
+      name: mod_wsgi-httpd
+      version: 2.4.12.6
+
   - name: Copy aa staging_conf
     copy:
       src: secrets/staging_worker.py
