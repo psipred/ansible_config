@@ -100,10 +100,25 @@
       state: directory
       owner: "{{ django_worker_user }}"
 
+  - name: Check Celery running status
+    shell: ps aux | grep celery
+    register: celery_running
+    always_run: yes
+
+  - name: Stop the aa_workers
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop worker --pidfile=celery.pid"
+    become_user: "{{ django_worker_user }}"
+    when: celery_running.stdout.find("-m celery worker --loglevel=INFO -Q localhost,celery --app=analytics_automated_project.celery:app --pidfile=celeryd.pid") == 1
+
+  - name: Check Celery stopped status
+    shell: ps aux | grep celery
+    register: celery_running
+    always_run: yes
+
 # Here we skip running the django migrations as they are only run by aahead
 # AND this role MUST come after aahead installation runs
-
-  - name: Start the aa_workers
-    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery"
-    become_user: "{{ django_worker_user }}"
 #celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
+  - name: Start the aa_workers
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery --detach --pidfile=celery.pid"
+    become_user: "{{ django_worker_user }}"
+    when: celery_running.stdout.find("-m celery worker --loglevel=INFO -Q localhost,celery --app=analytics_automated_project.celery:app --pidfile=celeryd.pid") == -1
