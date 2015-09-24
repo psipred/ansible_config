@@ -3,238 +3,265 @@
 # http://bioteam.net/2012/01/building-open-grid-scheduler-on-centos-rhel-6-2/
 #
 
-#   - name: Install Dependencies
-#     yum:
-#       pkg: motif,motif-devel,openssl-devel,openssl-static,make,gcc,autoconf,pam-devel,libXpm,libXpm-devel,ncurses,ncurses-devel,unzip,texinfo
-#       state: latest
-#     sudo: yes
-#
-# # may need openmotif
-#
-#   - name: Check if we have the Open Grid Scheduler tarball
-#     stat: "path=/root/GE2011.11p1.tar.gz"
-#     become_user: root
-#     register: ogs_tarball_exist
-#
-#   - name: Download OGS tarball
-#     shell: chdir=/root/ wget --timeout 120 http://sourceforge.net/projects/gridscheduler/files/GE2011.11p1/GE2011.11p1.tar.gz/download?use_mirror=superb-sea2 -O GE2011.11p1.tar.gz
-#     when: ogs_tarball_exist.stat.exists == False
-#     become_user: root
-#     register: get_url_result
-#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-#     retries: 10
-#     delay: 10
-#
-#   - name: untar the tarball
-#     become_user: root
-#     shell: "cd /root; tar -zxvf GE2011.11p1.tar.gz"
-#     when: get_url_result.changed
-#
-#   - name: Check got a recent java sdk
-#     stat: "path=/opt/jdk-8u60-linux-x64.tar.gz"
-#     become_user: root
-#     register: java_exist
-#
-#   - name: Copy jdk
-#     copy:
-#       src: files/jdk-8u60-linux-x64.tar.gz
-#       dest: /opt/
-#       owner: root
-#     become_user: root
-#     when: java_exist.stat.exists == False
-#
-#   - name: untar the jdk tarball
-#     become_user: root
-#     shell: "cd /opt; tar -zxvf jdk-8u60-linux-x64.tar.gz"
-#     when: java_exist.stat.exists == False
-#
-#   - name: Check if we have Ant
-#     stat: "path=/opt/apache-ant-1.9.6-bin.tar.gz"
-#     become_user: root
-#     register: ant_tarball_exist
-#
-#   - name: Download ant tarball
-#     shell: chdir=/opt/ wget --timeout 120 http://mirrors.ukfast.co.uk/sites/ftp.apache.org//ant/binaries/apache-ant-1.9.6-bin.tar.gz -O apache-ant-1.9.6-bin.tar.gz
-#     when: ant_tarball_exist.stat.exists == False
-#     become_user: root
-#     register: get_url_result
-#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-#     retries: 10
-#     delay: 10
-#
-#   - name: untar the ant tarball
-#     become_user: root
-#     shell: "cd /opt; tar -zxvf apache-ant-1.9.6-bin.tar.gz"
-#     when: get_url_result.changed
-#
-#   - name: Check if we have junit
-#     stat: "path=/opt/junit4.10.zip"
-#     become_user: root
-#     register: junit_exist
-#
-#   - name: Download ant tarball
-#     shell: chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/junit/files/junit/4.10/junit4.10.zip/download?use_mirror=superb-sea2 -O junit4.10.zip
-#     when: junit_exist.stat.exists == False
-#     become_user: root
-#     register: get_url_result
-#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-#     retries: 10
-#     delay: 10
-#
-#   - name: unzip the junit zip
-#     become_user: root
-#     shell: "cd /opt; unzip junit4.10.zip"
-#     when: get_url_result.changed
-#
-#   - name: Check if we have javacc
-#     stat: "path=/opt/javacc-6.0.zip"
-#     become_user: root
-#     register: javacc_exist
-#
-#   - name: Download javacc tarball
-#     shell: chdir=/opt/ wget --timeout 120 https://java.net/projects/javacc/downloads/download/javacc-6.0.zip -O javacc-6.0.zip
-#     when: javacc_exist.stat.exists == False
-#     become_user: root
-#     register: get_url_result
-#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-#     retries: 10
-#     delay: 10
-#
-#   - name: unzip the javacc zip
-#     become_user: root
-#     shell: "cd /opt; unzip javacc-6.0.zip"
-#     when: get_url_result.changed
-#
-#   - name: Check if we have IzPack
-#     stat: "path=/opt/Izpack-1.4.4.tar.gz"
-#     become_user: root
-#     register: izpack_exist
-#
-#   - name: Download IzPack tarball
-#     shell: chdir=/opt/ wget --timeout 120 http://bioteam.net/wp-content/uploads/misc/Izpack-1.4.4.tar.gz -O Izpack-1.4.4.tar.gz
-#     when: izpack_exist.stat.exists == False
-#     become_user: root
-#     register: get_url_result
-#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-#     retries: 10
-#     delay: 10
-#
-#   - name: untar the IzPack
-#     become_user: root
-#     shell: "cd /opt; tar -zxvf Izpack-1.4.4.tar.gz"
-#     when: get_url_result.changed
-#
-#   - name: make berkeley_db build dir
-#     become_user: root
-#     file: path=/opt/berkeley-db state=directory
-#
-#   - name: Check if we have berkely_db_tar
-#     stat: "path=/opt/berkeley-db/db-4.4.20.tar.gz"
-#     become_user: root
-#     register: bdb_exist
-#
-#   - name: Download BDB tarball
-#     shell: chdir=/opt/berkeley-db/ wget --timeout 120 http://download.oracle.com/berkeley-db/db-4.4.20.tar.gz -O db-4.4.20.tar.gz
-#     when: bdb_exist.stat.exists == False
-#     become_user: root
-#     register: get_url_result
-#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-#     retries: 10
-#     delay: 10
-#
-#   - name: untar BDB
-#     become_user: root
-#     shell: "cd /opt/berkeley-db; tar -zxvf db-4.4.20.tar.gz"
-#     when: get_url_result.changed
-#
-#   - name: Configure BDB
-#     shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix ../dist/configure --prefix=/opt/berkeley-db/ --enable-rpc
-#     become_user: root
-#     when: get_url_result.changed
-#
-#   - name: Make BDB
-#     shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix make
-#     become_user: root
-#     when: get_url_result.changed
-#
-#   - name: Install BDB
-#     shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix make install
-#     become_user: root
-#     when: get_url_result.changed
+  - name: Install Dependencies
+    yum:
+      pkg: motif,motif-devel,openssl-devel,openssl-static,make,gcc,autoconf,pam-devel,libXpm,libXpm-devel,ncurses,ncurses-devel,unzip,texinfo
+      state: latest
+    sudo: yes
 
-  # - name: Check if we have opens 1.0.0
-  #   stat: "path=/opt/openssl-1.0.0s.tar.gz"
-  #   become_user: root
-  #   register: openssl_exist
-  #
-  # - name: Get openssl
-  #   shell: chdir=/opt/ wget --timeout 120 https://www.openssl.org/source/openssl-1.0.0s.tar.gz -O openssl-1.0.0s.tar.gz
-  #   become_user: root
-  #   when: openssl_exist.stat.exists == False
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 10
-  #   delay: 10
-  #
-  # - name: untar the openssl
-  #   become_user: root
-  #   shell: "cd /opt; tar -zxvf openssl-1.0.0s.tar.gz"
-  #   when: get_url_result.changed
-  #
-  # - name: configure openssl build
-  #   become_user: root
-  #   shell: "cd /opt/openssl-1.0.0s; ./config"
-  #   when: get_url_result.changed
-  #
-  # - name: make openssl build
-  #   become_user: root
-  #   shell: "cd /opt/openssl-1.0.0s; make"
-  #   when: get_url_result.changed
-  #
-  # - name: make openssl lib
-  #   become_user: root
-  #   shell: "cd /opt/openssl-1.0.0s; mkdir lib"
-  #   when: get_url_result.changed
-  #
-  # - name: move libss.a
-  #   become_user: root
-  #   shell: "cd /opt/openssl-1.0.0s; mv libssl.a lib/"
-  #   when: get_url_result.changed
-  #
-  # - name: move libcrypto.a
-  #   become_user: root
-  #   shell: "cd /opt/openssl-1.0.0s; mv libcrypto.a lib/"
-  #   when: get_url_result.changed
-  #
-  # - name: Move aimk
-  #   become_user: root
-  #   copy:
-  #     src: sge_files/aimk
-  #     dest: /root/GE2011.11p1/source
-  #
-  # - name: Move aimk.site
-  #   become_user: root
-  #   copy:
-  #     src: sge_files/aimk.site
-  #     dest: /root/GE2011.11p1/source
-  #
-  # - name: Move build.properties
-  #   become_user: root
-  #   copy:
-  #     src: sge_files/build.properties
-  #     dest: /root/GE2011.11p1/source
-  #
-  # - name: Move project.properties
-  #   become_user: root
-  #   copy:
-  #     src: sge_files/project.properties
-  #     dest: /root/GE2011.11p1/source/clients/gui-installer/nbproject/
+# may need openmotif
 
-  # - name: Move make.texi
-  #   become_user: root
-  #   copy:
-  #     src: sge_files/make.texi
-  #     dest: /root/GE2011.11p1/source/3rdparty/qmake/doc/
+  - name: Check if we have the Open Grid Scheduler tarball
+    stat: "path=/root/GE2011.11p1.tar.gz"
+    become_user: root
+    register: ogs_tarball_exist
+
+  - name: Download OGS tarball
+    shell: chdir=/root/ wget --timeout 120 http://sourceforge.net/projects/gridscheduler/files/GE2011.11p1/GE2011.11p1.tar.gz/download?use_mirror=superb-sea2 -O GE2011.11p1.tar.gz
+    when: ogs_tarball_exist.stat.exists == False
+    become_user: root
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: untar the tarball
+    become_user: root
+    shell: "cd /root; tar -zxvf GE2011.11p1.tar.gz"
+    when: get_url_result.changed
+
+  - name: Check got a recent java sdk
+    stat: "path=/opt/jdk-8u60-linux-x64.tar.gz"
+    become_user: root
+    register: java_exist
+
+  - name: Copy jdk
+    copy:
+      src: files/jdk-8u60-linux-x64.tar.gz
+      dest: /opt/
+      owner: root
+    become_user: root
+    when: java_exist.stat.exists == False
+
+  - name: untar the jdk tarball
+    become_user: root
+    shell: "cd /opt; tar -zxvf jdk-8u60-linux-x64.tar.gz"
+    when: java_exist.stat.exists == False
+
+  - name: Check if we have Ant
+    stat: "path=/opt/apache-ant-1.9.6-bin.tar.gz"
+    become_user: root
+    register: ant_tarball_exist
+
+  - name: Download ant tarball
+    shell: chdir=/opt/ wget --timeout 120 http://mirrors.ukfast.co.uk/sites/ftp.apache.org//ant/binaries/apache-ant-1.9.6-bin.tar.gz -O apache-ant-1.9.6-bin.tar.gz
+    when: ant_tarball_exist.stat.exists == False
+    become_user: root
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: untar the ant tarball
+    become_user: root
+    shell: "cd /opt; tar -zxvf apache-ant-1.9.6-bin.tar.gz"
+    when: get_url_result.changed
+
+  - name: Check if we have junit
+    stat: "path=/opt/junit4.10.zip"
+    become_user: root
+    register: junit_exist
+
+  - name: Download ant tarball
+    shell: chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/junit/files/junit/4.10/junit4.10.zip/download?use_mirror=superb-sea2 -O junit4.10.zip
+    when: junit_exist.stat.exists == False
+    become_user: root
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: unzip the junit zip
+    become_user: root
+    shell: "cd /opt; unzip junit4.10.zip"
+    when: get_url_result.changed
+
+  - name: Check if we have javacc
+    stat: "path=/opt/javacc-6.0.zip"
+    become_user: root
+    register: javacc_exist
+
+  - name: Download javacc tarball
+    shell: chdir=/opt/ wget --timeout 120 https://java.net/projects/javacc/downloads/download/javacc-6.0.zip -O javacc-6.0.zip
+    when: javacc_exist.stat.exists == False
+    become_user: root
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: unzip the javacc zip
+    become_user: root
+    shell: "cd /opt; unzip javacc-6.0.zip"
+    when: get_url_result.changed
+
+  - name: Check if we have IzPack
+    stat: "path=/opt/Izpack-1.4.4.tar.gz"
+    become_user: root
+    register: izpack_exist
+
+  - name: Download IzPack tarball
+    shell: chdir=/opt/ wget --timeout 120 http://bioteam.net/wp-content/uploads/misc/Izpack-1.4.4.tar.gz -O Izpack-1.4.4.tar.gz
+    when: izpack_exist.stat.exists == False
+    become_user: root
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: untar the IzPack
+    become_user: root
+    shell: "cd /opt; tar -zxvf Izpack-1.4.4.tar.gz"
+    when: get_url_result.changed
+
+  - name: make berkeley_db build dir
+    become_user: root
+    file: path=/opt/berkeley-db state=directory
+
+  - name: Check if we have berkely_db_tar
+    stat: "path=/opt/berkeley-db/db-4.4.20.tar.gz"
+    become_user: root
+    register: bdb_exist
+
+  - name: Download BDB tarball
+    shell: chdir=/opt/berkeley-db/ wget --timeout 120 http://download.oracle.com/berkeley-db/db-4.4.20.tar.gz -O db-4.4.20.tar.gz
+    when: bdb_exist.stat.exists == False
+    become_user: root
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: untar BDB
+    become_user: root
+    shell: "cd /opt/berkeley-db; tar -zxvf db-4.4.20.tar.gz"
+    when: get_url_result.changed
+
+  - name: Configure BDB
+    shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix ../dist/configure --prefix=/opt/berkeley-db/ --enable-rpc
+    become_user: root
+    when: get_url_result.changed
+
+  - name: Make BDB
+    shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix make
+    become_user: root
+    when: get_url_result.changed
+
+  - name: Install BDB
+    shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix make install
+    become_user: root
+    when: get_url_result.changed
+
+  - name: Check if we have opens 1.0.0
+    stat: "path=/opt/openssl-1.0.0s.tar.gz"
+    become_user: root
+    register: openssl_exist
+
+  - name: Get openssl
+    shell: chdir=/opt/ wget --timeout 120 https://www.openssl.org/source/openssl-1.0.0s.tar.gz -O openssl-1.0.0s.tar.gz
+    become_user: root
+    when: openssl_exist.stat.exists == False
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 10
+    delay: 10
+
+  - name: untar the openssl
+    become_user: root
+    shell: "cd /opt; tar -zxvf openssl-1.0.0s.tar.gz"
+    when: get_url_result.changed
+
+  - name: configure openssl build
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; ./config shared"
+    when: get_url_result.changed
+
+  - name: make openssl build
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; make"
+    when: get_url_result.changed
+
+  - name: make openssl lib
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; mkdir lib"
+    when: get_url_result.changed
+
+  - name: move libss.a
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; mv libssl.a lib/"
+    when: get_url_result.changed
+
+  - name: move libcrypto.a
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; mv libcrypto.a lib/"
+    when: get_url_result.changed
+
+  - name: move libcrypto.so.1.0.0
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; mv libcrypto.so.1.0.0 lib/"
+    when: get_url_result.changed
+
+  - name: move libssl.so.1.0.0
+    become_user: root
+    shell: "cd /opt/openssl-1.0.0s; mv libssl.so.1.0.0 lib/"
+    when: get_url_result.changed
+
+  - name: Move aimk
+    become_user: root
+    copy:
+      src: sge_files/aimk
+      dest: /root/GE2011.11p1/source
+
+  - name: Move aimk.site
+    become_user: root
+    copy:
+      src: sge_files/aimk.site
+      dest: /root/GE2011.11p1/source
+
+  - name: Move build.properties
+    become_user: root
+    copy:
+      src: sge_files/build.properties
+      dest: /root/GE2011.11p1/source
+
+  - name: Move project.properties
+    become_user: root
+    copy:
+      src: sge_files/project.properties
+      dest: /root/GE2011.11p1/source/clients/gui-installer/nbproject/
+  - name: Move make.texi
+    become_user: root
+    copy:
+      src: sge_files/make.texi
+      dest: /root/GE2011.11p1/source/3rdparty/qmake/doc/
+
+  - name: Move mk_dist
+    become_user: root
+    copy:
+      src: sge_files/mk_dist
+      dest: /root/GE2011.11p1/source/scripts/
+
+  - name: Move distinst
+    become_user: root
+    copy:
+      src: sge_files/distinst
+      dest: /root/GE2011.11p1/source/scripts/
+
+  - name: Move distinst.site
+    become_user: root
+    copy:
+      src: sge_files/distinst.site
+      dest: /root/GE2011.11p1/source/scripts/
 
   - name: aimk -only-depend
     shell: chdir=/root/GE2011.11p1/source ./aimk -only-depend
@@ -249,7 +276,46 @@
     become_user: root
 
   - name: compile OGS
+    become_user: root
     shell: chdir=/root/GE2011.11p1/source ./aimk
+    environment:
+      JAVA_HOME: /opt/jdk1.8.0_60
+      ANT_HOME: /opt/apache-ant-1.9.6
+      CLASSPATH: /opt/junit4.10/junit-4.10.jar:/opt/apache-ant-1.9.6/lib/ant.jar
+      JUNIT_JAR: /opt/junit4.10/junit-4.10.jar
+      PATH: /root/perl5/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/jdk1.8.0_60/bin:/opt/apache-ant-1.9.6/bin
+
+  - name: compile OGS man
+    become_user: root
+    shell: chdir=/root/GE2011.11p1/source ./aimk -man
+    environment:
+      JAVA_HOME: /opt/jdk1.8.0_60
+      ANT_HOME: /opt/apache-ant-1.9.6
+      CLASSPATH: /opt/junit4.10/junit-4.10.jar:/opt/apache-ant-1.9.6/lib/ant.jar
+      JUNIT_JAR: /opt/junit4.10/junit-4.10.jar
+      PATH: /root/perl5/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/jdk1.8.0_60/bin:/opt/apache-ant-1.9.6/bin
+
+  - name: make a distribution dir
+    become_user: root
+    file: path=/opt/ogs_src state=directory
+
+  - name: Stage binaries
+    become_user: root
+    shell: chdir=/root/GE2011.11p1/source ./scripts/distinst -v -allall -bin -libs -basedir /opt/ogs_src/ -vdir GE2011.11
+    environment:
+      JAVA_HOME: /opt/jdk1.8.0_60
+      ANT_HOME: /opt/apache-ant-1.9.6
+      CLASSPATH: /opt/junit4.10/junit-4.10.jar:/opt/apache-ant-1.9.6/lib/ant.jar
+      JUNIT_JAR: /opt/junit4.10/junit-4.10.jar
+      PATH: /root/perl5/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/jdk1.8.0_60/bin:/opt/apache-ant-1.9.6/bin
+
+  - name: create mk_dist sym
+    become_user: root
+    file: src=/root/GE2011.11p1/source/scripts/mk_dist dest=/opt/ogs_src/mk_dist state=link
+
+  - name: Build Distribution archive
+    become_user: root
+    shell: chdir=/opt/ogs_src ./mk_dist -vdir GE2011.11 -version GE2011.11 -common -doc -bin linux-x64
     environment:
       JAVA_HOME: /opt/jdk1.8.0_60
       ANT_HOME: /opt/apache-ant-1.9.6
