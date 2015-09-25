@@ -49,7 +49,7 @@
   user: dbuchan
   sudo: yes
   roles:
-    - buildsge
-    #- sgehead
+    #- buildsge
+    - sgehead
   vars_files:
     - secrets/staging_secrets.yaml

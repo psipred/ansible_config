@@ -1,7 +1,8 @@
 ---
 # This file follows the following build guide
-# http://bioteam.net/2012/01/building-open-grid-scheduler-on-centos-rhel-6-2/
 #
+# http://bioteam.net/2012/01/building-open-grid-scheduler-on-centos-rhel-6-2/
+# must put a copy of jdk-8u60-linux-x64.tar.gz in files/
 
   - name: Install Dependencies
     yum:

@@ -1,1 +1,40 @@
 ---
+#
+# This roles assumes the ogs build worker AND it left behind the tarballs and
+# the compiled stuff in /opt/ogs_src/GE2011.11 and /opt/sge6_dist
+#
+
+#export SGE_ROOT=/opt/ogs_src/GE2011.11/
+  - name: Install expect
+    yum:
+      pkg: expect
+      state: latest
+    sudo: yes
+
+  - name: add ogs_admin group
+    group: name=ogs state=present
+
+  - name: "Add {{ ogs_admin_user }}"
+    user: "name={{ ogs_admin_user }} password={{ ogs_admin_hashed_password }} group=ogs"
+    sudo: yes
+
+  - name: give {{ ogs_admin_user }} permissions on the ogs_src
+    sudo: yes
+    file:
+       path: /opt/ogs_src
+       group: ogs
+       recurse: yes
+       mode: "g+rw"
+       state: directory
+
+  - name: Move expect script
+    become_user: root
+    copy:
+      src: files/ogs_setup.exp
+      dest: /opt/ogs_src/GE2011.11
+
+
+# we can test the existance to the cell default dir to see if we need to run the
+# install_qmaster
+  # - name: install the qmaster
+  # - name: install execd

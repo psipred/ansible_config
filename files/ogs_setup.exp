@@ -1,0 +1,60 @@
+#!/usr/bin/expect -f
+
+spawn /opt/ogs_src/GE2011.11/install_qmaster
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "under an user id other than >root< (y/n) \[y\]"
+send "y\r"
+exec sleep 1
+
+expect "Please enter a valid user name"
+send "ogs_admin\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "to use default \[/opt/ogs_src/GE2011.11\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "(default: 2) >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "(default: 2) >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Enter cell name \[default\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "to use default \[p6444\] >>"
+send "staging6444\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Enter a qmaster spool directory \[/opt/ogs_src/GE2011.11/default/spool/qmaster\] >>"
+send "\r"
+exec sleep 1
+
+expect eof
+exit
