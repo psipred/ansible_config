@@ -73,7 +73,7 @@
     become_user: root
     register: junit_exist
 
-  - name: Download ant tarball
+  - name: Download junit tarball
     shell: chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/junit/files/junit/4.10/junit4.10.zip/download?use_mirror=superb-sea2 -O junit4.10.zip
     when: junit_exist.stat.exists == False
     become_user: root

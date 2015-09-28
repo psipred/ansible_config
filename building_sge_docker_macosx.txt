@@ -1,0 +1,16 @@
+1) Docker quickstart terminal
+
+2) docker pull centos:7
+
+3) docker run -it centos:7 bash
+
+4) Run setup commands as per the ansible ogsinstall or
+http://bioteam.net/2012/01/building-open-grid-scheduler-on-centos-rhel-6-2/
+
+5) exit
+
+6) commit the docker session
+> docker commit 3a769844805a centos/ogs_compiled_installed
+
+7) restart with
+docker run -it centos/ogs_compiled_installed bash
