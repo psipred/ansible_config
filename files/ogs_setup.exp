@@ -77,6 +77,12 @@ expect "Hit <RETURN> to continue >>"
 send "\r"
 exec sleep 1
 
+expect "Do you want to enable the JMX MBean server (y/n) \[n\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
 
 
 expect eof
