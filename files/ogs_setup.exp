@@ -84,6 +84,87 @@ expect "Hit <RETURN> to continue >>"
 send "\r"
 exec sleep 1
 
+expect "Please choose a spooling method (berkeleydb|classic) \[berkeleydb\] >>"
+send "\r"
+exec sleep 1
+expect "Default: \[/opt/ogs_src/GE2011.11/default/spool/spooldb\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Please enter a range \[20000-20100\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Default: \[/opt/ogs_src/GE2011.11/default/spool\] >>"
+send "\r"
+exec sleep 1
+
+expect "Default: \[none\] >>"
+send "psipred@cs.ucl.ac.uk\r"
+exec sleep 1
+
+expect "Do you want to change the configuration parameters (y/n) \[n\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "start qmaster at machine boot (y/n) \[y\] >>"
+send "n\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Do you want to use a file which contains the list of hosts (y/n) \[n\] >>"
+send "\r"
+exec sleep 1
+expect "Hosts(s):"
+send "bioinfstage4\r"
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+expect "Hosts(s):"
+send "\r"
+expect "Finished adding hosts. Hit <RETURN> to continue >>"
+send "\r"
+
+expect "Do you want to add your shadow host(s) now? (y/n) \[y\] >>"
+send "n\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Default configuration is \[1\] >>"
+send "\r"
+exec sleep 1
+expect "Do you agree? (y/n) \[y\] >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to see where Grid Engine logs messages >>"
+send "\r"
+exec sleep 1
+
+expect "Do you want to see previous screen about using Grid Engine again (y/n) \[n\] >>"
+send "\r"
+exec sleep 1
+
+expect "Please hit <RETURN> >>"
+send "\r"
+exec sleep 1
 
 expect eof
 exit

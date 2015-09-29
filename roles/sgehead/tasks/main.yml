@@ -33,6 +33,11 @@
       src: files/ogs_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
+  #test default location and if exists stop and start head otherwise run
+  #expect script
+
+#source /opt/ogs_src/GE2011.11//default/common/settings.csh
+
 
 # we can test the existance to the cell default dir to see if we need to run the
 # install_qmaster
