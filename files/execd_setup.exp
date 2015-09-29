@@ -28,7 +28,7 @@ expect "Hit <RETURN> to continue >>"
 send "\r"
 exec sleep 1
 
-expect "for this host (y/n) [n] >>"
+expect "for this host (y/n) \[n\] >>"
 send "\r"
 exec sleep 1
 
@@ -36,7 +36,7 @@ expect "Hit <RETURN> to continue >>"
 send "\r"
 exec sleep 1
 
-expect "start execd at machine boot (y/n) [y] >>"
+expect "start execd at machine boot (y/n) \[y\] >>"
 send "n\r"
 exec sleep 1
 expect "Hit <RETURN> to continue >>"
