@@ -62,10 +62,13 @@ exec sleep 1
 expect "Are you going to install Windows Execution Hosts? (y/n) \[n\] >>"
 send "\r"
 exec sleep 1
+
+expect "and set the file permissions of your distribution (enter: y) (y/n) \[y\] >>"
+send "\r"
+exec sleep 1
 expect "Hit <RETURN> to continue >>"
 send "\r"
 exec sleep 1
-
 
 expect eof
 exit
