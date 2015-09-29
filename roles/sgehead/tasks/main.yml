@@ -11,6 +11,28 @@
       state: latest
     sudo: yes
 
+#open ports 6444 and 6445
+
+  - name: Get the current firewalld rules
+    shell: firewall-cmd --list-all
+    register: firewalldrules
+    always_run: yes
+    sudo: yes
+
+  - name: Add Postgres firewalld rules
+    command: firewall-cmd --zone=public --add-port=6444/tcp --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("6444"/tcp") == -1
+
+  - name: Add Postgres firewalld rules
+    command: firewall-cmd --zone=public --add-port=6445/tcp --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("6445"/tcp") == -1
+
+  - name: Reload firewalld
+    command: firewall-cmd --reload
+    sudo: true
+
   - name: add ogs_admin group
     group: name=ogs state=present
 
@@ -33,10 +55,28 @@
       src: files/ogs_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
-  #test default location and if exists stop and start head otherwise run
-  #expect script
+  - name: Check if we have default cluster config present
+    stat: "path=/opt/ogs_src/GE2011.11/default/"
+    become_user: root
+    register: default_present
 
-#source /opt/ogs_src/GE2011.11//default/common/settings.csh
+  - name: Run install_qmaster expect script
+    become_user: root
+    shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/ogs_setup.exp"
+    when: default_present == -1
+
+  - name: Move expect script
+    become_user: root
+    copy:
+      src: files/execd_setup.exp
+      dest: /opt/ogs_src/GE2011.11
+
+  - name: Run install_exced expect script
+    become_user: root
+    shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
+    when: default_present == -1
+
+#Do we need to do this? source /opt/ogs_src/GE2011.11//default/common/settings.csh
 
 
 # we can test the existance to the cell default dir to see if we need to run the

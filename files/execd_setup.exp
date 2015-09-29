@@ -1,0 +1,66 @@
+#!/usr/bin/expect -f
+
+spawn /opt/ogs_src/GE2011.11/install_execd
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "to use default \[/opt/ogs_src/GE2011.11/\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "installation or press <RETURN> to use \[default\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "for this host (y/n) [n] >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "start execd at machine boot (y/n) [y] >>"
+send "n\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Do you want to add a default queue instance for this host (y/n) \[y\] >>"
+send "\r"
+exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
+
+expect "Hit <RETURN> to see where Grid Engine logs messages >>"
+send "\r"
+exec sleep 1
+
+expect "Do you want to see previous screen about using Grid Engine again (y/n) \[n\] >>"
+send "\r"
+exec sleep 1
+
+expect eof
+exit

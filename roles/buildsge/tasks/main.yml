@@ -240,6 +240,7 @@
     copy:
       src: sge_files/project.properties
       dest: /root/GE2011.11p1/source/clients/gui-installer/nbproject/
+
   - name: Move make.texi
     become_user: root
     copy:
@@ -317,6 +318,7 @@
   - name: Build Distribution archive
     become_user: root
     shell: chdir=/opt/ogs_src ./mk_dist -vdir GE2011.11 -version GE2011.11 -common -doc -bin linux-x64
+    when: default_present == -1
     environment:
       JAVA_HOME: /opt/jdk1.8.0_60
       ANT_HOME: /opt/apache-ant-1.9.6
