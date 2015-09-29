@@ -55,6 +55,9 @@ exec sleep 1
 expect "Enter a qmaster spool directory \[/opt/ogs_src/GE2011.11/default/spool/qmaster\] >>"
 send "\r"
 exec sleep 1
+expect "Hit <RETURN> to continue >>"
+send "\r"
+exec sleep 1
 
 expect eof
 exit
