@@ -76,6 +76,40 @@
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
     when: default_present == -1
 
+  - name: move default config dir to exec hosts
+    become_user: root
+    synchronize:
+      mode: pull
+      src: /opt/ogs_src/GE2011.11/default
+      dest: /tmp/
+    delegate_to: bioinfstage3
+
+  - name: move default config dir to exec hosts
+    become_user: root
+    synchronize:
+      mode: pull
+      src: /opt/ogs_src/GE2011.11/default
+      dest: /tmp/
+    delegate_to: bioinfstage3
+
+  - name: move sge-common
+    become_user: root
+    synchronize:
+      mode: pull
+      src: /opt/sge6_dist/ge-GE2011.11-common.tar.gz
+      dest: /tmp/
+    delegate_to: bioinfstage3
+
+  - name: move sge-linux binaries
+    become_user: root
+    synchronize:
+      mode: pull
+      src: /opt/sge6_dist/ge-GE2011.11-bin-linux-x64.tar.gz
+      dest: /tmp/
+    delegate_to: bioinfstage3
+
+      # These 2 /opt/sge6_dist/ge-GE2011.11-*
+      # scp -r /opt/ogs_src/GE2011.11/default/*
 #Do we need to do this? source /opt/ogs_src/GE2011.11//default/common/settings.csh
 
 
