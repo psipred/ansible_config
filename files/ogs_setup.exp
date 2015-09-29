@@ -70,5 +70,10 @@ expect "Hit <RETURN> to continue >>"
 send "\r"
 exec sleep 1
 
+expect "Are all hosts of your cluster in a single DNS domain (y/n) \[y\] >>"
+send "\r"
+exec sleep 1
+
+
 expect eof
 exit
