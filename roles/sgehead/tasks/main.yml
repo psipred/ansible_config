@@ -49,7 +49,7 @@
        mode: "g+rw"
        state: directory
 
-  - name: Move expect script
+  - name: Move qmaster expect script
     become_user: root
     copy:
       src: files/ogs_setup.exp
@@ -65,7 +65,7 @@
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/ogs_setup.exp"
     when: default_present == -1
 
-  - name: Move expect script
+  - name: Move execd expect script
     become_user: root
     copy:
       src: files/execd_setup.exp
@@ -82,15 +82,8 @@
       mode: pull
       src: /opt/ogs_src/GE2011.11/default
       dest: /tmp/
-    delegate_to: bioinfstage3
-
-  - name: move default config dir to exec hosts
-    become_user: root
-    synchronize:
-      mode: pull
-      src: /opt/ogs_src/GE2011.11/default
-      dest: /tmp/
-    delegate_to: bioinfstage3 #128.16.14.83?
+    delegate_to: bioinfstage3 #128.16.14.83
+    when: default_present == -1
 
   - name: move sge-common
     become_user: root
@@ -99,6 +92,7 @@
       src: /opt/sge6_dist/ge-GE2011.11-common.tar.gz
       dest: /tmp/
     delegate_to: bioinfstage3 #128.16.14.83
+    when: default_present == -1
 
   - name: move sge-linux binaries
     become_user: root
@@ -107,13 +101,12 @@
       src: /opt/sge6_dist/ge-GE2011.11-bin-linux-x64.tar.gz
       dest: /tmp/
     delegate_to: bioinfstage3 #128.16.14.83
+    when: default_present == -1
 
-      # These 2 /opt/sge6_dist/ge-GE2011.11-*
-      # scp -r /opt/ogs_src/GE2011.11/default/*
-#Do we need to do this? source /opt/ogs_src/GE2011.11//default/common/settings.csh
+  # - name: restart qmaster
+  #   shell: service sgeexecd.p6444 stop && sgeexecd.p6444 start
+  #   when: default_present == 1
 
-
-# we can test the existance to the cell default dir to see if we need to run the
-# install_qmaster
-  # - name: install the qmaster
-  # - name: install execd
+  # - name: restart execd
+  #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start
+  #   when: default_present == 1
