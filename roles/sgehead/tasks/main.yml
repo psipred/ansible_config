@@ -90,7 +90,7 @@
       mode: pull
       src: /opt/ogs_src/GE2011.11/default
       dest: /tmp/
-    delegate_to: bioinfstage3
+    delegate_to: bioinfstage3 #128.16.14.83?
 
   - name: move sge-common
     become_user: root
@@ -98,7 +98,7 @@
       mode: pull
       src: /opt/sge6_dist/ge-GE2011.11-common.tar.gz
       dest: /tmp/
-    delegate_to: bioinfstage3
+    delegate_to: bioinfstage3 #128.16.14.83
 
   - name: move sge-linux binaries
     become_user: root
@@ -106,7 +106,7 @@
       mode: pull
       src: /opt/sge6_dist/ge-GE2011.11-bin-linux-x64.tar.gz
       dest: /tmp/
-    delegate_to: bioinfstage3
+    delegate_to: bioinfstage3 #128.16.14.83
 
       # These 2 /opt/sge6_dist/ge-GE2011.11-*
       # scp -r /opt/ogs_src/GE2011.11/default/*

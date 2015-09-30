@@ -117,7 +117,7 @@ send "\r"
 exec sleep 1
 
 expect "start qmaster at machine boot (y/n) \[y\] >>"
-send "n\r"
+send "y\r"
 exec sleep 1
 expect "Hit <RETURN> to continue >>"
 send "\r"
