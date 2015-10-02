@@ -86,7 +86,6 @@
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
     when: default_present == -1
 
-
   # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start
   #   when: default_present == 1

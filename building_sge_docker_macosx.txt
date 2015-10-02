@@ -14,3 +14,26 @@ http://bioteam.net/2012/01/building-open-grid-scheduler-on-centos-rhel-6-2/
 
 7) restart with
 docker run -it centos/ogs_compiled_installed bash
+
+8) restart with ogs ports mapped
+docker run -it -p 6445:6445 -p 6444:6444 centos/ogs_installed bash
+
+docker images
+  list images
+docker ps -l
+  list last used container
+docker ps -a
+  list all containers
+
+docker start c964b9681d8e
+  start a container
+
+docker attach c964b9681d8e
+  get bash on a container you just started
+  detach with ctrl-p ctrl-q
+
+docker port <container> 8080
+  test container port map
+
+docker inspect <container>
+  container info
