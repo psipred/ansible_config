@@ -94,6 +94,11 @@
     environment:
       SGE_HOME: /opt/ogs_src/GE2011.11
 
+  - name: Add head node as submitt host
+    shell: "/opt/ogs_src/GE2011.11/bin/linux-x64/qconf -as bioinfstage3"
+    become_user: {{ ogs_admin_user }}
+    when: default_present.stat.isdir is not defined
+
   - name: build default tarball
     shell: "cd /opt/ogs_src/GE2011.11/; tar -pczf default.tar.gz default/"
     become_user: root
