@@ -22,12 +22,12 @@
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6444/tcp --permanent
     sudo: yes
-    when: firewalldrules.stdout.find("6444"/tcp") == -1
+    when: firewalldrules.stdout.find("6444/tcp") == -1
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6445/tcp --permanent
     sudo: yes
-    when: firewalldrules.stdout.find("6445"/tcp") == -1
+    when: firewalldrules.stdout.find("6445/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
@@ -46,34 +46,50 @@
     register: default_present
 
   - name: add the ogs directory
-    file: path=/opt/ogs_src/GE2011.11 state=directory
-    become_user: {{ ogs_admin_user }}
-    when: default_present == -1
+    file:
+      path: /opt/ogs_src/GE2011.11
+      state: directory
+      recurse: yes
+      group: ogs
+      owner: "{{ ogs_admin_user }}"
+    sudo: yes
+    when: default_present.stat.isdir is not defined
 
-  - name: move default dir
-    when: default_present == -1
-    become_user: {{ ogs_admin_user }}
-    shell: mv /tmp/default /opt/ogs_src/GE2011.11
+  - name: copy default dir
+    when: default_present.stat.isdir is not defined
+    become_user: "{{ ogs_admin_user }}"
+    copy:
+      src: files/default.tar.gz
+      dest: /opt/ogs_src/GE2011.11/
 
-  - name: move common tar
-    become_user: {{ ogs_admin_user }}
-    shell: mv /tmp/ge-GE2011.11-common.tar.gz /opt/ogs_src/GE2011.11
-    when: default_present == -1
+  - name: copy common tar
+    when: default_present.stat.isdir is not defined
+    become_user: "{{ ogs_admin_user }}"
+    copy:
+      src: files/ge-GE2011.11-common.tar.gz
+      dest: /opt/ogs_src/GE2011.11/
 
-  - name: move x86_64 tar
-    become_user: {{ ogs_admin_user }}
-    shell: mv /tmp/ge-GE2011.11-bin-linux-x64.tar.gz /opt/ogs_src/GE2011.11
-    when: default_present == -1
+  - name: copy x86_64 tar
+    when: default_present.stat.isdir is not defined
+    become_user: "{{ ogs_admin_user }}"
+    copy:
+      src: files/ge-GE2011.11-bin-linux-x64.tar.gz
+      dest: /opt/ogs_src/GE2011.11/
+
+  - name: untar default
+    become_user: "{{ ogs_admin_user }}"
+    shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf default.tar.gz"
+    when: default_present.stat.isdir is not defined
 
   - name: untar common
-    become_user: {{ ogs_admin_user }}
+    become_user: "{{ ogs_admin_user }}"
     shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf ge-GE2011.11-common.tar.gz"
-    when: default_present == -1
+    when: default_present.stat.isdir is not defined
 
   - name: untar x86_64
-    become_user: {{ ogs_admin_user }}
+    become_user: "{{ ogs_admin_user }}"
     shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf ge-GE2011.11-bin-linux-x64.tar.gz"
-    when: default_present == -1
+    when: default_present.stat.isdir is not defined
 
   - name: Move execd expect script
     become_user: root
@@ -81,10 +97,17 @@
       src: files/execd_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
+  - name: give {{ ogs_admin_user }} permissions on execd_setup.exp
+    sudo: yes
+    file:
+       path: /opt/ogs_src/GE2011.11/execd_setup.exp
+       group: ogs
+       mode: "uog+x"
+
   - name: Run install_exced expect script
     become_user: root
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
-    when: default_present == -1
+    when: default_present.stat.isdir is not defined
 
   # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start

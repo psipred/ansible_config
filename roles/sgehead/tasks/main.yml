@@ -22,12 +22,12 @@
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6444/tcp --permanent
     sudo: yes
-    when: firewalldrules.stdout.find("6444"/tcp") == -1
+    when: firewalldrules.stdout.find("6444/tcp") == -1
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6445/tcp --permanent
     sudo: yes
-    when: firewalldrules.stdout.find("6445"/tcp") == -1
+    when: firewalldrules.stdout.find("6445/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
@@ -55,6 +55,13 @@
       src: files/ogs_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
+  - name: give {{ ogs_admin_user }} permissions on ogs_setup.exp
+    sudo: yes
+    file:
+       path: /opt/ogs_src/GE2011.11/ogs_setup.exp
+       group: ogs
+       mode: "uog+x"
+
   - name: Check if we have default cluster config present
     stat: "path=/opt/ogs_src/GE2011.11/default/"
     become_user: root
@@ -63,7 +70,9 @@
   - name: Run install_qmaster expect script
     become_user: root
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/ogs_setup.exp"
-    when: default_present == -1
+    when: default_present.stat.isdir is not defined
+    environment:
+      SGE_HOME: /opt/ogs_src/GE2011.11
 
   - name: Move execd expect script
     become_user: root
@@ -71,42 +80,56 @@
       src: files/execd_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
+  - name: give {{ ogs_admin_user }} permissions on execd_setup.exp
+    sudo: yes
+    file:
+       path: /opt/ogs_src/GE2011.11/execd_setup.exp
+       group: ogs
+       mode: "uog+x"
+
   - name: Run install_exced expect script
     become_user: root
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
-    when: default_present == -1
+    when: default_present.stat.isdir is not defined
+    environment:
+      SGE_HOME: /opt/ogs_src/GE2011.11
 
-  - name: move default config dir to exec hosts
+  - name: build default tarball
+    shell: "cd /opt/ogs_src/GE2011.11/; tar -pczf default.tar.gz default/"
     become_user: root
-    synchronize:
-      mode: pull
-      src: /opt/ogs_src/GE2011.11/default
-      dest: /tmp/
-    delegate_to: bioinfstage3 #128.16.14.83
-    when: default_present == -1
 
-  - name: move sge-common
-    become_user: root
-    synchronize:
-      mode: pull
+  - name: get the default config dir
+    fetch:
+      src: /opt/ogs_src/GE2011.11/default.tar.gz
+      dest: files/
+      fail_on_missing: yes
+      flat: yes
+
+  - name: get the sge-common
+    fetch:
       src: /opt/sge6_dist/ge-GE2011.11-common.tar.gz
-      dest: /tmp/
-    delegate_to: bioinfstage3 #128.16.14.83
-    when: default_present == -1
+      dest: files/
+      fail_on_missing: yes
+      flat: yes
 
-  - name: move sge-linux binaries
-    become_user: root
-    synchronize:
-      mode: pull
+  - name: get the sge-linux binaries
+    fetch:
       src: /opt/sge6_dist/ge-GE2011.11-bin-linux-x64.tar.gz
-      dest: /tmp/
-    delegate_to: bioinfstage3 #128.16.14.83
-    when: default_present == -1
+      dest: files/
+      fail_on_missing: yes
+      flat: yes
+
+#if we want to force a reinstall then you need to remove the sge startup
+#scripts in /etc/init.f/sge* and delete the /opt/ogs_src/GE2011.11/default dir
 
   # - name: restart qmaster
   #   shell: service sgeexecd.p6444 stop && sgeexecd.p6444 start
   #   when: default_present == 1
+    # environment:
+    #   SGE_HOME: /opt/ogs_src/GE2011.11
 
   # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start
   #   when: default_present == 1
+    # environment:
+    #   SGE_HOME: /opt/ogs_src/GE2011.11

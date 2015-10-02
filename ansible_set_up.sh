@@ -16,3 +16,4 @@ export ANSIBLE_INVENTORY=~/ansible_hosts
 # ssh-add ~/.ssh/id_rsa
 # switch to the relevant virtualenv
 # source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate
+# source /cs/research/bioinf/home1/green/dbuchan/ansible/hacking/env-setup
