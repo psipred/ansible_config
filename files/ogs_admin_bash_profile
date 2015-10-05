@@ -1,0 +1,15 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+SGE_ROOT=/opt/ogs_src/GE2011.11/
+
+export SGE_ROOT
+
+PATH=$PATH:$HOME/.local/bin:$HOME/bin:/opt/ogs_src/GE2011.11/bin/linux-x64
+
+export PATH

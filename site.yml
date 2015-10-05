@@ -6,44 +6,44 @@
 #
 
 
- - name: Apply the rabbit_mq configuration
-   hosts: rabbit_mq
-   user: dbuchan
-   sudo: yes
-   roles:
-     - rabbitmq
-   vars_files:
-     - secrets/staging_secrets.yaml
-
-- name: Apply the postgres configuration
-  hosts: dbserver
-  user: dbuchan
-  sudo: yes
-  roles:
-    - dbserver
-  vars_files:
-    - secrets/staging_secrets.yaml
-
-- name: Apply Analytics Automated head node configuration
-  hosts: aa_head
-  user: dbuchan
-  sudo: yes
-  roles:
-    - djangomachine
-    - aahead
-  vars_files:
-    - secrets/staging_secrets.yaml
-
-- name: Apply Analytics Automated worker node configuration
-  hosts: aa_workers
-  user: dbuchan
-  sudo: yes
-  roles:
-    - djangomachine
-    - aaworker
-  vars_files:
-    - secrets/staging_secrets.yaml
-
+#  - name: Apply the rabbit_mq configuration
+#    hosts: rabbit_mq
+#    user: dbuchan
+#    sudo: yes
+#    roles:
+#      - rabbitmq
+#    vars_files:
+#      - secrets/staging_secrets.yaml
+#
+# - name: Apply the postgres configuration
+#   hosts: dbserver
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - dbserver
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+#
+# - name: Apply Analytics Automated head node configuration
+#   hosts: aa_head
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - djangomachine
+#     - aahead
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+#
+# - name: Apply Analytics Automated worker node configuration
+#   hosts: aa_workers
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - djangomachine
+#     - aaworker
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+#
 - name: Create SGE head
   hosts: sge_head
   user: dbuchan
@@ -53,12 +53,12 @@
     - sgehead
   vars_files:
     - secrets/staging_secrets.yaml
-
-- name: Create SGE node
-  hosts: sge_node
-  user: dbuchan
-  sudo: yes
-  roles:
-    - sgenode
-  vars_files:
-    - secrets/staging_secrets.yaml
+#
+# - name: Create SGE node
+#   hosts: sge_node
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - sgenode
+#   vars_files:
+#     - secrets/staging_secrets.yaml

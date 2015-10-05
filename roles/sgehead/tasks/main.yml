@@ -80,7 +80,26 @@
       src: files/execd_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
-  - name: give {{ ogs_admin_user }} permissions on execd_setup.exp
+  - name: Move execd expect script
+    become_user: root
+    copy:
+      src: files/execd_setup.exp
+      dest: /opt/ogs_src/GE2011.11
+
+  - name: Move bash profile
+    copy:
+      src: files/ogs_admin_bash_profile
+      dest: "/home/{{ ogs_admin_user }}/.bash_profile"
+
+  - name: "give {{ ogs_admin_user }} permissions on bash_profile"
+    sudo: yes
+    file:
+       path: "/home/{{ ogs_admin_user }}/.bash_profile"
+       group: 16485
+       mode: "g+rw"
+       owner: "{{ ogs_admin_user }}"
+
+  - name: "give {{ ogs_admin_user }} permissions on execd_setup.exp"
     sudo: yes
     file:
        path: /opt/ogs_src/GE2011.11/execd_setup.exp
@@ -94,9 +113,9 @@
     environment:
       SGE_HOME: /opt/ogs_src/GE2011.11
 
-  - name: Add head node as submitt host
+  - name: Add head node as submit host
     shell: "/opt/ogs_src/GE2011.11/bin/linux-x64/qconf -as bioinfstage3"
-    become_user: {{ ogs_admin_user }}
+    become_user: "{{ ogs_admin_user }}"
     when: default_present.stat.isdir is not defined
 
   - name: build default tarball
