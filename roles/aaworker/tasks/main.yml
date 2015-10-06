@@ -6,8 +6,21 @@
       group: apache
     sudo: yes
 
+  - name: Move bash profile for {{ django_worker_user }}
+    copy:
+      src: files/ogs_admin_bash_profile
+      dest: "/home/{{ django_worker_user }}/.bash_profile"
+
+  - name: "give {{ django_worker_user }} permissions on bash_profile"
+    sudo: yes
+    file:
+       path: "/home/{{ django_worker_user }}/.bash_profile"
+       group: apache
+       mode: "g+rw"
+       owner: "{{ django_worker_user }}"
+
   - name: Create worker virtualenv
-    become_user: "{{ django_aa_user }}"
+    become_user: "{{ django_worker_user }}"
     command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_worker_home }}aa_env"
 
   - name: Download get-pip.py

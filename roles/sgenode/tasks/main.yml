@@ -36,6 +36,15 @@
   - name: add ogs_admin group
     group: name=ogs state=present
 
+  # we need this user on the nodes as the workers run as this user when submitting
+  # work
+  - name: "Add {{ django_worker_user }} user"
+    user:
+      name: "{{ django_worker_user }}"
+      password: "{{ django_worker_hashed_password }}"
+      group: apache
+    sudo: yes
+
   - name: "Add {{ ogs_admin_user }}"
     user: "name={{ ogs_admin_user }} password={{ ogs_admin_hashed_password }} group=ogs"
     sudo: yes

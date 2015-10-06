@@ -86,7 +86,7 @@
       src: files/execd_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
-  - name: Move bash profile
+  - name: "Move bash profile for {{ ogs_admin_user }}"
     copy:
       src: files/ogs_admin_bash_profile
       dest: "/home/{{ ogs_admin_user }}/.bash_profile"
