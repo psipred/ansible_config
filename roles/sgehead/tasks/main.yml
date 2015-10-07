@@ -114,6 +114,9 @@
     environment:
       SGE_ROOT: /opt/ogs_src/GE2011.11
 
+  # Ideally we would remove the host from the queue but this requires multiple
+  # interactive editor sessions see
+  #https://resbook.wordpress.com/2011/03/21/remove-execution-host-from-gridengine/
   - name: Disable submissions to the head node
     shell: "/opt/ogs_src/GE2011.11/bin/linux-x64/qmod -d all.q@bioinfstage3"
     become_user: "{{ ogs_admin_user }}"
