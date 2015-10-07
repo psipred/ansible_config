@@ -80,12 +80,6 @@
       src: files/execd_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
-  - name: Move execd expect script
-    become_user: root
-    copy:
-      src: files/execd_setup.exp
-      dest: /opt/ogs_src/GE2011.11
-
   - name: "Move bash profile for {{ ogs_admin_user }}"
     copy:
       src: files/ogs_admin_bash_profile
@@ -117,6 +111,15 @@
     shell: "/opt/ogs_src/GE2011.11/bin/linux-x64/qconf -as bioinfstage3"
     become_user: "{{ ogs_admin_user }}"
     when: default_present.stat.isdir is not defined
+    environment:
+      SGE_ROOT: /opt/ogs_src/GE2011.11
+
+  - name: Disable submissions to the head node
+    shell: "/opt/ogs_src/GE2011.11/bin/linux-x64/qmod -d all.q@bioinfstage3"
+    become_user: "{{ ogs_admin_user }}"
+    when: default_present.stat.isdir is not defined
+    environment:
+      SGE_ROOT: /opt/ogs_src/GE2011.11
 
   - name: build default tarball
     shell: "cd /opt/ogs_src/GE2011.11/; tar -pczf default.tar.gz default/"
