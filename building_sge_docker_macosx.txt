@@ -37,3 +37,9 @@ docker port <container> 8080
 
 docker inspect <container>
   container info
+
+starting sge:
+/etc/init.d/sgemaster.p6444 start
+/etc/init.d/sgeexecd.p6444 start
+export PATH=$PATH:/opt/ogs_distribution/GE2011.11/bin/linux-x64/
+export DRMAA_LIBRARY_PATH=/opt/ogs_distribution/GE2011.11/lib/
