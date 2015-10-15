@@ -38,8 +38,23 @@ docker port <container> 8080
 docker inspect <container>
   container info
 
+delete docker images
+  docker rmi image_name
+delete docker containers
+  docker rm containr_id
+
+start aa container
+------------------
+docker run -it -p 6445:6445 -p 6444:6444 -p 8000:8000 -p80:80 centos/aa_installed bash
+
 starting sge:
-/etc/init.d/sgemaster.p6444 start
-/etc/init.d/sgeexecd.p6444 start
 export PATH=$PATH:/opt/ogs_distribution/GE2011.11/bin/linux-x64/
 export DRMAA_LIBRARY_PATH=/opt/ogs_distribution/GE2011.11/lib/
+export C_FORCE_ROOT=TRUE
+/root/rabbitmq_server-3.5.6/sbin/rabbitmq-server -detached
+runuser -l postgres -c 'pg_ctl start -D /var/lib/pgsql/data/'
+celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,gridengine,celery --detach --pidfile=celery.pid
+/etc/init.d/sgemaster.p6444 start
+/etc/init.d/sgeexecd.p6444 start
+qconf -as `hostname`
+python3 manage.py runserver --settings=analytics_automated_project.settings.dev
