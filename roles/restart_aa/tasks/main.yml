@@ -1,36 +1,3 @@
----
-  - name: "Add {{ django_aa_user }} user"
-    user:
-      name: "{{ django_aa_user }}"
-      password: "{{ django_aa_hashed_password }}"
-      group: apache
-    sudo: yes
-
-  - name: Download get-pip.py
-    shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
-    become_user: "{{ django_aa_user }}"
-    register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 2
-    delay: 10
-
-  - name: Check pip install
-    shell: pip --version
-    register: pip_install
-    always_run: yes
-    sudo: yes
-
-  - name: Install pip
-    shell: "chdir={{ django_aa_home }} /bin/python3.4 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
-
-  - name: Create the aa head virtualenv
-    become_user: "{{ django_aa_user }}"
-    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_aa_home }}aa_env"
 
   - name : Check Out AA from git
     become_user: "{{ django_aa_user }}"
@@ -46,6 +13,7 @@
       virtualenv: "{{ django_aa_home }}aa_env"
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
+      state: latest
       requirements: "{{ django_aa_home }}analytics_automated/requirements/staging.txt"
 
   - name: Copy aa staging_conf
@@ -78,14 +46,6 @@
       state: directory
       owner: "{{ django_aa_user }}"
 
-  - name: Run Django migrations
-    become_user: "{{ django_aa_user }}"
-    django_manage:
-      command: migrate
-      virtualenv: "{{ django_aa_home }}aa_env/"
-      settings: analytics_automated_project.settings.staging
-      app_path: "{{ django_aa_home }}/analytics_automated/"
-
   - name: Run Django collect static
     become_user: "{{ django_aa_user }}"
     django_manage:
@@ -94,29 +54,13 @@
       settings: analytics_automated_project.settings.staging
       app_path: "{{ django_aa_home }}/analytics_automated/"
 
-  - name: Install mod_wsgi
-    pip:
-      chdir: "{{ django_aa_home }}"
-      virtualenv: "{{ django_aa_home }}aa_env"
-      virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
-      name: mod_wsgi
-      version: 4.4.13
-
-  - name: Install mod_wsgi-httpd
-    pip:
-      chdir: "{{ django_aa_home }}"
-      virtualenv: "{{ django_aa_home }}aa_env"
-      virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
-      name: mod_wsgi-httpd
-      version: 2.4.12.6
-
-  - name: Get the current list of processes
-    shell: ps aux | grep httpd
-    register: aa_running
-    always_run: yes
-    sudo: yes
+  - name: Run Django migrations
+    become_user: "{{ django_aa_user }}"
+    django_manage:
+      command: migrate
+      virtualenv: "{{ django_aa_home }}aa_env/"
+      settings: analytics_automated_project.settings.staging
+      app_path: "{{ django_aa_home }}/analytics_automated/"
 
   - name : Configure AA/Apache
     shell: "source {{ django_aa_home}}aa_env/bin/activate; python manage.py runmodwsgi --settings=analytics_automated_project.settings.staging --setup-only --user django_aa --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/tmp/aa_httpd/"
@@ -124,9 +68,10 @@
       chdir: "{{ django_aa_home }}analytics_automated"
     become_user: "{{ django_aa_user }}"
     register: aa_started
-    when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name : Start aa
-    shell: "/tmp/aa_httpd/apachectl start"
+    shell: "/tmp/aa_httpd/apachectl restart"
     become_user: "{{ django_aa_user }}"
-    when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
+
+# as the server was started with --reload-on-changes then this should be sufficient
+# to restart the service
