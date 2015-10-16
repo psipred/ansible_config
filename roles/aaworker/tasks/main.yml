@@ -19,9 +19,11 @@
        mode: "g+rw"
        owner: "{{ django_worker_user }}"
 
-  - name: Create worker virtualenv
+  - name: Create the aa worker virtualenv
     become_user: "{{ django_worker_user }}"
-    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_worker_home }}aa_env"
+    command: virtualenv aa_env -p /bin/python3.4
+    args:
+        chdir: "{{ django_worker_home }}"
 
   - name: Download get-pip.py
     shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
@@ -58,6 +60,7 @@
       force: yes
 
   - name: Install requirements
+    become_user: "{{ django_worker_user }}"
     pip:
       chdir: "{{ django_worker_home }}"
       virtualenv: "{{ django_worker_home }}aa_env"
@@ -105,6 +108,12 @@
     copy:
       src: files/celery_staging.py
       dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/celery.py"
+      owner: "{{ django_worker_user }}"
+
+  - name: Copy wsgi.py
+    copy:
+      src: files/wsgi.py
+      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/"
       owner: "{{ django_worker_user }}"
 
   - name: Make aa logging dir

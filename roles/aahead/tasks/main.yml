@@ -30,7 +30,9 @@
 
   - name: Create the aa head virtualenv
     become_user: "{{ django_aa_user }}"
-    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_aa_home }}aa_env"
+    command: virtualenv aa_env -p /bin/python3.4
+    args:
+        chdir: "{{ django_aa_home }}"
 
   - name : Check Out AA from git
     become_user: "{{ django_aa_user }}"
@@ -41,6 +43,7 @@
       force: yes
 
   - name: Install requirements
+    become_user: "{{ django_aa_user }}"
     pip:
       chdir: "{{ django_aa_home }}"
       virtualenv: "{{ django_aa_home }}aa_env"
