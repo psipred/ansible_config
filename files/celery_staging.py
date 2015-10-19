@@ -10,7 +10,7 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'analytics_automated_project.settings.staging')
 
 # logger = get_task_logger(__name__)
-app = Celery('backend_tasks')
+app = Celery('analytics_automated')
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 app.config_from_object('django.conf:settings')
@@ -18,6 +18,6 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 CELERY_QUEUES = (
     Queue('localhost', routing_key='localhost.#'),
-    Queue('RServe', routing_key='RServe.#'),
-    Queue('GridEngine', routing_key='GridEngine.#'),
+    Queue('rserve', routing_key='rserve.#'),
+    Queue('gridengine', routing_key='gridengine.#'),
 )
