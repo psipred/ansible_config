@@ -10,7 +10,7 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'analytics_automated_project.settings.staging')
 
 # logger = get_task_logger(__name__)
-app = Celery('analytics_automated', backend='amqp', broker='amqp://external_worker:4SJtN3tVqR8p8vm3@128.16.14.77//')
+app = Celery('analytics_automated')
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 app.config_from_object('django.conf:settings')
