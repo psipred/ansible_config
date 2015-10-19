@@ -53,12 +53,6 @@
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
 
-  - name: Create the aa head virtualenv
-    become_user: "{{ django_worker_user }}"
-    command: virtualenv -p /bin/python3.4 aa_env
-    args:
-        chdir: "{{ django_worker_home }}"
-
   - name : Check Out AA from git
     become_user: "{{ django_worker_user }}"
     git:
