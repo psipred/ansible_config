@@ -20,7 +20,7 @@
        owner: "{{ django_worker_user }}"
 
   - name: Check if we have aa_env
-    stat: "{{ django_worker_home }}/aa_env"
+    stat: "path={{ django_worker_home }}/aa_env"
     become_user: root
     register: aa_env_exist
 

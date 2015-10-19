@@ -29,7 +29,7 @@
     shell: pip install --upgrade virtualenv
 
   - name: Check if we have aa_env
-    stat: "{{ django_aa_home }}/aa_env"
+    stat: "path={{ django_aa_home }}/aa_env"
     become_user: root
     register: aa_env_exist
 
