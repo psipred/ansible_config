@@ -19,9 +19,15 @@
        mode: "g+rw"
        owner: "{{ django_worker_user }}"
 
+  - name: Check if we have aa_env
+    stat: "{{ django_worker_home }}/aa_env"
+    become_user: root
+    register: aa_env_exist
+
   - name: Create the aa worker virtualenv
     become_user: "{{ django_worker_user }}"
-    command: virtualenv aa_env -p /bin/python3.4
+    command: virtualenv -p /bin/python3.4 aa_env
+    when: aa_env_exist.stat.exists == False
     args:
         chdir: "{{ django_worker_home }}"
 
@@ -49,7 +55,7 @@
 
   - name: Create the aa head virtualenv
     become_user: "{{ django_worker_user }}"
-    command: virtualenv aa_env -p /bin/python3.4
+    command: virtualenv -p /bin/python3.4 aa_env
     args:
         chdir: "{{ django_worker_home }}"
 

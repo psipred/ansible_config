@@ -28,9 +28,15 @@
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
 
+  - name: Check if we have aa_env
+    stat: "{{ django_aa_home }}/aa_env"
+    become_user: root
+    register: aa_env_exist
+
   - name: Create the aa head virtualenv
     become_user: "{{ django_aa_user }}"
     command: virtualenv aa_env -p /bin/python3.4
+    when: aa_env_exist.stat.exists == False
     args:
         chdir: "{{ django_aa_home }}"
 
