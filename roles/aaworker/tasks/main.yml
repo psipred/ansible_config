@@ -49,7 +49,9 @@
 
   - name: Create the aa head virtualenv
     become_user: "{{ django_worker_user }}"
-    command: virtualenv aa_env -p /bin/python3.4 creates="{{  django_worker_home }}aa_env"
+    command: virtualenv aa_env -p /bin/python3.4
+    args:
+        chdir: "{{ django_worker_home }}"
 
   - name : Check Out AA from git
     become_user: "{{ django_worker_user }}"
@@ -69,6 +71,7 @@
       requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
 
   - name: Install mod_wsgi
+    become_user: "{{ django_worker_user }}"
     pip:
       chdir: "{{ django_worker_home }}"
       virtualenv: "{{ django_worker_home }}aa_env"
@@ -78,6 +81,7 @@
       version: 4.4.13
 
   - name: Install mod_wsgi-httpd
+    become_user: "{{ django_worker_user }}"
     pip:
       chdir: "{{ django_worker_home }}"
       virtualenv: "{{ django_worker_home }}aa_env"
@@ -130,7 +134,7 @@
   - name: Stop the aa_workers
     shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop worker --pidfile=celery.pid"
     become_user: "{{ django_worker_user }}"
-    when: celery_running.stdout.find("-m celery worker --loglevel=INFO -Q localhost,celery --app=analytics_automated_project.celery:app --pidfile=celeryd.pid") == 1
+    when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == 1
 
   - name: Check Celery stopped status
     shell: ps aux | grep celery
@@ -141,6 +145,6 @@
 # AND this role MUST come after aahead installation runs
 #celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
   - name: Start the aa_workers
-    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery --detach --pidfile=celery.pid"
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery,gridengine --detach --pidfile=celery.pid"
     become_user: "{{ django_worker_user }}"
-    when: celery_running.stdout.find("-m celery worker --loglevel=INFO -Q localhost,celery --app=analytics_automated_project.celery:app --pidfile=celeryd.pid") == -1
+    when: celery_running.stdout.find("-m celery worker --loglevel=INFO ") == -1

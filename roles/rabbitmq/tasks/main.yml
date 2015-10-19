@@ -47,6 +47,11 @@
     sudo: yes
     when: firewalldrules.stdout.find("25672/tcp") == -1
 
+  - name: Add erl firewalld rules
+    command: firewall-cmd --zone=public --add-port=15672/tcp --permanent
+    sudo: yes
+    when: firewalldrules.stdout.find("15672/tcp") == -1
+
   - name: Add AMQP firewalld rules
     command: firewall-cmd --zone=public --add-port=5671-5672/tcp --permanent
     sudo: yes
@@ -67,12 +72,12 @@
     when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
 
   - name: add external rabbit user
-    shell: /home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl add_user {{ external_rabbit_user }} {{ external_rabbit_password }}
+    shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl add_user {{ external_rabbit_user }} {{ external_rabbit_password }}"
     become_user: "{{ rabbit_user }}"
     when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
 
   - name: set external rabbit user details
-    shell: /home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl  set_permissions -p / {{ external_rabbit_user }} ".*" ".*" ".*"
+    shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl set_permissions -p / {{ external_rabbit_user }} \".*\" \".*\" \".*\""
     become_user: "{{ rabbit_user }}"
     when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
 
