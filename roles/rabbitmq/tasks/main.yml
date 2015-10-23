@@ -69,38 +69,36 @@
   - name: Start rabbitMQ
     command: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmq-server -detached"
     become_user: "{{ rabbit_user }}"
-    when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
+    when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
   - name: add external rabbit user
     shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl add_user {{ external_rabbit_user }} {{ external_rabbit_password }}"
     become_user: "{{ rabbit_user }}"
-    when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
+    when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
   - name: set external rabbit user details
     shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl set_permissions -p / {{ external_rabbit_user }} \".*\" \".*\" \".*\""
     become_user: "{{ rabbit_user }}"
-    when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
+    when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
-  - name: Download rabbitMQ tarball
+  - name: Download rabbitMQadmin tarball
     # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
     shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 http://bioinfstage1:15672/cli/rabbitmqadmin -O rabbutmqadmin"
     when: rabbit_tarball_exist.stat.exists == False
     become_user: "{{ rabbit_user }}"
     register: get_url_result
-    until: get_url_result.stdout.find("/home/rabbit/rabbitmq_server-") == -1
+    until: get_url_result.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
     retries: 10
     delay: 10
 
   - name: enable management plugin
     shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmq-plugins enable rabbitmq_management"
     become_user: "{{ rabbit_user }}"
-    when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
+    when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
   - name: enable external user on the management plugin
     shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl set_user_tags {{ external_rabbit_user }} administrator"
     become_user: "{{ rabbit_user }}"
-    when: rabbit_running.stdout.find("/home/rabbit/rabbitmq_server-") == -1
-
-
+    when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
   # we should restart rabbit if it is already running and we've updated it

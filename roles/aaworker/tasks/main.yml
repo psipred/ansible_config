@@ -19,6 +19,10 @@
        mode: "g+rw"
        owner: "{{ django_worker_user }}"
 
+  # The virtualenv installed above is broken so we update it here
+  - name: Upgrade virtualenv
+    shell: pip install --upgrade virtualenv
+
   - name: Check if we have aa_env
     stat: "path={{ django_worker_home }}/aa_env"
     become_user: root
@@ -31,6 +35,12 @@
     args:
         chdir: "{{ django_worker_home }}"
 
+  - name: Check pip install
+    shell: pip --version
+    register: pip_install
+    always_run: yes
+    sudo: yes
+
   - name: Download get-pip.py
     shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
     become_user: "{{ django_worker_user }}"
@@ -38,20 +48,11 @@
     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     retries: 2
     delay: 10
-
-  - name: Check pip install
-    shell: pip --version
-    register: pip_install
-    always_run: yes
-    sudo: yes
+    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
   - name: Install pip
     shell: "chdir={{ django_worker_home }} /bin/python3.4 get-pip.py"
     when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
 
   - name : Check Out AA from git
     become_user: "{{ django_worker_user }}"
@@ -69,26 +70,6 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
       requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
-
-  - name: Install mod_wsgi
-    become_user: "{{ django_worker_user }}"
-    pip:
-      chdir: "{{ django_worker_home }}"
-      virtualenv: "{{ django_worker_home }}aa_env"
-      virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
-      name: mod_wsgi
-      version: 4.4.13
-
-  - name: Install mod_wsgi-httpd
-    become_user: "{{ django_worker_user }}"
-    pip:
-      chdir: "{{ django_worker_home }}"
-      virtualenv: "{{ django_worker_home }}aa_env"
-      virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
-      name: mod_wsgi-httpd
-      version: 2.4.12.6
 
   - name: Copy aa staging_conf
     copy:
@@ -126,6 +107,14 @@
       state: directory
       owner: "{{ django_worker_user }}"
 
+  - name: symlink submissions to the aa dir
+    file:
+      src: /webdata/submissions
+      dest: "{{ django_worker_home }}/analytics_automated/submissions"
+      state: link
+      owner: "{{ django_worker_user }}"
+      mode: "uog+rw"
+
   - name: Check Celery running status
     shell: ps aux | grep celery
     register: celery_running
@@ -134,7 +123,7 @@
   - name: Stop the aa_workers
     shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop worker --pidfile=celery.pid"
     become_user: "{{ django_worker_user }}"
-    when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == 1
+    #when: celery_running.stdout.find("celery worker") == 1
 
   - name: Check Celery stopped status
     shell: ps aux | grep celery
@@ -147,4 +136,4 @@
   - name: Start the aa_workers
     shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery,gridengine --detach --pidfile=celery.pid"
     become_user: "{{ django_worker_user }}"
-    when: celery_running.stdout.find("-m celery worker --loglevel=INFO ") == -1
+    #nwhen: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1

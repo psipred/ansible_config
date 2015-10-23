@@ -1,0 +1,12 @@
+#copy auto mount config
+  - name: Copy auto.bioinf
+    sudo: yes
+    copy:
+      src: files/auto.bioinf
+      dest: /etc/auto.bioinf
+
+#restart automount
+  - name: Restart autofs
+    shell: service autofs restart
+    always_run: yes
+    sudo: yes

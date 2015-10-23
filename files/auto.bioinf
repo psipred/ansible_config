@@ -1,0 +1,2 @@
+#Bioinf server mounts from EVS1
+/webdata  -local_lock=all    evs1.cs.ucl.ac.uk:/research/bioinf_0/webdata/bioinfstage
