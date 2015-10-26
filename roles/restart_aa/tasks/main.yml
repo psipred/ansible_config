@@ -72,6 +72,8 @@
   - name : Start aa
     shell: "/tmp/aa_httpd/apachectl restart"
     become_user: "{{ django_aa_user }}"
+    environment:
+      DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
 
 # as the server was started with --reload-on-changes then this should be sufficient
 # to restart the service
