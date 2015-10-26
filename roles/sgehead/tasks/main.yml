@@ -152,11 +152,11 @@
 #if we want to force a reinstall then you need to remove the sge startup
 #scripts in /etc/init.f/sge* and delete the /opt/ogs_src/GE2011.11/default dir
 
-  # - name: restart qmaster
-  #   shell: service sgeexecd.p6444 stop && sgeexecd.p6444 start
-  #   when: default_present == 1
-    # environment:
-    #   SGE_HOME: /opt/ogs_src/GE2011.11
+  - name: restart qmaster
+    shell: service sgeexecd.p6444 stop && sgeexecd.p6444 start
+    when: default_present == 1
+    environment:
+      SGE_HOME: /opt/ogs_src/GE2011.11
 
   # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start
