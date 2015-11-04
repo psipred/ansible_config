@@ -67,6 +67,8 @@
   user: dbuchan
   sudo: yes
   roles:
-    - sgenode
+    # - sgenode
+    # - blastmachine
+    - psipred
   vars_files:
     - secrets/staging_secrets.yaml
