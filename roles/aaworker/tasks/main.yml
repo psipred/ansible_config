@@ -134,9 +134,9 @@
 # AND this role MUST come after aahead installation runs
 #celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
   - name: Start the aa_workers
-    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery,gridengine --detach --pidfile=celery.pid"
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery,gridengine,low_gridengine --detach --pidfile=celery.pid"
     become_user: "{{ django_worker_user }}"
     environment:
       DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
       SGE_ROOT: /opt/ogs_src/GE2011.11/
-    #nwhen: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
+    #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1

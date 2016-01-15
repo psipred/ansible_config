@@ -127,6 +127,13 @@
     always_run: yes
     sudo: yes
 
+  - name: Make the apachedir
+    file:
+      path: "/opt/aa_httpd/"
+      state: directory
+      owner: "{{ django_aa_user }}"
+      group: apache
+
   - name : Configure AA/Apache
     shell: "source {{ django_aa_home}}aa_env/bin/activate; python manage.py runmodwsgi --settings=analytics_automated_project.settings.staging --setup-only --user django_aa --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/aa_httpd/"
     args:
