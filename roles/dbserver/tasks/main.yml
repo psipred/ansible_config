@@ -2,7 +2,7 @@
 
   - name: Install postgreSQL
     yum:
-      pkg: postgresql
+      pkg: postgresql, postgresql-server
       state: latest
     sudo: yes
     register: postgres_installed
@@ -84,3 +84,14 @@
       role_attr_flags: CREATEDB
       db: "{{ a_a_db }}"
       priv: ALL
+
+  - name: copy over the rabbit systemd service
+    sudo: true
+    copy:
+      src: files/postgresql.service
+      dest: /etc/systemd/system/
+      mode: "uog+x"
+
+  - name: Add postgres to systemctl
+    sudo: true
+    shell: systemctl enable postgresql.service

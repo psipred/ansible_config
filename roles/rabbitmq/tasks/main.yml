@@ -71,7 +71,7 @@
     become_user: "{{ rabbit_user }}"
     when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
-  - name: Check rabbitMQ status
+  - name: Check rabbitMQ user status
     shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmqctl list_users"
     become_user: "{{ rabbit_user }}"
     register: rabbit_users
@@ -108,3 +108,14 @@
     when: rabbit_running.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
 
   # we should restart rabbit if it is already running and we've updated it
+
+  - name: copy over the rabbit systemd service
+    sudo: true
+    copy:
+      src: files/rabbit.service
+      dest: /etc/systemd/system/
+      mode: "uog+x"
+
+  - name: Add service to systemctl
+    sudo: true
+    shell: systemctl enable rabbit.service
