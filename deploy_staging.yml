@@ -61,14 +61,14 @@
 #     - sgehead
 #   vars_files:
 #     - secrets/staging_secrets.yaml
-#
-# - name: Create SGE node
-#   hosts: sge_node
-#   user: dbuchan
-#   sudo: yes
-#   roles:
-#     # - sgenode
-#     # - blastmachine
-#     - psipred
-#   vars_files:
-#     - secrets/staging_secrets.yaml
+
+- name: Create SGE node
+  hosts: sge_node
+  user: dbuchan
+  sudo: yes
+  roles:
+    - sgenode
+    # - blastmachine
+    # - psipred
+  vars_files:
+    - secrets/staging_secrets.yaml

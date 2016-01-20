@@ -149,17 +149,33 @@
       fail_on_missing: yes
       flat: yes
 
+  - name: rewrite the first line of the sgemaster.staging6444
+    shell: sed "1s/.*/#\!\/bin\/sh/" /etc/init.d/sgemaster.staging6444 > /tmp/sgemaster.staging6444
+    sudo: yes
+
+  - name: rewrite the 2nd line of the sgemaster.staging6444
+    shell: sed "2s/.*/sed -e s\/#ENFORCE_SHLIBPATH#\/\/ dist\/util\/rctemplates\/sgemaster_template/" /tmp/sgemaster.staging6444 > /etc/init.d/sgemaster.staging6444
+    sudo: yes
+
+  - name: rewrite the first line of the sgeexecd.staging6444
+    shell: sed "1s/.*/#\!\/bin\/sh/" /etc/init.d/sgeexecd.staging6444 > /tmp/sgeexecd.staging6444
+    sudo: yes
+
+  - name: rewrite the 2nd line of the sgemaster.staging6444
+    shell: sed "2s/.*/sed -e s\/#ENFORCE_SHLIBPATH#\/\/ dist\/util\/rctemplates\/sgeexecd_template/" /tmp/sgeexecd.staging6444 > /etc/init.d/sgeexecd.staging6444
+    sudo: yes
+
 #if we want to force a reinstall then you need to remove the sge startup
 #scripts in /etc/init.d/sge* and delete the /opt/ogs_src/GE2011.11/default dir
 
   # - name: restart qmaster
-  #   shell: service sgeexecd.p6444 stop && sgeexecd.p6444 start
-  #   when: default_present.stat.isdir == True
-  #   environment:
-  #     SGE_HOME: /opt/ogs_src/GE2011.11
-
-  # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start
   #   when: default_present == 1
     # environment:
-    #   SGE_HOME: /opt/ogs_src/GE2011.11
+    #   SGE_ROOT: /opt/ogs_src/GE2011.11
+
+  # - name: restart execd
+  #   shell: service sgeexecd.p6444 stop && sgeexecd.p6444 start
+  #   when: default_present.stat.isdir == True
+  #   environment:
+  #     SGE_ROOT: /opt/ogs_src/GE2011.11

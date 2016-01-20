@@ -1,6 +1,6 @@
 ---
 #
-# This roles assumes the ogs build worker AND it left behind the tarballs and
+# This roles assumes the ogs build worked AND it left behind the tarballs and
 # the compiled stuff in /opt/ogs_src/GE2011.11 and /opt/sge6_dist
 #
 
@@ -117,6 +117,14 @@
     become_user: root
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
     when: default_present.stat.isdir is not defined
+
+  - name: rewrite the first line of the sgeexecd.staging6444
+    shell: sed "1s/.*/#\!\/bin\/sh/" /etc/init.d/sgeexecd.staging6444 > /tmp/sgeexecd.staging6444
+    sudo: yes
+
+  - name: rewrite the 2nd line of the sgemaster.staging6444
+    shell: sed "2s/.*/sed -e s\/#ENFORCE_SHLIBPATH#\/\/ dist\/util\/rctemplates\/sgeexecd_template/" /tmp/sgeexecd.staging6444 > /etc/init.d/sgeexecd.staging6444
+    sudo: yes
 
   # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start
