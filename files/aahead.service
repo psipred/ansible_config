@@ -1,0 +1,13 @@
+[Unit]
+Description=Start AA Head on startup
+
+[Service]
+Type=forking
+User=django_aa
+StandardOutput=tty
+Environment=DRMAA_LIBRARY_PATH=/opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
+Environment=SGE_ROOT=/opt/ogs_src/GE2011.11/
+ExecStart=/bin/sh -c "/opt/aa_httpd/apachectl start"
+
+[Install]
+WantedBy=multi-user.target

@@ -140,3 +140,14 @@
       DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
       SGE_ROOT: /opt/ogs_src/GE2011.11/
     #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
+
+  - name: copy over the aa worker service
+    sudo: true
+    copy:
+      src: files/aaworker.service
+      dest: /etc/systemd/system/
+      mode: "uog+x"
+
+  - name: Add service to systemctl
+    sudo: true
+    shell: systemctl enable aaworker.service
