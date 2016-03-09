@@ -1,0 +1,24 @@
+---
+
+  - name: Check if disopred installed
+    stat: path=/opt/disopred
+    register: disopred_exist
+
+  - name : Check Out DISOPRED from GIT
+    when: disopred_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/disopred.git
+      dest: /opt/disopred
+      clone: yes
+      force: yes
+
+  - name: Download dso_lib
+    shell: "chdir=/opt/disopred wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/DISOPRED/dso_lib.tar.gz -O dso_lib.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: untar dso_lib
+    shell: "cd /opt/disopred; tar -zxvf dso_lib.tar.gz"

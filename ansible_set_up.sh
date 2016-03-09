@@ -17,3 +17,9 @@ export ANSIBLE_INVENTORY=~/ansible_hosts
 # switch to the relevant virtualenv
 # source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate
 # source /cs/research/bioinf/home1/green/dbuchan/ansible/hacking/env-setup
+
+#Everything
+ansible-playbook -i staging deploy_staging.yml
+
+webservices
+ansible-playbook -i staging restart_aa.yml

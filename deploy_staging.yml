@@ -13,7 +13,7 @@
 #     - automount
 #   vars_files:
 #     - secrets/staging_secrets.yaml
-
+#
 # - name: Apply the rabbit_mq configuration
 #   hosts: rabbit_mq
 #   user: dbuchan
@@ -22,7 +22,7 @@
 #    - rabbitmq
 #   vars_files:
 #    - secrets/staging_secrets.yaml
-
+#
 # - name: Apply the postgres configuration
 #   hosts: dbserver
 #   user: dbuchan
@@ -51,24 +51,25 @@
 #     - aaworker
 #   vars_files:
 #     - secrets/staging_secrets.yaml
-#
+
 # - name: Create SGE head
 #   hosts: sge_head
 #   user: dbuchan
 #   sudo: yes
 #   roles:
-#     - buildsge
+#     #- buildsge
 #     - sgehead
 #   vars_files:
 #     - secrets/staging_secrets.yaml
-
+#
 - name: Create SGE node
   hosts: sge_node
   user: dbuchan
   sudo: yes
   roles:
-    - sgenode
+    # - sgenode
     # - blastmachine
     # - psipred
+    - disopred
   vars_files:
     - secrets/staging_secrets.yaml
