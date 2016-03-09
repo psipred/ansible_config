@@ -1,0 +1,82 @@
+---
+  - name: "Add {{ webserver_user }} user"
+    user:
+      name: "{{ webserver_user }}"
+      password: "{{ webserver_hashed_password }}"
+      group: apache
+    sudo: yes
+
+  - name: Check pip install
+    shell: pip --version
+    register: pip_install
+    always_run: yes
+    sudo: yes
+
+  - name: Download get-pip.py
+    shell: "chdir={{ webserver_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+    become_user: "{{ webserver_user }}"
+    register: get_url_result
+    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    retries: 2
+    delay: 10
+    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Install pip
+    shell: "chdir={{ webserver_home }} /bin/python3.4 get-pip.py"
+    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Upgrade virtualenv
+    shell: pip install --upgrade virtualenv
+
+  - name: Check if we have webserver_env
+    stat: "path={{ webserver_home }}/webserver_env"
+    become_user: root
+    register: webserver_env_exist
+
+  - name: Create the webserver virtualenv
+    become_user: "{{ webserver_user }}"
+    command: virtualenv webserver_env -p /bin/python3.4
+    when: webserver_env_exist.stat.exists == False
+    args:
+        chdir: "{{ webserver_home }}"
+
+  - name : Check Out PSIPRED website from git
+    become_user: "{{ webserver_user }}"
+    git:
+      repo: https://github.com/psipred/psipred_website.git
+      dest: "{{ webserver_home }}psipred_website"
+      clone: yes
+      force: yes
+
+  - name: Install requirements
+    become_user: "{{ webserver_user }}"
+    pip:
+      chdir: "{{ webserver_home }}"
+      virtualenv: "{{ webserver_home }}webserver_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ webserver_home }}aa_env/bin/python"
+      requirements: "{{ webserver_home }}psipred_website/requirements/staging.txt"
+
+  - name: Copy psipred_website staging conf
+    copy:
+      src: secrets/psipred_staging.py
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/staging.py"
+      owner: "{{ webserver_user }}"
+
+  - name: Copy aa staging secrets
+    copy:
+      src: secrets/psipred_staging_secrets.json
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
+      owner: "{{ webserver_user }}"
+
+  - name: Copy base secrets
+    copy:
+      src: secrets/base_secrets.json
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
+      owner: "{{ webserver_user }}"
+
+  - name: Copy wsgi.py
+    copy:
+      src: files/psipred_wsgi.py
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/wsgi.py"
+      owner: "{{ webserver_user }}"
