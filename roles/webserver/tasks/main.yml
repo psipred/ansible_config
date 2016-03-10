@@ -80,3 +80,63 @@
       src: files/psipred_wsgi.py
       dest: "{{ webserver_home }}/psipred_website/psipred_website/wsgi.py"
       owner: "{{ webserver_user }}"
+
+  #Logging not yet set up for frontend
+  - name: Make aa logging dir
+    file:
+      path: "{{ webserver_home }}/psipred_website/logs"
+      state: directory
+      owner: "{{ webserver_user }}"
+
+  - name: Run Django migrations
+    become_user: "{{ webserver_user }}"
+    django_manage:
+      command: migrate
+      virtualenv: "{{ webserver_home }}webserver_env/"
+      settings: psipred_website.settings.staging
+      app_path: "{{ webserver_home }}/psipred_website/"
+
+  - name: Run Django collect static
+    become_user: "{{ webserver_user }}"
+    django_manage:
+      command: collectstatic
+      virtualenv: "{{ webserver_home }}webserver_env/"
+      settings: psipred_website.settings.staging
+      app_path: "{{ webserver_home }}/psipred_website/"
+
+  - name: Get the current list of processes
+    shell: ps aux | grep httpd
+    register: webserver_running
+    always_run: yes
+    sudo: yes
+
+  - name: Make the apachedir
+    file:
+      path: "/opt/webserver_httpd/"
+      state: directory
+      owner: "{{ webserver_user }}"
+      group: apache
+
+  - name : Configure website and apache
+    shell: "source {{ webserver_home }}webserver_env/bin/activate; python manage.py runmodwsgi --settings=psipred_website.settings.staging --setup-only --user webserver --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/webserver_httpd/"
+    args:
+      chdir: "{{ webserver_home }}psipred_website"
+    become_user: "{{ webserver_user }}"
+    register: web_server_started
+    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
+
+  - name : Start webserver
+    shell: "/opt/webserver_httpd/apachectl start"
+    become_user: "{{ webserver_user }}"
+    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
+
+  - name: copy over the webserver service
+    sudo: true
+    copy:
+      src: files/webserver.service
+      dest: /etc/systemd/system/
+      mode: "uog+x"
+
+  - name: Add service to systemctl
+    sudo: true
+    shell: systemctl enable webserver.service
