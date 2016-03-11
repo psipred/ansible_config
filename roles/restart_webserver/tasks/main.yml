@@ -1,0 +1,76 @@
+
+  - name : Check Out Webserver from git
+    become_user: "{{ webserver_user }}"
+    git:
+      repo: https://github.com/psipred/psipred_website.git
+      dest: "{{ webserver_home }}psipred_website"
+      clone: yes
+      force: yes
+
+  - name: Install requirements
+    pip:
+      chdir: "{{ webserver_home }}"
+      virtualenv: "{{ webserver_home }}webserver_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ webserver_home }}webserver_env/bin/python"
+      state: latest
+      requirements: "{{ webserver_home }}psipred_website/requirements/staging.txt"
+
+  - name: Copy psipred_website staging conf
+    copy:
+      src: secrets/psipred_staging.py
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/staging.py"
+      owner: "{{ webserver_user }}"
+
+  - name: Copy aa staging secrets
+    copy:
+      src: secrets/psipred_staging_secrets.json
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
+      owner: "{{ webserver_user }}"
+
+  - name: Copy base secrets
+    copy:
+      src: secrets/base_secrets.json
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
+      owner: "{{ webserver_user }}"
+
+  - name: Copy wsgi.py
+    copy:
+      src: files/psipred_wsgi.py
+      dest: "{{ webserver_home }}/psipred_website/psipred_website/wsgi.py"
+      owner: "{{ webserver_user }}"
+
+  - name: Make webserver logging dir
+    file:
+      path: "{{ webserver_home }}/psipred_website/logs"
+      state: directory
+      owner: "{{ webserver_user }}"
+
+  - name: Run Django collect static
+    become_user: "{{ webserver_user }}"
+    django_manage:
+      command: collectstatic
+      virtualenv: "{{ webserver_home }}webserver_env/"
+      settings: psipred_website.settings.staging
+      app_path: "{{ webserver_home }}/psipred_website/"
+
+  - name: Run Django migrations
+    become_user: "{{ webserver_user }}"
+    django_manage:
+      command: migrate
+      virtualenv: "{{ webserver_home }}webserver_env/"
+      settings: psipred_website.settings.staging
+      app_path: "{{ webserver_home }}/psipred_website/"
+
+  - name : Configure webserver
+    shell: "source {{ webserver_home}}webserver_env/bin/activate; python manage.py runmodwsgi --settings=psipred_website.settings.staging --setup-only --user webserver --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/webserver_httpd/"
+    args:
+      chdir: "{{ webserver_home }}psipred_website"
+    become_user: "{{ webserver_user }}"
+    register: webserver_started
+
+  - name : Restart webserver
+    shell: "/opt/webserver_httpd/apachectl restart"
+    become_user: "{{ webserver_user }}"
+# as the server was started with --reload-on-changes then this should be sufficient
+# to restart the service
