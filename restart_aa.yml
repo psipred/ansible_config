@@ -1,13 +1,13 @@
 # ansible-playbook -i staging restart_aa.yml -f 1
 
-# - name: Restart django aa on the aahead
-#   hosts: aa_head
-#   user: dbuchan
-#   sudo: yes
-#   roles:
-#    - restart_aa
-#   vars_files:
-#    - secrets/staging_secrets.yaml
+- name: Restart django aa on the aahead
+  hosts: aa_head
+  user: dbuchan
+  sudo: yes
+  roles:
+   - restart_aa
+  vars_files:
+   - secrets/staging_secrets.yaml
 #
 # - name: Apply the postgres configuration
 #   hosts: aa_workers
@@ -18,11 +18,11 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: Restart Webserver
-  hosts: webserver
-  user: dbuchan
-  sudo: yes
-  roles:
-    - restart_webserver
-  vars_files:
-    - secrets/staging_secrets.yaml
+# - name: Restart Webserver
+#   hosts: webserver
+#   user: dbuchan
+#   sudo: yes
+#   roles:
+#     - restart_webserver
+#   vars_files:
+#     - secrets/staging_secrets.yaml
