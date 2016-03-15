@@ -18,11 +18,11 @@
   vars_files:
     - secrets/staging_secrets.yaml
 
-# - name: Restart Webserver
-#   hosts: webserver
-#   user: dbuchan
-#   sudo: yes
-#   roles:
-#     - restart_webserver
-#   vars_files:
-#     - secrets/staginsug_secrets.yaml
+- name: Restart Webserver
+  hosts: webserver
+  user: dbuchan
+  sudo: yes
+  roles:
+    - restart_webserver
+  vars_files:
+    - secrets/staging_secrets.yaml
