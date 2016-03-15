@@ -10,3 +10,8 @@
     shell: service autofs restart
     always_run: yes
     sudo: yes
+
+  - name: add chkconfig
+    shell: chkconfig autofs on
+    always_run: yes
+    sudo: yes

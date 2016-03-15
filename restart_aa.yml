@@ -8,15 +8,15 @@
    - restart_aa
   vars_files:
    - secrets/staging_secrets.yaml
-#
-# - name: Apply the postgres configuration
-#   hosts: aa_workers
-#   user: dbuchan
-#   sudo: yes
-#   roles:
-#     - aaworker
-#   vars_files:
-#     - secrets/staging_secrets.yaml
+
+- name: Apply the postgres configuration
+  hosts: aa_workers
+  user: dbuchan
+  sudo: yes
+  roles:
+    - aaworker
+  vars_files:
+    - secrets/staging_secrets.yaml
 
 # - name: Restart Webserver
 #   hosts: webserver
@@ -25,4 +25,4 @@
 #   roles:
 #     - restart_webserver
 #   vars_files:
-#     - secrets/staging_secrets.yaml
+#     - secrets/staginsug_secrets.yaml
