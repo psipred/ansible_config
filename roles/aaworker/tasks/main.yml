@@ -63,8 +63,9 @@
       force: yes
 
   - name: Install requirements
-    become_user: "{{ django_worker_user }}"
+    # become_user: "{{ django_worker_user }}"
     pip:
+      state: latest
       chdir: "{{ django_worker_home }}"
       virtualenv: "{{ django_worker_home }}aa_env"
       virtualenv_command: /bin/virtualenv
