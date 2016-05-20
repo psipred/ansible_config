@@ -1,0 +1,24 @@
+---
+
+  - name: Check if memsatsvm is installed
+    stat: path=/opt/memsat-svm
+    register: memsat_exist
+
+  - name : Check Out MEMSATSVM from GIT
+    when: memsat_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/MemSatSVM.git
+      dest: /opt/memsat-svm
+      clone: yes
+      force: yes
+
+  - name: Download memsat model data
+    shell: "chdir=/opt/memsat-svm wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: untar memsat model data
+    shell: "cd /opt/memsat-svm; tar -zxvf models.tar.gz"
