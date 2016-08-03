@@ -1,0 +1,54 @@
+---
+#
+# INSTALLING TO /webdata as we are out of room in /opt ffs
+#
+#
+  - name: Check if pgenthreader is installed
+    stat: path=/webdata/pgenthreader
+    register: pgenthreader_exist
+
+  - name : Check Out pGenTHREADER from git
+    when: pgenthreader_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/pGenTHREADER.git
+      dest: /webdata/pgenthreader
+      clone: yes
+      force: yes
+
+  - name: Download foldlib
+    when: pgenthreader_exist.stat.exists == False
+    shell: "chdir=/webdata/pgenthreader wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/pGenTHREADER/foldlibs/foldlib.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download domainlib
+    when: pgenthreader_exist.stat.exists == False
+    shell: "chdir=/webdata/pgenthreader wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/pGenTHREADER/foldlibs/cath_3_5_domainlib.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: make foldlib dir
+    when: pgenthreader_exist.stat.exists == False
+    shell: "mkdir /webdata/pgenthreader/tdb/"
+
+  - name: untar foldlib
+    when: pgenthreader_exist.stat.exists == False
+    shell: "cd /webdata/pgenthreader; tar -C /webdata/pgenthreader/tdb/ -zxvf foldlib.tar.gz"
+
+  - name: untar domainlib
+    when: pgenthreader_exist.stat.exists == False
+    shell: "cd /webdata/pgenthreader; tar -zxvf cath_3_5_domainlib.tar.gz"
+
+  - name: make the binaries
+    when: pgenthreader_exist.stat.exists == False
+    shell: "cd /webdata/pgenthreader/src; make"
+
+  - name: install the binaries
+    when: pgenthreader_exist.stat.exists == False
+    shell: "cd /webdata/pgenthreader/src; make install"

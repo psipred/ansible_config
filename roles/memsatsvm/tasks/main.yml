@@ -1,5 +1,27 @@
 ---
 
+  - name: Install libgd
+    yum:
+      pkg: gd
+      state: latest
+    sudo: yes
+
+  - name: Install libgd-devel
+    yum:
+      pkg: gd-devel
+      state: latest
+    sudo: yes
+
+  - name: Install Round.pm
+    cpanm:
+      name: Math::Round
+      mirror: http://cpan.mirror.triple-it.nl/
+
+  - name: Install GD.pm
+    cpanm:
+      name: GD
+      mirror: http://cpan.mirror.triple-it.nl/
+
   - name: Check if memsatsvm is installed
     stat: path=/opt/memsat-svm
     register: memsat_exist
@@ -13,6 +35,7 @@
       force: yes
 
   - name: Download memsat model data
+    when: memsat_exist.stat.exists == False
     shell: "chdir=/opt/memsat-svm wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz"
     register: get_url_result
     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
@@ -22,3 +45,6 @@
 
   - name: untar memsat model data
     shell: "cd /opt/memsat-svm; tar -zxvf models.tar.gz"
+
+  - name: make binaries
+    shell: "cd /opt/memsat-svm; make"

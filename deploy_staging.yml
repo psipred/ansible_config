@@ -72,7 +72,20 @@
     # - psipred
     # - disopred
     # - memsatsvm
-    - ffpred
+
+    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+    # - genTHREADER
+    # - BioSerf
+    # - DomPred
+    # - Mempack
+    # - DomSerf
+    # - pDomTHREADER
+    # - ffpred URGH
+
+    # - Metsite
+    # - HSPred
+    # - MemEMBED
+    # - Generate TDB
   vars_files:
     - secrets/staging_secrets.yaml
 
