@@ -1,0 +1,33 @@
+---
+#
+# INSTALLING TO /webdata as we are out of room in /opt ffs
+#
+#
+  - name: Check if dompred is installed
+    stat: path=/webdata/dompred
+    register: dompred_exist
+
+  - name : Check Out dompred from git
+    when: dompred_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/dompred.git
+      dest: /webdata/dompred
+      clone: yes
+      force: yes
+
+  - name: Download data files
+    when: dompred_exist.stat.exists == False
+    shell: "chdir=/webdata/dompred wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/dompred_data/dompred_data.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # whe
+
+  - name: untar dompred data
+    when: dompred_exist.stat.exists == False
+    shell: "cd /webdata/dompred; tar -zxvf dompred_data.tar.gz"
+
+  - name: compile DomSSEA
+    when: dompred_exist.stat.exists == False
+    shell: cd /webdata/dompred/src; javac DomSSEA.java

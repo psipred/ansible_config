@@ -1,0 +1,8 @@
+---
+
+# get and compile boot 1.38
+  # http://sourceforge.net/projects/boost/files/boost/1.38.0/boost_1_38_0.tar.gz
+# edit mempack Makefile as appropriate for this boost location
+# make
+# get the datasets
+# unpack the datasets
