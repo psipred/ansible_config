@@ -1,8 +1,105 @@
 ---
 
-# get and compile boot 1.38
+# get and compile boost 1.38
   # http://sourceforge.net/projects/boost/files/boost/1.38.0/boost_1_38_0.tar.gz
-# edit mempack Makefile as appropriate for this boost location
 # make
+# make install
 # get the datasets
 # unpack the datasets
+# libboost libboost-devel
+  - name: Check if boost is present
+    stat: path=/opt/ImageMagick-6.8.9-10
+    register: imagemagick_exist
+
+  - name: Download ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "chdir=/opt/ wget --timeout 120 ftp://ftp.imagemagick.org/pub/ImageMagick/releases/ImageMagick-6.8.9-10.tar.xz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+  - name: untar ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/; tar -xvf ImageMagick-6.8.9-10.tar.xz"
+
+  - name: configure ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/ImageMagick-6.8.9-10/; ./configure"
+
+BLARGHEL BLARGHEL
+
+  - name: Check if boost is present
+    stat: path=/opt/boost_1_38_0
+    register: boost_exist
+
+  - name: Download boost 1.38
+    when: boost_exist.stat.exists == False
+    shell: "chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/boost/files/boost/1.38.0/boost_1_38_0.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: untar boost 1.38
+    when: boost_exist.stat.exists == False
+    shell: "cd /opt/; tar -zxvf boost_1_38_0.tar.gz"
+
+  - name: configure boost
+    when: boost_exist.stat.exists == False
+    shell: "cd /opt/boost_1_38_0/; ./configure"
+
+  - name: make boost
+    when: boost_exist.stat.exists == False
+    shell: "cd /opt/boost_1_38_0/; make"
+
+  - name: Check if mempack is present
+    stat: path=/opt/mempack
+    register: mempack_exist
+
+  - name : Check out mempack from GIT
+    when: mempack_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/mempack.git
+      dest: /opt/mempack
+      clone: yes
+      force: yes
+
+  - name: Download mempack model data
+    when: mempack_exist.stat.exists == False
+    shell: "chdir=/opt/mempack wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/mempack/mempack_datasets.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Copy mempack Makefile
+    when: mempack_exist.stat.exists == False
+    copy:
+      src: files/mempack_Makefile
+      dest: "/opt/mempack/Makefile"
+
+  - name: make mempack
+    when: mempack_exist.stat.exists == False
+    shell: "cd /opt/mempack/; make"
+
+  - name: untar mempack datasets
+    when: mempack_exist.stat.exists == False
+    shell: "cd /opt/mempack; tar -zxvf mempack_datasets.tar.gz"
+
+  - name: Install SVG.pm
+    cpanm:
+      name: SVG
+      mirror: http://cpan.mirror.triple-it.nl/
+
+  - name: Install GD::SVG.pm
+    cpanm:
+      name: GD::SVG
+      mirror: http://cpan.mirror.triple-it.nl/
+
+  # - name: Install Image::Magick.pm
+  #   cpanm:
+  #     name: Image::Magick
+  #     mirror: http://cpan.mirror.triple-it.nl/
