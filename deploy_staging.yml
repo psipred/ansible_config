@@ -76,8 +76,8 @@
     # - pDomTHREADER # installed to /webdata due to space on bioinfstage4
     # - genTHREADER # installed to /webdata due to space on bioinfstage4
     # - dompred # installed to /webdata due to space on bioinfstage4
-    - mempack
-    #- metsite
+    # - mempack
+    - metsite
 
     # - ffpred URGH
     # - BioSerf

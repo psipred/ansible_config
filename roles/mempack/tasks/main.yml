@@ -27,7 +27,17 @@
     when: imagemagick_exist.stat.exists == False
     shell: "cd /opt/ImageMagick-6.8.9-10/; ./configure"
 
-BLARGHEL BLARGHEL
+  - name: make ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/ImageMagick-6.8.9-10/; make"
+
+  - name: install ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/ImageMagick-6.8.9-10/; make install"
+
+  - name: link the ImageMagick libs
+    # when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/ImageMagick-6.8.9-10/; ldconfig /usr/local/lib"
 
   - name: Check if boost is present
     stat: path=/opt/boost_1_38_0
@@ -99,7 +109,7 @@ BLARGHEL BLARGHEL
       name: GD::SVG
       mirror: http://cpan.mirror.triple-it.nl/
 
-  # - name: Install Image::Magick.pm
-  #   cpanm:
-  #     name: Image::Magick
-  #     mirror: http://cpan.mirror.triple-it.nl/
+  - name: Install Image::Magick.pm
+    cpanm:
+      name: Image::Magick
+      mirror: http://cpan.mirror.triple-it.nl/
