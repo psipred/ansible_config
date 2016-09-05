@@ -77,15 +77,15 @@
     # - genTHREADER # installed to /webdata due to space on bioinfstage4
     # - dompred # installed to /webdata due to space on bioinfstage4
     # - mempack
-    #- metsite
-    - hspred
+    # - metsite
+    # - hspred
+    # - memembed
+    - maketdb
 
-    # - ffpred URGH
     # - BioSerf
     # - DomSerf
+    # - ffpred URGH
 
-    # - MemEMBED
-    # - Generate TDB
   vars_files:
     - secrets/staging_secrets.yaml
 
