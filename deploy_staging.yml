@@ -77,13 +77,13 @@
     # - genTHREADER # installed to /webdata due to space on bioinfstage4
     # - dompred # installed to /webdata due to space on bioinfstage4
     # - mempack
-    - metsite
+    #- metsite
+    - hspred
 
     # - ffpred URGH
     # - BioSerf
     # - DomSerf
 
-    # - HSPred
     # - MemEMBED
     # - Generate TDB
   vars_files:

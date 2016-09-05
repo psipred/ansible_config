@@ -4,14 +4,14 @@
 #
 #
   - name: Check if dompred is installed
-    stat: path=/webdata/dompred
+    stat: path=/opt/dompred
     register: dompred_exist
 
   - name : Check Out dompred from git
     when: dompred_exist.stat.exists == False
     git:
       repo: https://github.com/psipred/dompred.git
-      dest: /webdata/dompred
+      dest: /opt/dompred
       clone: yes
       force: yes
 
@@ -26,8 +26,8 @@
 
   - name: untar dompred data
     when: dompred_exist.stat.exists == False
-    shell: "cd /webdata/dompred; tar -zxvf dompred_data.tar.gz"
+    shell: "cd /opt/dompred; tar -zxvf dompred_data.tar.gz"
 
   - name: compile DomSSEA
     when: dompred_exist.stat.exists == False
-    shell: cd /webdata/dompred/src; javac DomSSEA.java
+    shell: cd /opt/dompred/src; javac DomSSEA.java
