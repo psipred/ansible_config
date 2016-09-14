@@ -1,0 +1,108 @@
+  - name: Check modeller is present
+    stat: path=/opt/modeller9.17
+    register: modeller_exist
+
+  - name: Download modeller
+    when: modeller_exist.stat.exists == False
+    shell: "chdir=/opt/ wget --timeout 120 https://salilab.org/modeller/9.17/modeller-9.17.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: untar modeller
+    when: modeller_exist.stat.exists == False
+    shell: "cd /opt/; tar -zxvf modeller-9.17.tar.gz"
+
+  - name: Move hacked install script over
+    # when: maketdb_exist.stat.exists == False
+    copy:
+      src: secrets/modeller_Install
+      dest: /opt/modeller-9.17/Install
+      mode: "uog+x"
+
+  - name: install modeller
+    when: modeller_exist.stat.exists == False
+    shell: "cd /opt/modeller-9.17; ./Install"
+
+  - name: Check cmake is present
+    stat: path=/opt/cmake-3.6.2/
+    register: cmake_exist
+
+  - name: Download cmake
+    when: cmake_exist.stat.exists == False
+    shell: "chdir=/opt/ wget --timeout 120 https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: untar cmake
+    when: cmake_exist.stat.exists == False
+    shell: "cd /opt/; tar -zxvf cmake-3.6.2.tar.gz"
+
+  - name: build and install cmake
+    when: cmake_exist.stat.exists == False
+    shell: "cd /opt/cmake-3.6.2; ./bootstrap --prefix=/opt/local/ && make && make install"
+
+  - name: Check HHSuite is present
+    stat: path=/opt/hh-suite
+    register: hhsuite_exist
+
+  - name : Check out HHSuite from GIT
+    when: hhsuite_exist.stat.exists == False
+    git:
+      repo: https://github.com/soedinglab/hh-suite.git
+      dest: /opt/hh-suite
+      clone: yes
+      force: yes
+
+  - name: make build dir
+    when: hhsuite_exist.stat.exists == False
+    shell: "cd /opt/hh-suite; mkdir build"
+
+  - name: cmake hhsuite
+    when: hhsuite_exist.stat.exists == False
+    shell: 'cd /opt/hh-suite/build; /opt/local/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/opt/local/ ..'
+
+  - name: make hhsuite
+    when: hhsuite_exist.stat.exists == False
+    shell: 'cd /opt/hh-suite/build; make'
+
+  - name: install hhsuite
+    when: hhsuite_exist.stat.exists == False
+    shell: 'cd /opt/hh-suite/build; make install'
+
+  - name: Check bioserf package is available
+    stat: path=/opt/bioserf
+    register: bioserf_exist
+
+  - name : Check out bioserf from GIT
+    when: bioserf_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/bioserf.git
+      dest: /opt/bioserf
+      clone: yes
+      force: yes
+
+  - name: make bioserf components
+    when: bioserf_exist.stat.exists == False
+    shell: 'cd /opt/bioserf/src; make'
+
+  - name: install bioserf components
+    when: bioserf_exist.stat.exists == False
+    shell: 'cd /opt/bioserf/src; make install'
+
+# get a copy of the pdb
+# run makepdbaa to produce pdb_aa.fasta
+# run makeblastdb over pdb_aa.fasta
+
+# get CathDomainSeqs.S100.ATOM now at http://download.cathdb.info/cath/releases/latest-release/sequence-data/cath-domain-seqs-S100.fa
+# run makeblastdb over this to make blast - this should be in blast install
+# uptodate tdb and dom_tdb see genthreader install
+
+# CathDomainSummary_3.5 this is parsed from the http://download.cathdb.info/cath/releases/latest-release/cath-classification-data/cath-domain-list.txt
+#
+#

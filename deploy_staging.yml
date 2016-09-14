@@ -80,10 +80,9 @@
     # - metsite
     # - hspred
     # - memembed
-    - maketdb
+    # - maketdb
+    - bioserf #package includes all the domserf code too
 
-    # - BioSerf
-    # - DomSerf
     # - ffpred URGH
 
   vars_files:
