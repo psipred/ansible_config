@@ -7,8 +7,9 @@
 
 # - name: Set up mount point
 #   hosts: everyone
-#   user: dbuchan
-#   sudo: yes
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   roles:
 #     - automount
 #   vars_files:
@@ -16,8 +17,9 @@
 #
 # - name: Apply the rabbit_mq configuration
 #   hosts: rabbit_mq
-#   user: dbuchan
-#   sudo: yes
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   roles:
 #    - rabbitmq
 #   vars_files:
@@ -25,8 +27,9 @@
 #
 # - name: Apply the postgres configuration
 #   hosts: dbserver
-#   user: dbuchan
-#   sudo: yes
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   roles:
 #     - dbserver
 #   vars_files:
@@ -34,8 +37,9 @@
 #
 # - name: Apply Analytics Automated head node configuration
 #   hosts: aa_head
-#   user: dbuchan
-#   sudo: yes
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   roles:
 #     - djangomachine
 #     - aahead
@@ -44,8 +48,9 @@
 #
 # - name: Apply Analytics Automated worker node configuration
 #   hosts: aa_workers
-#   user: dbuchan
-#   sudo: yes
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   roles:
 #     - djangomachine
 #     - aaworker
@@ -54,8 +59,9 @@
 
 # - name: Create SGE head
 #   hosts: sge_head
-#   user: dbuchan
-#   sudo: yes
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   roles:
 #     #- buildsge
 #     - sgehead
@@ -64,8 +70,9 @@
 #
 - name: Create SGE node
   hosts: sge_node
-  user: dbuchan
-  sudo: yes
+  become: true
+  become_user: root
+  become_method: sudo
   roles:
     # - sgenode
     # - blastmachine
@@ -81,16 +88,17 @@
     # - hspred
     # - memembed
     # - maketdb
-    - bioserf #package includes all the domserf code too
-
-    # - ffpred URGH
-
+    # - bioserf #package includes all the domserf code too
+    # - metapsicov
+    # - ffpred
   vars_files:
     - secrets/staging_secrets.yaml
 
 # - name: Install webserver
 #   hosts: webserver
-#   user: dbuchan
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
 #   sudo: yes
 #   roles:
 #     - djangomachine

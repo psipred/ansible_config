@@ -35,8 +35,8 @@
       src: files/signalp
       dest: /opt/signalp-4.1
       mode: "uog+x"
-#
-#
+
+NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
   - name: Check if nephpos is installed
     stat: path=/opt/ape-1.0
     register: netphos_exist
@@ -139,6 +139,9 @@
     stat: path=/opt/EMBOSS-6.4.0
     register: emboss_exist
 
+THIS DID NOT INSTALL CORRECTLY. configure needs a prefix AND the resulting
+make file needs to be edited to remove jemboss from line 279
+
   - name: Download EMBOSS
     when: emboss_exist.stat.exists == False
     shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/EMBOSS-6.4.0.tar.gz"
@@ -149,22 +152,25 @@
     when: emboss_exist.stat.exists == False
 
   - name: configure emboss
-    shell: "cd /opt/EMBOSS-6.4.0; ./configure"
+    shell: "cd /opt/EMBOSS-6.4.0; ./configure --prefix=/opt/EMBOSS-6.4.0/"
     when: emboss_exist.stat.exists == False
 
   - name: make emboss
     shell: "cd /opt/EMBOSS-6.4.0; make"
     when: emboss_exist.stat.exists == False
-#
-#
+
+  - name: install emboss
+    shell: "cd /opt/EMBOSS-6.4.0; make install"
+    when: emboss_exist.stat.exists == False
+
   - name: Check if ffpred is installed
-    stat: path=/opt/ffpred3
+    stat: path=/opt/ffpred4
     register: ffpred_exist
 
-  - name : Check Out MEMSATSVM from GIT
+  - name : Check Out FFPRED from GIT
     when: ffpred_exist.stat.exists == False
     git:
-      repo: https://github.com/psipred/FFPred3.git
+      repo: https://github.com/psipred/FFPred4.git
       dest: /opt/ffpred3
       clone: yes
       force: yes
@@ -179,7 +185,7 @@
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
   - name: untar ffpred SVMs
-    shell: "cd /opt/ffpred3; tar -zxvf SVMs.tar.gz"
+    shell: "cd /opt/ffpred3; tar -h -zxvf SVMs.tar.gz"
     when: ffpred_exist.stat.exists == False
 
   - name: remove SVM tarball

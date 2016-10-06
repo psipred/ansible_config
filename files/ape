@@ -22,7 +22,8 @@ setenv	APE	/opt/ape-1.0
 
 # determine platform (do not change this unless you don't have 'uname'!)
 setenv	UNIX	`uname -s`
-setenv	ARCH	`uname -m`
+#setenv	ARCH	`uname -m`
+setenv	ARCH	"i386"
 
 # determine where to store temporary files
 setenv	TMP	/tmp
