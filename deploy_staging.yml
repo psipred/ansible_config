@@ -62,6 +62,10 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
+# mempack won't compile in OSX
+# domThreader seg faults in OSX
+#
+
 - name: Create SGE node
   hosts: sge_node
   user: dbuchan
