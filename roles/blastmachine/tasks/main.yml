@@ -4,13 +4,21 @@
     stat: path=/usr/local/bin/blastp
     register: blastp_exist
 
+  # - name: Download BLAST+ tarball
+  #   shell: "chdir=/opt/ wget --timeout 120 ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.2.31+-src.tar.gz -O ncbi-blast-2.2.31+-src.tar.gz"
+  #   when: blastp_exist.stat.exists == False
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download BLAST+ tarball
-    shell: "chdir=/opt/ wget --timeout 120 ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.2.31+-src.tar.gz -O ncbi-blast-2.2.31+-src.tar.gz"
     when: blastp_exist.stat.exists == False
+    get_url:
+      url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.2.31+-src.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar the tarball
     shell: cd /opt/; tar -zxvf ncbi-blast-2.2.31+-src.tar.gz
@@ -49,6 +57,14 @@
   # - name: unzip uniref90
   #   shell: cd /opt/uniref/; gunzip uniref90.fasta.gz
   #   when: uniref_exist.stat.exists == False
+
+  # - name: Download unired90
+  #   when: uniref_exist.stat.exists == False
+  #   get_url:
+  #     url: ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
+  #     dest: /opt/
+  #     timeout: 120
+  #   register: get_url_result
 
   - name: Copy uniref_test_db
     copy:

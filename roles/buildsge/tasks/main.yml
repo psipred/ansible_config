@@ -17,14 +17,22 @@
     become_user: root
     register: ogs_tarball_exist
 
+  # - name: Download OGS tarball
+  #   shell: chdir=/root/ wget --timeout 120 http://sourceforge.net/projects/gridscheduler/files/GE2011.11p1/GE2011.11p1.tar.gz/download?use_mirror=superb-sea2 -O GE2011.11p1.tar.gz
+  #   when: ogs_tarball_exist.stat.exists == False
+  #   become_user: root
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download OGS tarball
-    shell: chdir=/root/ wget --timeout 120 http://sourceforge.net/projects/gridscheduler/files/GE2011.11p1/GE2011.11p1.tar.gz/download?use_mirror=superb-sea2 -O GE2011.11p1.tar.gz
     when: ogs_tarball_exist.stat.exists == False
-    become_user: root
+    get_url:
+      url: http://sourceforge.net/projects/gridscheduler/files/GE2011.11p1/GE2011.11p1.tar.gz/download?use_mirror=superb-sea2
+      dest: /root/GE2011.11p1.tar.gz
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar the tarball
     become_user: root
@@ -54,14 +62,22 @@
     become_user: root
     register: ant_tarball_exist
 
+  # - name: Download ant tarball
+  #   shell: chdir=/opt/ wget --timeout 120 http://mirrors.ukfast.co.uk/sites/ftp.apache.org//ant/binaries/apache-ant-1.9.6-bin.tar.gz -O apache-ant-1.9.6-bin.tar.gz
+  #   when: ant_tarball_exist.stat.exists == False
+  #   become_user: root
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download ant tarball
-    shell: chdir=/opt/ wget --timeout 120 http://mirrors.ukfast.co.uk/sites/ftp.apache.org//ant/binaries/apache-ant-1.9.6-bin.tar.gz -O apache-ant-1.9.6-bin.tar.gz
     when: ant_tarball_exist.stat.exists == False
-    become_user: root
+    get_url:
+      url: http://mirrors.ukfast.co.uk/sites/ftp.apache.org/ant/binaries/apache-ant-1.9.7-bin.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar the ant tarball
     become_user: root
@@ -73,14 +89,23 @@
     become_user: root
     register: junit_exist
 
+  # - name: Download junit tarball
+  #   shell: chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/junit/files/junit/4.10/junit4.10.zip/download?use_mirror=superb-sea2 -O junit4.10.zip
+  #   when: junit_exist.stat.exists == False
+  #   become_user: root
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download junit tarball
-    shell: chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/junit/files/junit/4.10/junit4.10.zip/download?use_mirror=superb-sea2 -O junit4.10.zip
     when: junit_exist.stat.exists == False
-    become_user: root
+    get_url:
+      url: http://sourceforge.net/projects/junit/files/junit/4.10/junit4.10.zip/download?use_mirror=superb-sea2
+      dest: /opt/junit4.10.zip
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
+
 
   - name: unzip the junit zip
     become_user: root
@@ -92,14 +117,23 @@
     become_user: root
     register: javacc_exist
 
+  # - name: Download javacc tarball
+  #   shell: chdir=/opt/ wget --timeout 120 https://java.net/projects/javacc/downloads/download/javacc-6.0.zip -O javacc-6.0.zip
+  #   when: javacc_exist.stat.exists == False
+  #   become_user: root
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download javacc tarball
-    shell: chdir=/opt/ wget --timeout 120 https://java.net/projects/javacc/downloads/download/javacc-6.0.zip -O javacc-6.0.zip
-    when: javacc_exist.stat.exists == False
     become_user: root
+    when: javacc_exist.stat.exists == False
+    get_url:
+      url: https://java.net/projects/javacc/downloads/download/javacc-6.0.zip
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: unzip the javacc zip
     become_user: root
@@ -111,14 +145,22 @@
     become_user: root
     register: izpack_exist
 
+  # - name: Download IzPack tarball
+  #   shell: chdir=/opt/ wget --timeout 120 http://bioteam.net/wp-content/uploads/misc/Izpack-1.4.4.tar.gz -O Izpack-1.4.4.tar.gz
+  #   when: izpack_exist.stat.exists == False
+  #   become_user: root
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download IzPack tarball
-    shell: chdir=/opt/ wget --timeout 120 http://bioteam.net/wp-content/uploads/misc/Izpack-1.4.4.tar.gz -O Izpack-1.4.4.tar.gz
     when: izpack_exist.stat.exists == False
-    become_user: root
+    get_url:
+      url: http://bioteam.net/wp-content/uploads/misc/Izpack-1.4.4.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar the IzPack
     become_user: root
@@ -134,14 +176,22 @@
     become_user: root
     register: bdb_exist
 
+  # - name: Download BDB tarball
+  #   shell: chdir=/opt/berkeley-db/ wget --timeout 120 http://download.oracle.com/berkeley-db/db-4.4.20.tar.gz -O db-4.4.20.tar.gz
+  #   when: bdb_exist.stat.exists == False
+  #   become_user: root
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Download BDB tarball
-    shell: chdir=/opt/berkeley-db/ wget --timeout 120 http://download.oracle.com/berkeley-db/db-4.4.20.tar.gz -O db-4.4.20.tar.gz
     when: bdb_exist.stat.exists == False
-    become_user: root
+    get_url:
+      url: http://download.oracle.com/berkeley-db/db-4.4.20.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar BDB
     become_user: root
@@ -168,14 +218,23 @@
     become_user: root
     register: openssl_exist
 
+  # - name: Get openssl
+  #   shell: chdir=/opt/ wget --timeout 120 https://www.openssl.org/source/openssl-1.0.0s.tar.gz -O openssl-1.0.0s.tar.gz
+  #   become_user: root
+  #   when: openssl_exist.stat.exists == False
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
   - name: Get openssl
-    shell: chdir=/opt/ wget --timeout 120 https://www.openssl.org/source/openssl-1.0.0s.tar.gz -O openssl-1.0.0s.tar.gz
     become_user: root
     when: openssl_exist.stat.exists == False
+    get_url:
+      url: https://www.openssl.org/source/openssl-1.0.0s.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar the openssl
     become_user: root

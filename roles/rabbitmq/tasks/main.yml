@@ -16,15 +16,24 @@
     stat: "path=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
     register: rabbit_tarball_exist
 
-  - name: Download rabbitMQ tarball
-    # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbit_mq_version }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz -O rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
-    when: rabbit_tarball_exist.stat.exists == False
+  # - name: Download rabbitMQ tarball
+  #   # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
+  #   shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbit_mq_version }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz -O rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
+  #   when: rabbit_tarball_exist.stat.exists == False
+  #   become_user: "{{ rabbit_user }}"
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 10
+  #   delay: 10
+
+  - name: Download RabbitMQ tarball
     become_user: "{{ rabbit_user }}"
+    when: rabbit_tarball_exist.stat.exists == False
+    get_url:
+      url: https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbit_mq_version }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz
+      dest: "/opt/{{ rabbit_user }}}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 10
-    delay: 10
 
   - name: untar the tarball
     shell: "cd /home/{{ rabbit_user }}; tar -zxvf /home/{{ rabbit_user }}/rabbitmq-server-generic-unix-{{ rabbit_mq_version }}.tar.gz"
@@ -89,13 +98,22 @@
 
   - name: Download rabbitMQadmin tarball
     # get_url: "url=https://www.rabbitmq.com/releases/rabbitmq-server/v3.5.4/rabbitmq-server-generic-unix-3.5.4.tar.gz dest=/home/{{ rabbit_user }}/rabbitmq-server-generic-unix-3.5.4.tar.gz"
-    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 http://bioinfstage1:15672/cli/rabbitmqadmin -O rabbutmqadmin"
+    shell: "chdir=/home/{{ rabbit_user }} wget --timeout 120 http://bioinfstage1:15672/cli/rabbitmqadmin -O rabbitmqadmin"
     when: rabbit_tarball_exist.stat.exists == False
     become_user: "{{ rabbit_user }}"
     register: get_url_result
     until: get_url_result.stdout.find("rabbitmq_server-3.5.3/sbin") == -1
     retries: 10
     delay: 10
+
+  - name: Download RabbitMQ tarball
+    become_user: "{{ rabbit_user }}"
+    when: rabbit_tarball_exist.stat.exists == False
+    get_url:
+      url: http://bioinfstage1:15672/cli/rabbitmqadmin
+      dest: "/home/{{ rabbit_user }}"
+      timeout: 120
+    register: get_url_result
 
   - name: enable management plugin
     shell: "/home/{{ rabbit_user }}/rabbitmq_server-{{ rabbit_mq_version }}/sbin/rabbitmq-plugins enable rabbitmq_management"

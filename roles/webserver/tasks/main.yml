@@ -12,14 +12,22 @@
     always_run: yes
     sudo: yes
 
-  - name: Download get-pip.py
-    shell: "chdir={{ webserver_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+  # - name: Download get-pip.py
+  #   shell: "chdir={{ webserver_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+  #   become_user: "{{ webserver_user }}"
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 2
+  #   delay: 10
+  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: get get-pip.py
     become_user: "{{ webserver_user }}"
+    get_url:
+      url: https://bootstrap.pypa.io/get-pip.py
+      dest: "{{ webserver_home }}/get-pip.py"
+      timeout: 120
     register: get_url_result
-    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    retries: 2
-    delay: 10
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
   - name: Install pip
     shell: "chdir={{ webserver_home }} /bin/python3.4 get-pip.py"

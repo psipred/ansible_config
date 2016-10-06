@@ -1,0 +1,15 @@
+  - name: Check memembed is present
+    stat: path=/opt/memembed
+    register: memembed_exist
+
+  - name : Check out memembed from GIT
+    when: memembed_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/memembed.git
+      dest: /opt/memembed
+      clone: yes
+      force: yes
+
+  - name: make and install memembed
+    shell: "cd /opt/memembed; make"
+    when: memembed_exist.stat.exists == False

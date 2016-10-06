@@ -19,9 +19,17 @@
     stat: path=/opt/signalp-4.1
     register: signalp_exist
 
+  # - name: Download signalP
+  #   when: signalp_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/signalp-4.1e.Linux.tar.gz"
+  #   register: get_url_result
+
   - name: Download signalP
-    when: signalp_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/signalp-4.1e.Linux.tar.gz"
+    when: signalP_exist.stat.exists == False
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/signalp-4.1e.Linux.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: untar signalp
@@ -35,15 +43,23 @@
       src: files/signalp
       dest: /opt/signalp-4.1
       mode: "uog+x"
-#
-#
+
+NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
   - name: Check if nephpos is installed
     stat: path=/opt/ape-1.0
     register: netphos_exist
 
+  # - name: Download netphos
+  #   when: netphos_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netphos-3.1.Linux.tar"
+  #   register: get_url_result
+
   - name: Download netphos
     when: netphos_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netphos-3.1.Linux.tar"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netphos-3.1.Linux.tar
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: untar netphos
@@ -57,15 +73,22 @@
       src: files/ape
       dest: /opt/ape-1.0
       mode: "uog+x"
-#
-#
+
   - name: Check if netNGlyc is installed
     stat: path=/opt/netNglyc-1.0
     register: netnglyc_exist
 
+  # - name: Download netnglyc
+  #   when: netnglyc_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netNglyc-1.0c.Linux.tar.Z"
+  #   register: get_url_result
+
   - name: Download netnglyc
     when: netnglyc_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netNglyc-1.0c.Linux.tar.Z"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netNglyc-1.0c.Linux.tar.Z
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: untar netNglyc
@@ -79,15 +102,22 @@
       src: files/netNglyc
       dest: /opt/netNglyc-1.0
       mode: "uog+x"
-#
-#
+
   - name: Check if netOGlyc is installed
     stat: path=/opt/netOglyc-3.1d
     register: netoglyc_exist
 
+  # - name: Download netoglyc
+  #   when: netoglyc_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netOglyc-3.1d.Linux.tar.Z"
+  #   register: get_url_result
+
   - name: Download netoglyc
     when: netoglyc_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netOglyc-3.1d.Linux.tar.Z"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/netOglyc-3.1d.Linux.tar.Z
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: untar netOglyc
@@ -101,29 +131,43 @@
       src: files/netOglyc
       dest: /opt/netOglyc-3.1d
       mode: "uog+x"
-#
-#
+
   - name: Check if wolfpsort is installed
     stat: path=/opt/WoLFPSort-master
     register: psort_exist
 
+  # - name: Download wolfpsort
+  #   when: psort_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/wolfpsort_0.2.zip"
+  #   register: get_url_result
+
   - name: Download wolfpsort
     when: psort_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/wolfpsort_0.2.zip"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/wolfpsort_0.2.zip
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: unzip wolfpsort
     shell: "cd /opt; unzip wolfpsort_0.2.zip"
     when: psort_exist.stat.exists == False
-#
-#
+
   - name: Check if coils is installed
     stat: path=/opt/coils
     register: coils_exist
 
+  # - name: Download coils
+  #   when: coils_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/coils.tar.gz"
+  #   register: get_url_result
+
   - name: Download coils
     when: coils_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/coils.tar.gz"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/coils.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: untar coils
@@ -139,9 +183,19 @@
     stat: path=/opt/EMBOSS-6.4.0
     register: emboss_exist
 
+THIS DID NOT INSTALL CORRECTLY. configure needs a prefix AND the resulting
+make file needs to be edited to remove jemboss from line 279
+
+  # - name: Download EMBOSS
+  #   when: emboss_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/EMBOSS-6.4.0.tar.gz"
+  #   register: get_url_result
   - name: Download EMBOSS
     when: emboss_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/EMBOSS-6.4.0.tar.gz"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/EMBOSS-6.4.0.tar.g
+      dest: /opt/
+      timeout: 120
     register: get_url_result
 
   - name: untar emboss
@@ -149,22 +203,25 @@
     when: emboss_exist.stat.exists == False
 
   - name: configure emboss
-    shell: "cd /opt/EMBOSS-6.4.0; ./configure"
+    shell: "cd /opt/EMBOSS-6.4.0; ./configure --prefix=/opt/EMBOSS-6.4.0/"
     when: emboss_exist.stat.exists == False
 
   - name: make emboss
     shell: "cd /opt/EMBOSS-6.4.0; make"
     when: emboss_exist.stat.exists == False
-#
-#
+
+  - name: install emboss
+    shell: "cd /opt/EMBOSS-6.4.0; make install"
+    when: emboss_exist.stat.exists == False
+
   - name: Check if ffpred is installed
-    stat: path=/opt/ffpred3
+    stat: path=/opt/ffpred4
     register: ffpred_exist
 
-  - name : Check Out MEMSATSVM from GIT
+  - name : Check Out FFPRED from GIT
     when: ffpred_exist.stat.exists == False
     git:
-      repo: https://github.com/psipred/FFPred3.git
+      repo: https://github.com/psipred/FFPred4.git
       dest: /opt/ffpred3
       clone: yes
       force: yes
@@ -179,7 +236,7 @@
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
   - name: untar ffpred SVMs
-    shell: "cd /opt/ffpred3; tar -zxvf SVMs.tar.gz"
+    shell: "cd /opt/ffpred3; tar -h -zxvf SVMs.tar.gz"
     when: ffpred_exist.stat.exists == False
 
   - name: remove SVM tarball

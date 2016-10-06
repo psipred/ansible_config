@@ -1,0 +1,55 @@
+  - name: Check maketdb is present
+    stat: path=/opt/maketdb
+    register: maketdb_exist
+
+  - name : Check out make tdb from GIT
+    when: maketdb_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/maketdb.git
+      dest: /opt/maketdb
+      clone: yes
+      force: yes
+
+  - name: make maketdb components
+    when: maketdb_exist.stat.exists == False
+    shell: "cd /opt/maketdb/src/; make"
+
+  - name: install maketdb
+    when: maketdb_exist.stat.exists == False
+    shell: "cd /opt/maketdb/src; make install"
+
+  - name: Move make_tdb.pl script over
+    # when: maketdb_exist.stat.exists == False
+    copy:
+      src: secrets/make_tdb.pl
+      dest: /opt/maketdb/bin/
+      mode: "uog+x"
+
+  - name: Check tcoffee is present
+    stat: path=/opt/T-COFFEE_distribution_Version_11.00.05372cb
+    register: tcoffee_exist
+
+  # - name: Download tcoffee
+  #   when: tcoffee_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz"
+  #   register: get_url_result
+  #   # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download tcoffee
+    when: tcoffee_exist.stat.exists == False
+    get_url:
+      url: http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+
+  - name: untar tcoffee
+    when: tcoffee_exist.stat.exists == False
+    shell: "cd /opt/; tar -zxvf T-COFFEE_distribution_Version_11.00.05372cb.tar.gz"
+
+  - name: install tcoffee
+    when: tcoffee_exist.stat.exists == False
+    shell: "cd /opt/T-COFFEE_distribution_Version_11.00.05372cb/; ./install tcoffee"

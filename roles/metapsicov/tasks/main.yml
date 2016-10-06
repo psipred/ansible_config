@@ -1,0 +1,191 @@
+---
+  - name: Check if there is a dir for the HHpdb db
+    stat: path=/opt/hh-suite/hhdb/pdb/
+    register: hhpdb_exist
+
+  - name : Create db dir
+    when: hhpdb_exist.stat.exists == False
+    file:
+      state: directory
+      path: /opt/hh-suite/hhdb/pdb/
+      mode: ug+rwx
+
+  # Not doing it this way as we are highly space limited on the target devices
+  # - name: get HHSeach pdb70 db
+  #   when: hhpdb_exist.stat.exists == False
+  #   unarchive:
+  #     src: http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pdb70_14Sep16.tgz
+  #     dest: /opt/hh-suite/hhdb/pdb/
+  #     remote_src: yes
+
+  - name: Download pdb70 db
+    when: hhpdb_exist.stat.exists == False
+    shell: "chdir=/opt/hh-suite/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pdb70_14Sep16.tgz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: unarchive HHSeach pdb70 db
+    when: hhpdb_exist.stat.exists == False
+    unarchive:
+      src: /opt/hh-suite/hhdb/pdb70_14Sep16.tgz
+      dest: /opt/hh-suite/hhdb/pdb/
+      remote_src: yes
+
+  - name: Check if there is a dir for the HHuniprot
+    stat: path=/opt/hh-suite/hhdb/uniprot/
+    register: hhuniprot_exist
+
+  - name : Create HH uniprot20 dir
+    when: hhuniprot_exist.stat.exists == False
+    file:
+      state: directory
+      path: /opt/hh-suite/hhdb/uniprot/
+      mode: ug+rwx
+
+  - name: Download uniprot20 db
+    when: hhuniprot_exist.stat.exists == False
+    shell: "chdir=/opt/hh-suite/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/uniprot20_2016_02.tgz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: unpack HHSeach uniprot20 db
+    when: hhuniprot_exist.stat.exists == False
+    unarchive:
+      src: /opt/hh-suite/hhdb/uniprot20_2016_02.tgz
+      dest: /opt/hh-suite/hhdb/uniprot/
+      remote_src: yes
+
+  - name: Check if there is a dir for the HHuniprot
+    stat: path=/opt/hmmer-3.1b2-linux-intel-x86_64/
+    register: hmmer_exist
+
+  - name: get hmmer
+    when: hmmer_exist.stat.exists == False
+    get_url:
+      url: http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+
+  - name: unarchive hmmer
+    when: hmmer_exist.stat.exists == False
+    unarchive:
+      src: /opt/hmmer-3.1b2-linux-intel-x86_64.tar.gz
+      dest: /opt/
+      remote_src: yes
+
+  - name: configure hmmer-3
+    when: hmmer_exist.stat.exists == False
+    shell: "cd /opt/hmmer-3.1b2-linux-intel-x86_64/; ./configure"
+
+  - name: make hmmer-3
+    when: hmmer_exist.stat.exists == False
+    shell: "cd /opt/hmmer-3.1b2-linux-intel-x86_64/; make"
+
+  - name: check we have blas
+    stat: path=/opt/OpenBlas
+    register: blas_exist
+
+  - name : Check out blas from GIT
+    when: blas_exist.stat.exists == False
+    git:
+      repo: https://github.com/xianyi/OpenBLAS.git
+      dest: /opt/OpenBlas
+      clone: yes
+      force: yes
+
+  - name: make OpenBlas
+    when: blas_exist.stat.exists == False
+    shell: "cd /opt/OpenBlas/; make"
+
+  - name: install OpenBlas
+    when: blas_exist.stat.exists == False
+    shell: "cd /opt/OpenBlas/; make install"
+
+  - name: check we have ccmpred
+    stat: path=/opt/CCMpred
+    register: ccmpred_exist
+
+  - name : Check out ccmpred from GIT
+    when: ccmpred_exist.stat.exists == False
+    git:
+      repo: https://github.com/soedinglab/CCMpred
+      recursive: yes
+      dest: /opt/CCMpred
+      clone: yes
+      force: yes
+
+  - name: cmake ccmpred
+    when: ccmpred_exist.stat.exists == False
+    shell: "cd /opt/CCMpred/; cmake ."
+
+  - name: make ccmpred
+    when: ccmpred_exist.stat.exists == False
+    shell: "cd /opt/CCMpred/; make"
+
+  - name: Install freecontact dependencies
+    yum:
+      pkg: lapack, lapack-devel, lapack64, lapack64-devel
+      state: latest
+
+  - name: check we have FreeContact
+    stat: path=/opt/freecontact-1.0.21
+    register: freecontact_exist
+
+  - name: get freecontact
+    when: freecontact_exist.stat.exists == False
+    get_url:
+      url: ftp://rostlab.org/free/freecontact-1.0.21.tar.xz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+
+  - name: unarchive freecontact
+    when: freecontact_exist.stat.exists == False
+    unarchive:
+      src: /opt/freecontact-1.0.21.tar.xz
+      dest: /opt/
+      remote_src: yes
+
+  - name: configure freecontact
+    when: freecontact_exist.stat.exists == False
+    shell: 'cd /opt/freecontact-1.0.21/; ./configure CFLAGS=-I/opt/OpenBLAS/include LIBS=-L/opt/OpenBLAS/lib LDFLAGS=-L/opt/OpenBLAS/lib CPPFLAGS=-I/opt/OpenBLAS/include'
+
+  - name: make freecontact
+    when: freecontact_exist.stat.exists == False
+    environment:
+      LD_LIBRARY_PATH: /opt/OpenBLAS/lib/
+    shell: "cd /opt/freecontact-1.0.21/; make"
+    #run with env LD_LIBRARY_PATH=/opt/OpenBLAS/lib/ src/freecontact
+
+  - name: check we have metapsicov
+    stat: path=/opt/metapsicov
+    register: metapsicov_exist
+
+  - name : Check out metapsicov from GIT
+    when: metapsicov_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/metapsicov.git
+      dest: /opt/metapsicov
+      clone: yes
+      force: yes
+
+  - name: make metapsicov components
+    when: metapsicov_exist.stat.exists == False
+    shell: "cd /opt/metapsicov/src; make"
+
+  - name: install metapsicov components
+    when: metapsicov_exist.stat.exists == False
+    shell: "cd /opt/metapsicov/src; make install"

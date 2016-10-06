@@ -1,0 +1,19 @@
+  - name: Check hspred is present
+    stat: path=/opt/hspred
+    register: hspred_exist
+
+  - name : Check out hspred from GIT
+    when: hspred_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/hspred.git
+      dest: /opt/hspred
+      clone: yes
+      force: yes
+
+  # - name: make metsite components
+  #   when: metsite_exist.stat.exists == False
+  #   shell: "cd /opt/metsite/src/; make"
+  #
+  # - name: install metsite
+  #   when: metsite_exist.stat.exists == False
+  #   shell: "cd /opt/metsite/src; make install"

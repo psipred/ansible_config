@@ -34,14 +34,22 @@
       clone: yes
       force: yes
 
-  - name: Download memsat model data
-    when: memsat_exist.stat.exists == False
-    shell: "chdir=/opt/memsat-svm wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz"
-    register: get_url_result
+  # - name: Download memsat model data
+  #   when: memsat_exist.stat.exists == False
+  #   shell: "chdir=/opt/memsat-svm wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz"
+  #   register: get_url_result
     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     # retries: 2
     # delay: 10
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download memsat
+    when: memsat_exist.stat.exists == False
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz
+      dest: /opt/memsat-svm
+      timeout: 120
+    register: get_url_result
 
   - name: untar memsat model data
     shell: "cd /opt/memsat-svm; tar -zxvf models.tar.gz"
