@@ -11,14 +11,23 @@
     stat: path=/opt/ImageMagick-6.8.9-10
     register: imagemagick_exist
 
-  - name: Download ImageMagick
-    when: imagemagick_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 ftp://ftp.imagemagick.org/pub/ImageMagick/releases/ImageMagick-6.8.9-10.tar.xz"
-    register: get_url_result
+  # - name: Download ImageMagick
+  #   when: imagemagick_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 ftp://ftp.imagemagick.org/pub/ImageMagick/releases/ImageMagick-6.8.9-10.tar.xz"
+  #   register: get_url_result
     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     # retries: 2
     # delay: 10
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    get_url:
+      url: ftp://ftp.imagemagick.org/pub/ImageMagick/releases/ImageMagick-6.8.9-10.tar.xz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+
   - name: untar ImageMagick
     when: imagemagick_exist.stat.exists == False
     shell: "cd /opt/; tar -xvf ImageMagick-6.8.9-10.tar.xz"

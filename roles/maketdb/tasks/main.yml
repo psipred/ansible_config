@@ -29,14 +29,22 @@
     stat: path=/opt/T-COFFEE_distribution_Version_11.00.05372cb
     register: tcoffee_exist
 
-  - name: Download tcoffee
-    when: tcoffee_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz"
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  # - name: Download tcoffee
+  #   when: tcoffee_exist.stat.exists == False
+  #   shell: "chdir=/opt/ wget --timeout 120 http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz"
+  #   register: get_url_result
+  #   # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     # retries: 2
     # delay: 10
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download tcoffee
+    when: tcoffee_exist.stat.exists == False
+    get_url:
+      url: http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
 
   - name: untar tcoffee
     when: tcoffee_exist.stat.exists == False

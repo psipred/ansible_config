@@ -89,7 +89,8 @@
     # - memembed
     # - maketdb
     # - bioserf #package includes all the domserf code too
-    # - metapsicov
+    - metapsicov
+
     # - ffpred
   vars_files:
     - secrets/staging_secrets.yaml
