@@ -52,7 +52,11 @@
     register: get_url_result
 
   - name: untar memsat model data
-    shell: "cd /opt/memsat-svm; tar -zxvf models.tar.gz"
+    when: memsat_exist.stat.exists == False
+    unarchive:
+      src: /opt/memsat-svm/models.tar.gzmodels.tar.gz
+      dest: /opt/memsat-svm/
+      remote_src: yes
 
   - name: make binaries
     shell: "cd /opt/memsat-svm; make"

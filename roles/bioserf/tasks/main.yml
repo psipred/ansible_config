@@ -2,15 +2,6 @@
     stat: path=/opt/modeller9.17
     register: modeller_exist
 
-  # - name: Download modeller
-  #   when: modeller_exist.stat.exists == False
-  #   shell: "chdir=/opt/ wget --timeout 120 https://salilab.org/modeller/9.17/modeller-9.17.tar.gz"
-  #   register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
   - name: Download modeller
     when: modeller_exist.stat.exists == False
     get_url:
@@ -19,9 +10,12 @@
       timeout: 120
     register: get_url_result
 
-  - name: untar modeller
+  - name: unarchive modeller
     when: modeller_exist.stat.exists == False
-    shell: "cd /opt/; tar -zxvf modeller-9.17.tar.gz"
+    unarchive:
+      src: /opt/modeller-9.17.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: Move hacked install script over
     # when: maketdb_exist.stat.exists == False
@@ -38,15 +32,6 @@
     stat: path=/opt/cmake-3.6.2/
     register: cmake_exist
 
-  # - name: Download cmake
-  #   when: cmake_exist.stat.exists == False
-  #   shell: "chdir=/opt/ wget --timeout 120 https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz"
-  #   register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
   - name: Download cmake
     when: cmake_exist.stat.exists == False
     get_url:
@@ -55,9 +40,12 @@
       timeout: 120
     register: get_url_result
 
-  - name: untar cmake
+  - name: unarchive cmake
     when: cmake_exist.stat.exists == False
-    shell: "cd /opt/; tar -zxvf cmake-3.6.2.tar.gz"
+    unarchive:
+      src: /opt/cmake-3.6.2.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: build and install cmake
     when: cmake_exist.stat.exists == False

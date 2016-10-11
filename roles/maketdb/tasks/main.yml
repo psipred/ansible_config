@@ -48,7 +48,10 @@
 
   - name: untar tcoffee
     when: tcoffee_exist.stat.exists == False
-    shell: "cd /opt/; tar -zxvf T-COFFEE_distribution_Version_11.00.05372cb.tar.gz"
+    unarchive:
+      src: /opt/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz
+      dest: /opt
+      remote_src: yes
 
   - name: install tcoffee
     when: tcoffee_exist.stat.exists == False

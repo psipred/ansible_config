@@ -24,10 +24,13 @@
     when: disopred_exist.stat.exists == False
     get_url:
       url: http://bioinfadmin.cs.ucl.ac.uk/downloads/DISOPRED/dso_lib.tar.gz
-      dest: /opt/
+      dest: /opt/disopred/
       timeout: 120
     register: get_url_result
 
-
   - name: untar dso_lib
-    shell: "cd /opt/disopred; tar -zxvf dso_lib.tar.gz"
+    when: disopred_exist.stat.exists == False
+    unarchive:
+      src: /opt/disopred/dso_lib.tar.gzdso_lib.tar.gz
+      dest: /opt/fisopred
+      remote_src: yes

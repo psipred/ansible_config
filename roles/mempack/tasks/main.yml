@@ -30,7 +30,10 @@
 
   - name: untar ImageMagick
     when: imagemagick_exist.stat.exists == False
-    shell: "cd /opt/; tar -xvf ImageMagick-6.8.9-10.tar.xz"
+    unarchive:
+      src: /opt/ImageMagick-6.8.9-10.tar.xz
+      dest: /opt
+      remote_src: yes
 
   - name: configure ImageMagick
     when: imagemagick_exist.stat.exists == False
@@ -63,7 +66,10 @@
 
   - name: untar boost 1.38
     when: boost_exist.stat.exists == False
-    shell: "cd /opt/; tar -zxvf boost_1_38_0.tar.gz"
+    unarchive:
+      src: /opt/boost_1_38_0.tar.gz
+      dest: /opt
+      remote_src: yes
 
   - name: configure boost
     when: boost_exist.stat.exists == False
@@ -104,9 +110,12 @@
     when: mempack_exist.stat.exists == False
     shell: "cd /opt/mempack/; make"
 
-  - name: untar mempack datasets
+  - name: untar mempack dataset
     when: mempack_exist.stat.exists == False
-    shell: "cd /opt/mempack; tar -zxvf mempack_datasets.tar.gz"
+    unarchive:
+      src: /opt/mempack/mempack_datasets.tar.gz
+      dest: /opt/mempack
+      remote_src: yes
 
   - name: Install SVG.pm
     cpanm:

@@ -85,20 +85,44 @@
       src: files/ge-GE2011.11-bin-linux-x64.tar.gz
       dest: /opt/ogs_src/GE2011.11/
 
+  # - name: untar default
+  #   become_user: "{{ ogs_admin_user }}"
+  #   shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf default.tar.gz"
+  #   when: default_present.stat.isdir is not defined
+
   - name: untar default
     become_user: "{{ ogs_admin_user }}"
-    shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf default.tar.gz"
     when: default_present.stat.isdir is not defined
+    unarchive:
+      src: /opt/ogs_src/GE2011.11/default.tar.gz
+      dest: /opt/ogs_src/GE2011.11/
+      remote_src: yes
+
+  # - name: untar common
+  #   become_user: "{{ ogs_admin_user }}"
+  #   shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf ge-GE2011.11-common.tar.gz"
+  #   when: default_present.stat.isdir is not defined
 
   - name: untar common
     become_user: "{{ ogs_admin_user }}"
-    shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf ge-GE2011.11-common.tar.gz"
     when: default_present.stat.isdir is not defined
+    unarchive:
+      src: /opt/ogs_src/GE2011.11/ge-GE2011.11-common.tar.gz
+      dest: /opt/ogs_src/GE2011.11/
+      remote_src: yes
+
+  # - name: untar x86_64
+  #   become_user: "{{ ogs_admin_user }}"
+  #   shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf ge-GE2011.11-bin-linux-x64.tar.gz"
+  #   when: default_present.stat.isdir is not defined
 
   - name: untar x86_64
     become_user: "{{ ogs_admin_user }}"
-    shell: "cd /opt/ogs_src/GE2011.11; tar -zxvf ge-GE2011.11-bin-linux-x64.tar.gz"
     when: default_present.stat.isdir is not defined
+    unarchive:
+      src: /opt/ogs_src/GE2011.11/ge-GE2011.11-bin-linux-x64.tar.gz
+      dest: /opt/ogs_src/GE2011.11/
+      remote_src: yes
 
   - name: Move execd expect script
     become_user: root

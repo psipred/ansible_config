@@ -34,7 +34,10 @@
 
   - name: untar dompred data
     when: dompred_exist.stat.exists == False
-    shell: "cd /opt/dompred; tar -zxvf dompred_data.tar.gz"
+    unarchive:
+      src: /opt/dompred_data.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: compile DomSSEA
     when: dompred_exist.stat.exists == False

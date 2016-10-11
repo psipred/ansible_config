@@ -88,8 +88,8 @@
     # - hspred
     # - memembed
     # - maketdb
-    # - bioserf #package includes all the domserf code too
-    - metapsicov
+    - bioserf #package includes all the domserf code too
+    # - metapsicov
 
     # - ffpred
   vars_files:

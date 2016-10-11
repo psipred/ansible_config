@@ -17,15 +17,6 @@
     become_user: root
     register: ogs_tarball_exist
 
-  # - name: Download OGS tarball
-  #   shell: chdir=/root/ wget --timeout 120 http://sourceforge.net/projects/gridscheduler/files/GE2011.11p1/GE2011.11p1.tar.gz/download?use_mirror=superb-sea2 -O GE2011.11p1.tar.gz
-  #   when: ogs_tarball_exist.stat.exists == False
-  #   become_user: root
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 10
-  #   delay: 10
-
   - name: Download OGS tarball
     when: ogs_tarball_exist.stat.exists == False
     get_url:
@@ -34,10 +25,12 @@
       timeout: 120
     register: get_url_result
 
-  - name: untar the tarball
-    become_user: root
-    shell: "cd /root; tar -zxvf GE2011.11p1.tar.gz"
-    when: get_url_result.changed
+  - name: untar GE
+    when: ogs_tarball_exist.stat.exists == False
+    unarchive:
+      src: /root/GE2011.11p1.tar.gz
+      dest: /root
+      remote_src: yes
 
   - name: Check got a recent java sdk
     stat: "path=/opt/jdk-8u60-linux-x64.tar.gz"
@@ -53,9 +46,11 @@
     when: java_exist.stat.exists == False
 
   - name: untar the jdk tarball
-    become_user: root
-    shell: "cd /opt; tar -zxvf jdk-8u60-linux-x64.tar.gz"
     when: java_exist.stat.exists == False
+    unarchive:
+      src: /opt/jdk-8u60-linux-x64.tar.gz
+      dest: /opt
+      remote_src: yes
 
   - name: Check if we have Ant
     stat: "path=/opt/apache-ant-1.9.6-bin.tar.gz"
@@ -80,9 +75,11 @@
     register: get_url_result
 
   - name: untar the ant tarball
-    become_user: root
-    shell: "cd /opt; tar -zxvf apache-ant-1.9.6-bin.tar.gz"
     when: get_url_result.changed
+    unarchive:
+      src: /opt/apache-ant-1.9.6-bin.tar.gz
+      dest: /opt
+      remote_src: yes
 
   - name: Check if we have junit
     stat: "path=/opt/junit4.10.zip"
@@ -106,11 +103,12 @@
       timeout: 120
     register: get_url_result
 
-
   - name: unzip the junit zip
-    become_user: root
-    shell: "cd /opt; unzip junit4.10.zip"
     when: get_url_result.changed
+    unarchive:
+      src: /opt/junit4.10.zip
+      dest: /opt
+      remote_src: yes
 
   - name: Check if we have javacc
     stat: "path=/opt/javacc-6.0.zip"
@@ -136,9 +134,11 @@
     register: get_url_result
 
   - name: unzip the javacc zip
-    become_user: root
-    shell: "cd /opt; unzip javacc-6.0.zip"
     when: get_url_result.changed
+    unarchive:
+      src: /opt/javacc-6.0.zip
+      dest: /opt
+      remote_src: yes
 
   - name: Check if we have IzPack
     stat: "path=/opt/Izpack-1.4.4.tar.gz"
@@ -163,9 +163,11 @@
     register: get_url_result
 
   - name: untar the IzPack
-    become_user: root
-    shell: "cd /opt; tar -zxvf Izpack-1.4.4.tar.gz"
     when: get_url_result.changed
+    unarchive:
+      src: /opt/Izpack-1.4.4.tar.gz
+      dest: /opt
+      remote_src: yes
 
   - name: make berkeley_db build dir
     become_user: root
@@ -189,14 +191,16 @@
     when: bdb_exist.stat.exists == False
     get_url:
       url: http://download.oracle.com/berkeley-db/db-4.4.20.tar.gz
-      dest: /opt/
+      dest: /opt/berkeley-db/
       timeout: 120
     register: get_url_result
 
   - name: untar BDB
-    become_user: root
-    shell: "cd /opt/berkeley-db; tar -zxvf db-4.4.20.tar.gz"
     when: get_url_result.changed
+    unarchive:
+      src: /opt/db-4.4.20.tar.gz
+      dest: /opt/berkeley-db/
+      remote_src: yes
 
   - name: Configure BDB
     shell: chdir=/opt/berkeley-db/db-4.4.20/build_unix ../dist/configure --prefix=/opt/berkeley-db/ --enable-rpc
@@ -213,7 +217,7 @@
     become_user: root
     when: get_url_result.changed
 
-  - name: Check if we have opens 1.0.0
+  - name: Check if we have openssl 1.0.0
     stat: "path=/opt/openssl-1.0.0s.tar.gz"
     become_user: root
     register: openssl_exist
@@ -237,9 +241,11 @@
     register: get_url_result
 
   - name: untar the openssl
-    become_user: root
-    shell: "cd /opt; tar -zxvf openssl-1.0.0s.tar.gz"
     when: get_url_result.changed
+    unarchive:
+      src: /opt/openssl-1.0.0s.tar.gz
+      dest: /opt
+      remote_src: yes
 
   - name: configure openssl build
     become_user: root
