@@ -4,7 +4,7 @@
 #
 #
   - name: Check if pgenthreader is installed
-    stat: path=/opt/pgenthreader
+    stat: path=/opt/pgenthreader/GenThreader.sh
     register: pgenthreader_exist
 
   - name : Check Out pGenTHREADER from git
@@ -72,7 +72,7 @@
     when: pgenthreader_exist.stat.exists == False
     unarchive:
       src: /opt/pgenthreader/cath_3_5_domainlib.tar.gz
-      dest: /opt/pgenthreader/cath_domain_tdb/
+      dest: /opt/pgenthreader/
       remote_src: yes
 
   - name: make the binaries

@@ -32,13 +32,18 @@
     stat: path=/opt/cmake-3.6.2/
     register: cmake_exist
 
+  # - name: Download cmake
+  #   when: cmake_exist.stat.exists == False
+  #   get_url:
+  #     url: https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz
+  #     dest: /opt/
+  #     timeout: 120
+  #   register: get_url_result
+
+  #ansible will not get this with the get_url plugin!
   - name: Download cmake
     when: cmake_exist.stat.exists == False
-    get_url:
-      url: https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz
-      dest: /opt/
-      timeout: 120
-    register: get_url_result
+    shell: "cd /opt; wget https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz"
 
   - name: unarchive cmake
     when: cmake_exist.stat.exists == False

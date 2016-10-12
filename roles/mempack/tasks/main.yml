@@ -57,12 +57,11 @@
 
   - name: Download boost 1.38
     when: boost_exist.stat.exists == False
-    shell: "chdir=/opt/ wget --timeout 120 http://sourceforge.net/projects/boost/files/boost/1.38.0/boost_1_38_0.tar.gz"
+    get_url:
+      url: http://sourceforge.net/projects/boost/files/boost/1.38.0/boost_1_38_0.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
   - name: untar boost 1.38
     when: boost_exist.stat.exists == False

@@ -74,24 +74,21 @@
   become_user: root
   become_method: sudo
   roles:
-    # - sgenode
-    # - blastmachine
-    # - psipred
-    # - disopred
-    # - memsatsvm
-    # - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    # - pDomTHREADER # installed to /webdata due to space on bioinfstage4
-    # - genTHREADER # installed to /webdata due to space on bioinfstage4
-    # - dompred # installed to /webdata due to space on bioinfstage4
-    # - mempack
-    # - metsite
-    # - hspred
-    # - memembed
-    # - maketdb
+    - sgenode
+    - blastmachine
+    - psipred
+    - disopred
+    - memsatsvm
+    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+    - dompred # installed to /webdata due to space on bioinfstage4
+    - mempack
+    - metsite
+    - hspred
+    - memembed
+    - maketdb
     - bioserf #package includes all the domserf code too
-    # - metapsicov
-
-    # - ffpred
+    - metapsicov
+    - ffpred
   vars_files:
     - secrets/staging_secrets.yaml
 

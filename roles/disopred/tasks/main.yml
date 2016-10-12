@@ -31,6 +31,6 @@
   - name: untar dso_lib
     when: disopred_exist.stat.exists == False
     unarchive:
-      src: /opt/disopred/dso_lib.tar.gzdso_lib.tar.gz
-      dest: /opt/fisopred
+      src: /opt/disopred/dso_lib.tar.gz
+      dest: /opt/disopred
       remote_src: yes

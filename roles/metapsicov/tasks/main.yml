@@ -1,13 +1,13 @@
 ---
   - name: Check if there is a dir for the HHpdb db
-    stat: path=/opt/hh-suite/hhdb/pdb/
+    stat: path=/opt/hhdb/pdb/
     register: hhpdb_exist
 
   - name : Create db dir
     when: hhpdb_exist.stat.exists == False
     file:
       state: directory
-      path: /opt/hh-suite/hhdb/pdb/
+      path: /opt/hhdb/pdb/
       mode: ug+rwx
 
   # Not doing it this way as we are highly space limited on the target devices
@@ -20,7 +20,7 @@
 
   - name: Download pdb70 db
     when: hhpdb_exist.stat.exists == False
-    shell: "chdir=/opt/hh-suite/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pdb70_14Sep16.tgz"
+    shell: "chdir=/opt/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pdb70_14Sep16.tgz"
     register: get_url_result
     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     # retries: 2
@@ -30,24 +30,27 @@
   - name: unarchive HHSeach pdb70 db
     when: hhpdb_exist.stat.exists == False
     unarchive:
-      src: /opt/hh-suite/hhdb/pdb70_14Sep16.tgz
-      dest: /opt/hh-suite/hhdb/pdb/
+      src: /opt/hhdb/pdb70_14Sep16.tgz
+      dest: /opt/hhdb/pdb
       remote_src: yes
 
-  - name: Check if there is a dir for the HHuniprot
-    stat: path=/opt/hh-suite/hhdb/uniprot/
+  - name: Check if there is a file for the HHuniprot
+    stat:
+      path: /opt/hhdb/uniprot20_2016_02.tgz
+      get_md5: false
+      get_checksum: false
     register: hhuniprot_exist
 
   - name : Create HH uniprot20 dir
     when: hhuniprot_exist.stat.exists == False
     file:
       state: directory
-      path: /opt/hh-suite/hhdb/uniprot/
+      path: /opt/hhdb/uniprot/
       mode: ug+rwx
 
   - name: Download uniprot20 db
     when: hhuniprot_exist.stat.exists == False
-    shell: "chdir=/opt/hh-suite/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/uniprot20_2016_02.tgz"
+    shell: "chdir=/opt/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/uniprot20_2016_02.tgz"
     register: get_url_result
     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
     # retries: 2
@@ -57,11 +60,11 @@
   - name: unpack HHSeach uniprot20 db
     when: hhuniprot_exist.stat.exists == False
     unarchive:
-      src: /opt/hh-suite/hhdb/uniprot20_2016_02.tgz
-      dest: /opt/hh-suite/hhdb/uniprot/
+      src: /opt/hhdb/uniprot20_2016_02.tgz
+      dest: /opt/hhdb/uniprot
       remote_src: yes
 
-  - name: Check if there is a dir for the HHuniprot
+  - name: Check if there is a dir for the hmmr3
     stat: path=/opt/hmmer-3.1b2-linux-intel-x86_64/
     register: hmmer_exist
 

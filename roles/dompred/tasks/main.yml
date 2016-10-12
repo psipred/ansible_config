@@ -3,8 +3,8 @@
 # INSTALLING TO /webdata as we are out of room in /opt ffs
 #
 #
-  - name: Check if dompred is installed
-    stat: path=/opt/dompred
+  - name: Check if dompred is present
+    stat: path=/opt/dompred/parseDS.pl
     register: dompred_exist
 
   - name : Check Out dompred from git
@@ -28,15 +28,15 @@
     when: dompred_exist.stat.exists == False
     get_url:
       url: http://bioinfadmin.cs.ucl.ac.uk/downloads/dompred_data/dompred_data.tar.gz
-      dest: /opt/
+      dest: /opt/dompred/
       timeout: 120
     register: get_url_result
 
   - name: untar dompred data
     when: dompred_exist.stat.exists == False
     unarchive:
-      src: /opt/dompred_data.tar.gz
-      dest: /opt/
+      src: /opt/dompred/dompred_data.tar.gz
+      dest: /opt/dompred/
       remote_src: yes
 
   - name: compile DomSSEA

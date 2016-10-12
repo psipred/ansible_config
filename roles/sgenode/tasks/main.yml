@@ -16,7 +16,8 @@
   - name: Get the current firewalld rules
     shell: firewall-cmd --list-all
     register: firewalldrules
-    always_run: yes
+    check_mode: no
+    #always_run: yes
     sudo: yes
 
   - name: Add Postgres firewalld rules
@@ -51,7 +52,9 @@
 
   - name: Check if we have default cluster config present
     stat: "path=/opt/ogs_src/GE2011.11/default/"
+    become: true
     become_user: root
+    become_method: sudo
     register: default_present
 
   - name: add the ogs directory
@@ -67,6 +70,8 @@
   - name: copy default dir
     when: default_present.stat.isdir is not defined
     become_user: "{{ ogs_admin_user }}"
+    become_method: sudo
+    become: true
     copy:
       src: files/default.tar.gz
       dest: /opt/ogs_src/GE2011.11/
@@ -74,6 +79,8 @@
   - name: copy common tar
     when: default_present.stat.isdir is not defined
     become_user: "{{ ogs_admin_user }}"
+    become_method: sudo
+    become: true
     copy:
       src: files/ge-GE2011.11-common.tar.gz
       dest: /opt/ogs_src/GE2011.11/
@@ -81,6 +88,8 @@
   - name: copy x86_64 tar
     when: default_present.stat.isdir is not defined
     become_user: "{{ ogs_admin_user }}"
+    become_method: sudo
+    become: true
     copy:
       src: files/ge-GE2011.11-bin-linux-x64.tar.gz
       dest: /opt/ogs_src/GE2011.11/
@@ -92,6 +101,8 @@
 
   - name: untar default
     become_user: "{{ ogs_admin_user }}"
+    become_method: sudo
+    become: true
     when: default_present.stat.isdir is not defined
     unarchive:
       src: /opt/ogs_src/GE2011.11/default.tar.gz
@@ -105,6 +116,8 @@
 
   - name: untar common
     become_user: "{{ ogs_admin_user }}"
+    become_method: sudo
+    become: true
     when: default_present.stat.isdir is not defined
     unarchive:
       src: /opt/ogs_src/GE2011.11/ge-GE2011.11-common.tar.gz
@@ -118,6 +131,8 @@
 
   - name: untar x86_64
     become_user: "{{ ogs_admin_user }}"
+    become_method: sudo
+    become: true
     when: default_present.stat.isdir is not defined
     unarchive:
       src: /opt/ogs_src/GE2011.11/ge-GE2011.11-bin-linux-x64.tar.gz
@@ -126,17 +141,22 @@
 
   - name: Move execd expect script
     become_user: root
+    become_method: sudo
+    become: true
     copy:
       src: files/execd_setup.exp
       dest: /opt/ogs_src/GE2011.11
 
   - name: give {{ ogs_admin_user }} permissions on execd_setup.exp
-    sudo: yes
+    become_user: root
+    become_method: sudo
+    become: true
     file:
        path: /opt/ogs_src/GE2011.11/execd_setup.exp
        group: ogs
        mode: "uog+x"
 
+  # if this is being re-run then /etc/init.d/sge* must be removed
   - name: Run install_exced expect script
     become_user: root
     shell: "cd /opt/ogs_src/GE2011.11/; /opt/ogs_src/GE2011.11/execd_setup.exp"
@@ -144,11 +164,15 @@
 
   - name: rewrite the first line of the sgeexecd.staging6444
     shell: sed "1s/.*/#\!\/bin\/sh/" /etc/init.d/sgeexecd.staging6444 > /tmp/sgeexecd.staging6444
-    sudo: yes
+    become_method: sudo
+    become_user: root
+    become: true
 
   - name: rewrite the 2nd line of the sgemaster.staging6444
     shell: sed "2s/.*/sed -e s\/#ENFORCE_SHLIBPATH#\/\/ dist\/util\/rctemplates\/sgeexecd_template/" /tmp/sgeexecd.staging6444 > /etc/init.d/sgeexecd.staging6444
-    sudo: yes
+    become_method: sudo
+    become_user: root
+    become: true
 
   # - name: restart execd
   #   shell: service sgemaster.p6444 stop && sgemaster.p6444 start

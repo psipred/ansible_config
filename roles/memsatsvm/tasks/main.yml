@@ -43,7 +43,7 @@
     # delay: 10
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
-  - name: Download memsat
+  - name: Download memsat tar ball
     when: memsat_exist.stat.exists == False
     get_url:
       url: http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz
@@ -54,7 +54,7 @@
   - name: untar memsat model data
     when: memsat_exist.stat.exists == False
     unarchive:
-      src: /opt/memsat-svm/models.tar.gzmodels.tar.gz
+      src: /opt/memsat-svm/models.tar.gz
       dest: /opt/memsat-svm/
       remote_src: yes
 

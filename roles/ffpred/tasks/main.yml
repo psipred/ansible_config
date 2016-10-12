@@ -25,7 +25,7 @@
   #   register: get_url_result
 
   - name: Download signalP
-    when: signalP_exist.stat.exists == False
+    when: signalp_exist.stat.exists == False
     get_url:
       url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/signalp-4.1e.Linux.tar.gz
       dest: /opt/
@@ -33,8 +33,11 @@
     register: get_url_result
 
   - name: untar signalp
-    shell: "cd /opt; tar -zxvf signalp-4.1e.Linux.tar.gz"
     when: signalp_exist.stat.exists == False
+    unarchive:
+      src: /opt/signalp-4.1e.Linux.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: copy over the configured signalp script
     when: signalp_exist.stat.exists == False
@@ -44,7 +47,6 @@
       dest: /opt/signalp-4.1
       mode: "uog+x"
 
-NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
   - name: Check if nephpos is installed
     stat: path=/opt/ape-1.0
     register: netphos_exist
@@ -63,9 +65,13 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
     register: get_url_result
 
   - name: untar netphos
-    shell: "cd /opt; tar -xvf netphos-3.1.Linux.tar"
     when: netphos_exist.stat.exists == False
+    unarchive:
+      src: /opt/netphos-3.1.Linux.tar
+      dest: /opt/
+      remote_src: yes
 
+  # NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
   - name: copy over the configured ape script
     when: netphos_exist.stat.exists == False
     sudo: true
@@ -73,7 +79,7 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
       src: files/ape
       dest: /opt/ape-1.0
       mode: "uog+x"
-
+#
   - name: Check if netNGlyc is installed
     stat: path=/opt/netNglyc-1.0
     register: netnglyc_exist
@@ -92,8 +98,11 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
     register: get_url_result
 
   - name: untar netNglyc
-    shell: "cd /opt; tar -xvf netNglyc-1.0c.Linux.tar.Z"
     when: netnglyc_exist.stat.exists == False
+    unarchive:
+      src: /opt/netNglyc-1.0c.Linux.tar.Z
+      dest: /opt/
+      remote_src: yes
 
   - name: copy over the configured netnglyc script
     when: netnglyc_exist.stat.exists == False
@@ -121,8 +130,11 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
     register: get_url_result
 
   - name: untar netOglyc
-    shell: "cd /opt; tar -xvf netOglyc-3.1d.Linux.tar.Z"
     when: netoglyc_exist.stat.exists == False
+    unarchive:
+      src: /opt/netOglyc-3.1d.Linux.tar.Z
+      dest: /opt/
+      remote_src: yes
 
   - name: copy over the configured netOglyc script
     when: netoglyc_exist.stat.exists == False
@@ -149,9 +161,12 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
       timeout: 120
     register: get_url_result
 
-  - name: unzip wolfpsort
-    shell: "cd /opt; unzip wolfpsort_0.2.zip"
+  - name: untar wolfpsort
     when: psort_exist.stat.exists == False
+    unarchive:
+      src: /opt/wolfpsort_0.2.zip
+      dest: /opt/
+      remote_src: yes
 
   - name: Check if coils is installed
     stat: path=/opt/coils
@@ -171,8 +186,11 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
     register: get_url_result
 
   - name: untar coils
-    shell: "cd /opt; tar -zxvf coils.tar.gz"
     when: coils_exist.stat.exists == False
+    unarchive:
+      src: /opt/coils.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: compile coils
     shell: "cd /opt/coils; cc -O2 -I. -o ncoils ncoils.c read_matrix.c -lm"
@@ -183,8 +201,8 @@ NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
     stat: path=/opt/EMBOSS-6.4.0
     register: emboss_exist
 
-THIS DID NOT INSTALL CORRECTLY. configure needs a prefix AND the resulting
-make file needs to be edited to remove jemboss from line 279
+# THIS DID NOT INSTALL CORRECTLY. configure needs a prefix AND the resulting
+# make file needs to be edited to remove jemboss from line 279
 
   # - name: Download EMBOSS
   #   when: emboss_exist.stat.exists == False
@@ -193,17 +211,24 @@ make file needs to be edited to remove jemboss from line 279
   - name: Download EMBOSS
     when: emboss_exist.stat.exists == False
     get_url:
-      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/EMBOSS-6.4.0.tar.g
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred_feature_suite/EMBOSS-6.4.0.tar.gz
       dest: /opt/
       timeout: 120
     register: get_url_result
 
   - name: untar emboss
-    shell: "cd /opt; tar -zxvf EMBOSS-6.4.0.tar.gz"
     when: emboss_exist.stat.exists == False
+    unarchive:
+      src: /opt/EMBOSS-6.4.0.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: configure emboss
     shell: "cd /opt/EMBOSS-6.4.0; ./configure --prefix=/opt/EMBOSS-6.4.0/"
+    when: emboss_exist.stat.exists == False
+
+  - name: edit Makefile
+    shell: "cd /opt/EMBOSS-6.4.0; sed -i 's/SUBDIRS = plplot ajax nucleus emboss test doc jemboss/SUBDIRS = plplot ajax nucleus emboss test doc/g' Makefile"
     when: emboss_exist.stat.exists == False
 
   - name: make emboss
@@ -215,7 +240,7 @@ make file needs to be edited to remove jemboss from line 279
     when: emboss_exist.stat.exists == False
 
   - name: Check if ffpred is installed
-    stat: path=/opt/ffpred4
+    stat: path=/opt/ffpred3
     register: ffpred_exist
 
   - name : Check Out FFPRED from GIT
@@ -226,19 +251,23 @@ make file needs to be edited to remove jemboss from line 279
       clone: yes
       force: yes
 
-  - name: Download ffpred SVMs
+  - name: Download ffpredSVMs
     when: ffpred_exist.stat.exists == False
-    shell: "chdir=/opt/ffpred3 wget --timeout 120 http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred/SVMs.tar.gz"
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred/SVMs.tar.gz
+      dest: /opt/
+      timeout: 120
     register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
 
   - name: untar ffpred SVMs
-    shell: "cd /opt/ffpred3; tar -h -zxvf SVMs.tar.gz"
     when: ffpred_exist.stat.exists == False
+    unarchive:
+      src: /opt/SVMs.tar.gz
+      dest: /opt/
+      remote_src: yes
+      extra_opts: "-h"
 
   - name: remove SVM tarball
-    shell: "cd /opt/ffpred3; rm SVMs.tar.gz"
+    shell: "cd /opt/; rm SVMs.tar.gz"
     when: ffpred_exist.stat.exists == False
