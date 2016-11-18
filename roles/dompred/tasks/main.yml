@@ -3,6 +3,12 @@
 # INSTALLING TO /webdata as we are out of room in /opt ffs
 #
 #
+  - name: "install gnuplot"
+    yum:
+      pkg: gnuplot
+      state: latest
+    sudo: yes
+
   - name: Check if dompred is present
     stat: path=/opt/dompred/parseDS.pl
     register: dompred_exist
