@@ -79,17 +79,20 @@
     - psipred
     - disopred
     - memsatsvm
-    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    - dompred # installed to /webdata due to space on bioinfstage4
+    INSTALL GNUPLOT FOR DOMPRED - dompred # installed to /webdata due to space on bioinfstage4
     - mempack
+    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+
+    - bioserf #package includes all the domserf code too
+
+    - ffpred
+    - metapsicov
+
     - metsite
     - hspred
     - memembed
     - maketdb
-    - bioserf #package includes all the domserf code too
-    - metapsicov
-    - ffpred
-  vars_files:
+    vars_files:
     - secrets/staging_secrets.yaml
 
 # - name: Install webserver
