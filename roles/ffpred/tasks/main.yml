@@ -259,7 +259,6 @@
       timeout: 120
     register: get_url_result
 
-
   - name: untar ffpred SVMs
     when: ffpred_exist.stat.exists == False
     unarchive:

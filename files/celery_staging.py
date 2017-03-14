@@ -13,8 +13,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'analytics_automated_project.set
 app = Celery('analytics_automated')
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
-app.config_from_object('django.conf:settings')
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+# app.config_from_object('django.conf:settings')
+# app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+app.config_from_object('django.conf:settings', namespace='CELERY_')
+app.autodiscover_tasks()
 
 CELERY_QUEUES = (
     Queue('localhost', routing_key='localhost.#'),

@@ -15,15 +15,15 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
-# - name: Apply the rabbit_mq configuration
-#   hosts: rabbit_mq
-#   become: true
-#   become_user: dbuchan
-#   become_method: sudo
-#   roles:
-#    - rabbitmq
-#   vars_files:
-#    - secrets/staging_secrets.yaml
+- name: Apply the redis configuration
+  hosts: redis
+  become: true
+  become_user: dbuchan
+  become_method: sudo
+  roles:
+   - redis
+  vars_files:
+   - secrets/staging_secrets.yaml
 #
 # - name: Apply the postgres configuration
 #   hosts: dbserver
@@ -68,33 +68,30 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
-- name: Create SGE node
-  hosts: sge_node
-  become: true
-  become_user: root
-  become_method: sudo
-  roles:
-    - sgenode
-    - blastmachine
-    - psipred
-    - disopred
-    - memsatsvm
-    - dompred # installed to /webdata due to space on bioinfstage4
-    - mempack
-    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    - bioserf
-
-    #domserf
-
-    - ffpred
-    - metapsicov
-
-    - metsite
-    - hspred
-    - memembed
-    - maketdb
-    vars_files:
-    - secrets/staging_secrets.yaml
+# - name: Create SGE node
+#   hosts: sge_node
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - sgenode
+#     - blastmachine
+#     - psipred
+#     - disopred
+#     - memsatsvm
+#     - dompred # installed to /webdata due to space on bioinfstage4
+#     - mempack
+#     - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+#     - bioserf
+#     - domserf
+#     - ffpred
+#     - metapsicov
+#     - metsite
+#     - hspred
+#     - memembed
+#     - maketdb
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
 # - name: Install webserver
 #   hosts: webserver
