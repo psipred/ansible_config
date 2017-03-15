@@ -1,6 +1,7 @@
 #copy auto mount config
   - name: Copy auto.bioinf
-    sudo: yes
+    become_user: root
+    become_method: sudo
     copy:
       src: files/auto.bioinf
       dest: /etc/auto.bioinf
@@ -9,9 +10,11 @@
   - name: Restart autofs
     shell: service autofs restart
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: add chkconfig
     shell: chkconfig autofs on
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo

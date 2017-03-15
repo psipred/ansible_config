@@ -8,7 +8,8 @@
     yum:
       pkg: motif,motif-devel,openssl-devel,openssl-static,make,gcc,autoconf,pam-devel,libXpm,libXpm-devel,ncurses,ncurses-devel,unzip,texinfo
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
 # may need openmotif
 

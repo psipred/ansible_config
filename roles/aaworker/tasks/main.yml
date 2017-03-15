@@ -4,7 +4,9 @@
       name: "{{ django_worker_user }}"
       password: "{{ django_worker_hashed_password }}"
       group: apache
-    sudo: yes
+    become_user: root
+    become_method: sudo
+
 
   - name: Move bash profile for {{ django_worker_user }}
     copy:
@@ -12,7 +14,8 @@
       dest: "/home/{{ django_worker_user }}/.bash_profile"
 
   - name: "give {{ django_worker_user }} permissions on bash_profile"
-    sudo: yes
+    become_user: root
+    become_method: sudo
     file:
        path: "/home/{{ django_worker_user }}/.bash_profile"
        group: apache
@@ -39,7 +42,8 @@
     shell: pip --version
     register: pip_install
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   # - name: Download get-pip.py
   #   shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
@@ -152,12 +156,14 @@
     #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
 
   - name: copy over the aa worker service
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/aaworker.service
       dest: /etc/systemd/system/
       mode: "uog+x"
 
   - name: Add service to systemctl
-    sudo: true
+    become_user: root
+    become_method: sudo
     shell: systemctl enable aaworker.service

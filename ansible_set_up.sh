@@ -18,8 +18,8 @@ ssh-add ~/.ssh/id_rsa
 source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate
 source /home/dbuchan/Applications/ansible/hacking/env-setup
 
-#Everything
-ansible-playbook -i staging deploy_staging.yml
+# ./Everything
+#ansible-playbook -i staging deploy_staging.yml
 
-webservices
+# webservices
 # ansible-playbook -i staging restart_aa.yml

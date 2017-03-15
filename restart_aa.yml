@@ -9,7 +9,7 @@
   vars_files:
    - secrets/staging_secrets.yaml
 
-- name: Apply the postgres configuration
+- name: restarts workers
   hosts: aa_workers
   user: dbuchan
   sudo: yes

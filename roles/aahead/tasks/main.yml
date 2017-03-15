@@ -1,16 +1,20 @@
 ---
+
   - name: "Add {{ django_aa_user }} user"
     user:
       name: "{{ django_aa_user }}"
       password: "{{ django_aa_hashed_password }}"
       group: apache
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Check pip install
     shell: pip --version
     register: pip_install
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
+
 
   # - name: Download get-pip.py
   #   shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
@@ -137,7 +141,8 @@
     shell: ps aux | grep httpd
     register: aa_running
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Make the apachedir
     file:
@@ -163,12 +168,14 @@
       SGE_ROOT: /opt/ogs_src/GE2011.11/
 
   - name: copy over the aa head service
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/aahead.service
       dest: /etc/systemd/system/
       mode: "uog+x"
 
   - name: Add service to systemctl
-    sudo: true
+    become_user: root
+    become_method: sudo
     shell: systemctl enable aahead.service
