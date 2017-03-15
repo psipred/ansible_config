@@ -9,7 +9,8 @@
     yum:
       pkg: expect
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
 #open ports 6444 and 6445
 
@@ -18,21 +19,25 @@
     register: firewalldrules
     check_mode: no
     #always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6444/tcp --permanent
-    sudo: yes
+    become_user: root
+    become_method: sudo
     when: firewalldrules.stdout.find("6444/tcp") == -1
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6445/tcp --permanent
-    sudo: yes
+    become_user: root
+    become_method: sudo
     when: firewalldrules.stdout.find("6445/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
-    sudo: true
+    become_user: root
+    become_method: sudo
 
   - name: add ogs_admin group
     group: name=ogs state=present
@@ -44,11 +49,13 @@
       name: "{{ django_worker_user }}"
       password: "{{ django_worker_hashed_password }}"
       group: apache
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: "Add {{ ogs_admin_user }}"
     user: "name={{ ogs_admin_user }} password={{ ogs_admin_hashed_password }} group=ogs"
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Check if we have default cluster config present
     stat: "path=/opt/ogs_src/GE2011.11/default/"
@@ -64,7 +71,8 @@
       recurse: yes
       group: ogs
       owner: "{{ ogs_admin_user }}"
-    sudo: yes
+    become_user: root
+    become_method: sudo
     when: default_present.stat.isdir is not defined
 
   - name: copy default dir

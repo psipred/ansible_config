@@ -3,7 +3,7 @@
   - name: Get the current firewalld rules
     shell: firewall-cmd --list-all
     register: firewalldrules
-    always_run: yes
+    check_mode: no
     become_user: dbuchan
     become_method: sudo
 

@@ -41,7 +41,8 @@
 
   - name: copy over the configured signalp script
     when: signalp_exist.stat.exists == False
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/signalp
       dest: /opt/signalp-4.1
@@ -74,7 +75,8 @@
   # NOTE THE THE ARCHITECTURE DETECTION DOES NOT WORK IN THE APE SCRIPT FOR x86_64
   - name: copy over the configured ape script
     when: netphos_exist.stat.exists == False
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/ape
       dest: /opt/ape-1.0
@@ -106,7 +108,8 @@
 
   - name: copy over the configured netnglyc script
     when: netnglyc_exist.stat.exists == False
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/netNglyc
       dest: /opt/netNglyc-1.0
@@ -138,7 +141,8 @@
 
   - name: copy over the configured netOglyc script
     when: netoglyc_exist.stat.exists == False
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/netOglyc
       dest: /opt/netOglyc-3.1d

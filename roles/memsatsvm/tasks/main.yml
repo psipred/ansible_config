@@ -4,20 +4,26 @@
     yum:
       pkg: gd
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Install libgd-devel
     yum:
       pkg: gd-devel
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Install Round.pm
+    become_user: root
+    become_method: sudo
     cpanm:
       name: Math::Round
       mirror: http://cpan.mirror.triple-it.nl/
 
   - name: Install GD.pm
+    become_user: root
+    become_method: sudo
     cpanm:
       name: GD
       mirror: http://cpan.mirror.triple-it.nl/

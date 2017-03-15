@@ -11,7 +11,7 @@
   - name: Check pip install
     shell: pip --version
     register: pip_install
-    always_run: yes
+    check_mode: no
     become_user: root
     become_method: sudo
 
@@ -75,30 +75,35 @@
       requirements: "{{ django_aa_home }}analytics_automated/requirements/staging.txt"
 
   - name: Copy aa staging_conf
+    become_user: "{{ django_aa_user }}"
     copy:
       src: secrets/staging.py
       dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
       owner: "{{ django_aa_user }}"
 
   - name: Copy aa staging secrets
+    become_user: "{{ django_aa_user }}"
     copy:
       src: secrets/staging_secrets.json
       dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
       owner: "{{ django_aa_user }}"
 
   - name: Copy aa base secrets
+    become_user: "{{ django_aa_user }}"
     copy:
       src: secrets/base_secrets.json
       dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/settings/"
       owner: "{{ django_aa_user }}"
 
   - name: Copy wsgi.py
+    become_user: "{{ django_aa_user }}"
     copy:
       src: files/wsgi.py
       dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/"
       owner: "{{ django_aa_user }}"
 
   - name: Make aa logging dir
+    become_user: "{{ django_aa_user }}"
     file:
       path: "{{ django_aa_home }}/analytics_automated/logs"
       state: directory
@@ -112,7 +117,18 @@
       group: apache
       mode: "ug+rw"
 
+  - name: move the files/ dir to submissions
+    become_user: "{{ django_aa_user }}"
+    command: "mv {{ django_aa_home }}/analytics_automated/submissions/files /webdata/submissions"
+
+  - name: remove the submissions dir
+    become_user: "{{ django_aa_user }}"
+    file:
+      path: "{{ django_aa_home }}/analytics_automated/submissions/"
+      state: absent
+
   - name: symlink submissions to the aa dir
+    become_user: "{{ django_aa_user }}"
     file:
       src: /webdata/submissions
       dest: "{{ django_aa_home }}/analytics_automated/submissions"
@@ -140,7 +156,7 @@
   - name: Get the current list of processes
     shell: ps aux | grep httpd
     register: aa_running
-    always_run: yes
+    check_mode: no
     become_user: root
     become_method: sudo
 

@@ -7,7 +7,8 @@
     yum:
       pkg: gnuplot
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Check if dompred is present
     stat: path=/opt/dompred/parseDS.pl
