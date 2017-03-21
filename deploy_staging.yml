@@ -5,15 +5,15 @@
 #  YOU MUST HAVE files/jdk-8u60-linux-x64.tar.gz
 #
 
-# - name: Set up mount point
-#   hosts: everyone
-#   become: true
-#   become_user: dbuchan
-#   become_method: sudo
-#   roles:
-#     - automount
-#   vars_files:
-#     - secrets/staging_secrets.yaml
+- name: Set up mount point
+  hosts: everyone
+  become: true
+  become_user: dbuchan
+  become_method: sudo
+  roles:
+    - automount
+  vars_files:
+    - secrets/staging_secrets.yaml
 #
 # - name: Apply the redis configuration
 #   hosts: redis
@@ -67,33 +67,44 @@
 #     - sgehead
 #   vars_files:
 #     - secrets/staging_secrets.yaml
-# mempack won't compile in OSX
-# domThreader seg faults in OSX
-#
 
-- name: Create SGE node
-  hosts: sge_node
+
+- name: Create blastmachine
+  hosts: blastmachine
   become: true
   become_user: root
   become_method: sudo
   roles:
-    - sgenode
+    - djangomachine
     - blastmachine
-    - psipred
-    - disopred
-    - memsatsvm
-    - dompred # installed to /webdata due to space on bioinfstage4
-    - mempack
-    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    - bioserf
-    - ffpred
-    - metapsicov
-    - metsite
-    - hspred
-    - memembed
-    - maketdb
+    - blastworkers
   vars_files:
     - secrets/staging_secrets.yaml
+
+# mempack won't compile in OSX
+# domThreader seg faults in OSX
+# - name: Create SGE node
+#   hosts: sge_node
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - sgenode
+#     - psipred
+#     - disopred
+#     - memsatsvm
+#     - dompred # installed to /webdata due to space on bioinfstage4
+#     - mempack
+#     - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+#     - bioserf
+#     - ffpred
+#     - metapsicov
+#     - metsite
+#     - hspred
+#     - memembed
+#     - maketdb
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
 # - name: Install webserver
 #   hosts: webserver
