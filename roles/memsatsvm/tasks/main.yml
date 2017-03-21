@@ -4,20 +4,26 @@
     yum:
       pkg: gd
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Install libgd-devel
     yum:
       pkg: gd-devel
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Install Round.pm
+    become_user: root
+    become_method: sudo
     cpanm:
       name: Math::Round
       mirror: http://cpan.mirror.triple-it.nl/
 
   - name: Install GD.pm
+    become_user: root
+    become_method: sudo
     cpanm:
       name: GD
       mirror: http://cpan.mirror.triple-it.nl/
@@ -43,7 +49,7 @@
     # delay: 10
     # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
-  - name: Download memsat
+  - name: Download memsat tar ball
     when: memsat_exist.stat.exists == False
     get_url:
       url: http://bioinfadmin.cs.ucl.ac.uk/downloads/memsat-svm/models.tar.gz
@@ -52,7 +58,11 @@
     register: get_url_result
 
   - name: untar memsat model data
-    shell: "cd /opt/memsat-svm; tar -zxvf models.tar.gz"
+    when: memsat_exist.stat.exists == False
+    unarchive:
+      src: /opt/memsat-svm/models.tar.gz
+      dest: /opt/memsat-svm/
+      remote_src: yes
 
   - name: make binaries
     shell: "cd /opt/memsat-svm; make"

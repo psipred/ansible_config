@@ -4,13 +4,15 @@
       name: "{{ webserver_user }}"
       password: "{{ webserver_hashed_password }}"
       group: apache
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Check pip install
     shell: pip --version
     register: pip_install
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   # - name: Download get-pip.py
   #   shell: "chdir={{ webserver_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
@@ -139,12 +141,14 @@
     when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name: copy over the webserver service
-    sudo: true
+    become_user: root
+    become_method: sudo
     copy:
       src: files/webserver.service
       dest: /etc/systemd/system/
       mode: "uog+x"
 
   - name: Add service to systemctl
-    sudo: true
+    become_user: root
+    become_method: sudo
     shell: systemctl enable webserver.service

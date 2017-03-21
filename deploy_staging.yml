@@ -15,13 +15,13 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
-# - name: Apply the rabbit_mq configuration
-#   hosts: rabbit_mq
+# - name: Apply the redis configuration
+#   hosts: redis
 #   become: true
 #   become_user: dbuchan
 #   become_method: sudo
 #   roles:
-#    - rabbitmq
+#    - redis
 #   vars_files:
 #    - secrets/staging_secrets.yaml
 #
@@ -67,7 +67,6 @@
 #     - sgehead
 #   vars_files:
 #     - secrets/staging_secrets.yaml
-#
 # mempack won't compile in OSX
 # domThreader seg faults in OSX
 #
@@ -78,24 +77,21 @@
   become_user: root
   become_method: sudo
   roles:
-    # - sgenode
-    # - blastmachine
-    # - psipred
-    # - disopred
-    # - memsatsvm
-    # - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    # - pDomTHREADER # installed to /webdata due to space on bioinfstage4
-    # - genTHREADER # installed to /webdata due to space on bioinfstage4
-    # - dompred # installed to /webdata due to space on bioinfstage4
-    # - mempack
-    # - metsite
-    # - hspred
-    # - memembed
-    # - maketdb
-    # - bioserf #package includes all the domserf code too
+    - sgenode
+    - blastmachine
+    - psipred
+    - disopred
+    - memsatsvm
+    - dompred # installed to /webdata due to space on bioinfstage4
+    - mempack
+    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+    - bioserf
+    - ffpred
     - metapsicov
-
-    # - ffpred
+    - metsite
+    - hspred
+    - memembed
+    - maketdb
   vars_files:
     - secrets/staging_secrets.yaml
 

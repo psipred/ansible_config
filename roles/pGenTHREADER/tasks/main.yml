@@ -4,7 +4,7 @@
 #
 #
   - name: Check if pgenthreader is installed
-    stat: path=/opt/pgenthreader
+    stat: path=/opt/pgenthreader/GenThreader.sh
     register: pgenthreader_exist
 
   - name : Check Out pGenTHREADER from git
@@ -53,13 +53,27 @@
     when: pgenthreader_exist.stat.exists == False
     shell: "mkdir /opt/pgenthreader/tdb/"
 
+  # - name: untar foldlib
+  #   when: pgenthreader_exist.stat.exists == False
+  #   shell: "cd /opt/pgenthreader; tar -C /webdata/pgenthreader/tdb/ -zxvf foldlib.tar.gz"
+
   - name: untar foldlib
     when: pgenthreader_exist.stat.exists == False
-    shell: "cd /opt/pgenthreader; tar -C /webdata/pgenthreader/tdb/ -zxvf foldlib.tar.gz"
+    unarchive:
+      src: /opt/pgenthreader/foldlib.tar.gz
+      dest: /opt/pgenthreader/tdb/
+      remote_src: yes
+
+  # - name: untar domainlib
+  #   when: pgenthreader_exist.stat.exists == False
+  #   shell: "cd /opt/pgenthreader; tar -zxvf cath_3_5_domainlib.tar.gz"
 
   - name: untar domainlib
     when: pgenthreader_exist.stat.exists == False
-    shell: "cd /opt/pgenthreader; tar -zxvf cath_3_5_domainlib.tar.gz"
+    unarchive:
+      src: /opt/pgenthreader/cath_3_5_domainlib.tar.gz
+      dest: /opt/pgenthreader/
+      remote_src: yes
 
   - name: make the binaries
     when: pgenthreader_exist.stat.exists == False

@@ -2,17 +2,19 @@
 
 - name: Restart django aa on the aahead
   hosts: aa_head
-  user: dbuchan
-  sudo: yes
+  become: true
+  become_user: dbuchan
+  become_method: sudo
   roles:
    - restart_aa
   vars_files:
    - secrets/staging_secrets.yaml
 
-- name: Apply the postgres configuration
+- name: restarts workers
   hosts: aa_workers
-  user: dbuchan
-  sudo: yes
+  become: true
+  become_user: dbuchan
+  become_method: sudo
   roles:
     - aaworker
   vars_files:
@@ -20,8 +22,9 @@
 
 - name: Restart Webserver
   hosts: webserver
-  user: dbuchan
-  sudo: yes
+  become: true
+  become_user: dbuchan
+  become_method: sudo
   roles:
     - restart_webserver
   vars_files:

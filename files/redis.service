@@ -1,0 +1,11 @@
+[Unit]
+Description=Start Redis on startup
+
+[Service]
+Type=forking
+User=redis
+StandardOutput=tty
+ExecStart=/bin/sh -c "/bin/redis-server --daemonize yes"
+
+[Install]
+WantedBy=multi-user.target

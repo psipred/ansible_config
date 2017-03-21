@@ -4,14 +4,6 @@
     stat: path=/usr/local/bin/blastp
     register: blastp_exist
 
-  # - name: Download BLAST+ tarball
-  #   shell: "chdir=/opt/ wget --timeout 120 ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.2.31+-src.tar.gz -O ncbi-blast-2.2.31+-src.tar.gz"
-  #   when: blastp_exist.stat.exists == False
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 10
-  #   delay: 10
-
   - name: Download BLAST+ tarball
     when: blastp_exist.stat.exists == False
     get_url:
@@ -20,9 +12,12 @@
       timeout: 120
     register: get_url_result
 
-  - name: untar the tarball
-    shell: cd /opt/; tar -zxvf ncbi-blast-2.2.31+-src.tar.gz
-    when: get_url_result.changed
+  - name: unarchive blast
+    when: blastp_exist.stat.exists == False
+    unarchive:
+      src: /opt/ncbi-blast-2.2.31+-src.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: configure blast
     shell: cd /opt/ncbi-blast-2.2.31+-src/c++; ./configure
@@ -37,7 +32,10 @@
     when: get_url_result.changed
 
   - name: Check if we have uniref90
-    stat: path=/opt/uniref/uniref90.fasta.gz
+    stat:
+      path: /opt/uniref/uniref90.fasta.00.phr
+      get_md5: false
+      get_checksum: false
     register: uniref_exist
 
   - name: Make uniref dir
@@ -47,31 +45,26 @@
     when: uniref_exist.stat.exists == False
 
   # - name: Download uniref90
-  #   shell: "chdir=/opt/uniref/ wget --timeout 120 ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz -O uniref90.fasta.gz"
-  #   when: uniref_exist.stat.exists == False
-  #   register: get_uniref_result
-  #   until: get_uniref_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 10
-  #   delay: 10
-  #
-  # - name: unzip uniref90
-  #   shell: cd /opt/uniref/; gunzip uniref90.fasta.gz
-  #   when: uniref_exist.stat.exists == False
-
-  # - name: Download unired90
   #   when: uniref_exist.stat.exists == False
   #   get_url:
   #     url: ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
-  #     dest: /opt/
+  #     dest: /opt/uniref/
   #     timeout: 120
   #   register: get_url_result
 
-  - name: Copy uniref_test_db
-    copy:
-      src: files/aa_test_uniref.fasta
-      dest: /opt/uniref/
+#we wget this so we don't do it in /tmp incase the disk is too small
+  - name: Download uniref90
+    shell: "chdir=/opt/uniref wget --timeout 120 ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    when: uniref_exist.stat.exists == False
+
+  - name: unzip uniref90
+    shell: cd /opt/uniref; /bin/gunzip uniref90.fasta.gz
     when: uniref_exist.stat.exists == False
 
   - name: Run formatdb
-    shell: cd /opt/uniref; /usr/local/bin/makeblastdb -in aa_test_uniref.fasta -dbtype prot
-  #  when: uniref_exist.stat.exists == False
+    shell: cd /opt/uniref; /usr/local/bin/makeblastdb -in uniref90.fasta -dbtype prot
+    when: uniref_exist.stat.exists == False

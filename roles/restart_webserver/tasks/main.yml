@@ -8,6 +8,7 @@
       force: yes
 
   - name: Install requirements
+    become_user: "{{ webserver_user }}"
     pip:
       chdir: "{{ webserver_home }}"
       virtualenv: "{{ webserver_home }}webserver_env"
@@ -17,30 +18,35 @@
       requirements: "{{ webserver_home }}psipred_website/requirements/staging.txt"
 
   - name: Copy psipred_website staging conf
+    become_user: "{{ webserver_user }}"
     copy:
       src: secrets/psipred_staging.py
       dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/staging.py"
       owner: "{{ webserver_user }}"
 
   - name: Copy aa staging secrets
+    become_user: "{{ webserver_user }}"
     copy:
       src: secrets/psipred_staging_secrets.json
       dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
       owner: "{{ webserver_user }}"
 
   - name: Copy base secrets
+    become_user: "{{ webserver_user }}"
     copy:
       src: secrets/base_secrets.json
       dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
       owner: "{{ webserver_user }}"
 
   - name: Copy wsgi.py
+    become_user: "{{ webserver_user }}"
     copy:
       src: files/psipred_wsgi.py
       dest: "{{ webserver_home }}/psipred_website/psipred_website/wsgi.py"
       owner: "{{ webserver_user }}"
 
   - name: Make webserver logging dir
+    become_user: "{{ webserver_user }}"
     file:
       path: "{{ webserver_home }}/psipred_website/logs"
       state: directory

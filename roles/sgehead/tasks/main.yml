@@ -9,7 +9,8 @@
     yum:
       pkg: expect
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
 #open ports 6444 and 6445
 
@@ -17,31 +18,37 @@
     shell: firewall-cmd --list-all
     register: firewalldrules
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6444/tcp --permanent
-    sudo: yes
+    become_user: root
+    become_method: sudo
     when: firewalldrules.stdout.find("6444/tcp") == -1
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=6445/tcp --permanent
-    sudo: yes
+    become_user: root
+    become_method: sudo
     when: firewalldrules.stdout.find("6445/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
-    sudo: true
+    become_user: root
+    become_method: sudo
 
   - name: add ogs_admin group
     group: name=ogs state=present
 
   - name: "Add {{ ogs_admin_user }}"
     user: "name={{ ogs_admin_user }} password={{ ogs_admin_hashed_password }} group=ogs"
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: give {{ ogs_admin_user }} permissions on the ogs_src
-    sudo: yes
+    become_user: root
+    become_method: sudo
     file:
        path: /opt/ogs_src
        group: ogs
@@ -56,7 +63,8 @@
       dest: /opt/ogs_src/GE2011.11
 
   - name: give {{ ogs_admin_user }} permissions on ogs_setup.exp
-    sudo: yes
+    become_user: root
+    become_method: sudo
     file:
        path: /opt/ogs_src/GE2011.11/ogs_setup.exp
        group: ogs
@@ -86,7 +94,8 @@
       dest: "/home/{{ ogs_admin_user }}/.bash_profile"
 
   - name: "give {{ ogs_admin_user }} permissions on bash_profile"
-    sudo: yes
+    become_user: root
+    become_method: sudo
     file:
        path: "/home/{{ ogs_admin_user }}/.bash_profile"
        group: 16485
@@ -94,7 +103,8 @@
        owner: "{{ ogs_admin_user }}"
 
   - name: "give {{ ogs_admin_user }} permissions on execd_setup.exp"
-    sudo: yes
+    become_user: root
+    become_method: sudo
     file:
        path: /opt/ogs_src/GE2011.11/execd_setup.exp
        group: ogs

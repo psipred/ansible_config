@@ -4,23 +4,27 @@
     yum:
       pkg: postgresql, postgresql-server
       state: latest
-    sudo: yes
+    become_user: root
+    become_method: sudo
     register: postgres_installed
 
   - name: Get the current firewalld rules
     shell: firewall-cmd --list-all
     register: firewalldrules
     always_run: yes
-    sudo: yes
+    become_user: root
+    become_method: sudo
 
   - name: Add Postgres firewalld rules
     command: firewall-cmd --zone=public --add-port=5432/tcp --permanent
-    sudo: yes
+    become_user: root
+    become_method: sudo
     when: firewalldrules.stdout.find("5432/tcp") == -1
 
   - name: Reload firewalld
     command: firewall-cmd --reload
-    sudo: true
+    become_user: root
+    become_method: sudo
 
   - name: Check if postgresDB location exists
     stat: "path={{ postgres_db_path }}"
@@ -97,13 +101,16 @@
       db: "{{ web_db }}"
       priv: ALL
 
-  - name: copy over the rabbit systemd service
-    sudo: true
+  - name: copy over the postgresql systemd service
+    become_user: root
+    become_method: sudo
     copy:
       src: files/postgresql.service
       dest: /etc/systemd/system/
       mode: "uog+x"
 
   - name: Add postgres to systemctl
-    sudo: true
+    sudo: root
+    become_user: dbuchan
+    become_method: sudo
     shell: systemctl enable postgresql.service

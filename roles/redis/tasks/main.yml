@@ -1,0 +1,54 @@
+---
+
+  - name: Install Dependencies
+    yum:
+      pkg: redis
+      state: latest
+    become_user: root
+    become_method: sudo
+
+  - name: "Add {{ redis_user }} user"
+    user: "name={{ redis_user }} password={{ redis_hashed_password }}"
+    become_user: root
+    become_method: sudo
+
+  - name: Get the current firewalld rules
+    shell: firewall-cmd --list-all
+    register: firewalldrules
+    check_mode: no
+    become_user: root
+    become_method: sudo
+
+  - name: Add Redis firewalld rules
+    command: firewall-cmd --zone=public --add-port=6379/tcp --permanent
+    when: firewalldrules.stdout.find("6379/tcp") == -1
+    become_user: root
+    become_method: sudo
+
+  - name: Reload firewalld
+    command: firewall-cmd --reload
+    become_user: root
+    become_method: sudo
+
+  - name: Check redis-server status
+    shell: ps aux | grep redis-server
+    register: redis_running
+
+  - name: Start redis
+    command: "/bin/redis-server --daemonize yes"
+    become_user: "{{ redis_user }}"
+    when: redis_running.stdout.find("redis-server *:6379") == -1
+    become_method: sudo
+
+  - name: copy over the redis systemd service
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/redis.service
+      dest: /etc/systemd/system/
+      mode: "uog+x"
+
+  - name: Add service to systemctl
+    shell: systemctl enable redis.service
+    become_user: root
+    become_method: sudo

@@ -1,7 +1,7 @@
 [dbserver]
 128.16.14.80
 
-[rabbit_mq]
+[redis]
 128.16.14.77
 
 [webserver]
