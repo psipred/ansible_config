@@ -68,7 +68,6 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-
 - name: Create blastmachine
   hosts: blastmachine
   become: true
