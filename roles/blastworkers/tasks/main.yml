@@ -8,6 +8,36 @@
     become_user: root
     become_method: sudo
 
+  - name: check we have pip
+    stat:
+      path: /usr/bin/pip3
+    become_user: root
+    register: pip_exist
+  # - name: Download get-pip.py
+  #   shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+  #   become_user: "{{ django_aa_user }}"
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 2
+  #   delay: 10
+  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download get-pip.py
+    become_user: "{{ blast_worker_user }}"
+    when: pip_exist.stat.exists == False
+    get_url:
+      url: https://bootstrap.pypa.io/get-pip.py
+      dest: "{{  blast_worker_home }}/get-pip.py"
+      timeout: 120
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+
+  - name: Install pip
+    shell: "chdir={{ blast_worker_home }} /bin/python3.4 get-pip.py"
+    when: pip_exist.stat.exists == False
+
   # The virtualenv installed above is broken so we update it here
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
