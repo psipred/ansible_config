@@ -8,13 +8,13 @@
 
 #restart automount
   - name: Restart autofs
-    shell: service autofs restart
-    always_run: yes
+    shell: /usr/sbin/service autofs restart
     become_user: root
     become_method: sudo
+    check_mode: no
 
   - name: add chkconfig
-    shell: chkconfig autofs on
-    always_run: yes
+    shell: /usr/sbin/chkconfig autofs on
     become_user: root
     become_method: sudo
+    check_mode: no

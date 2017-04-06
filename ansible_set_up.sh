@@ -11,6 +11,7 @@
 # on target machines add
 # dbuchan ALL=(ALL) NOPASSWD: ALL
 # to visudo config
+# make sure this is saved correctly after reboot
 
 ssh-agent bash
 ssh-add ~/.ssh/id_rsa

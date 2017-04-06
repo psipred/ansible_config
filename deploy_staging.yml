@@ -5,15 +5,15 @@
 #  YOU MUST HAVE files/jdk-8u60-linux-x64.tar.gz
 #
 
-- name: Set up mount point
-  hosts: everyone
-  become: true
-  become_user: dbuchan
-  become_method: sudo
-  roles:
-    - automount
-  vars_files:
-    - secrets/staging_secrets.yaml
+# - name: Set up mount point
+#   hosts: everyone
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
+#   roles:
+#     - automount
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 #
 # - name: Apply the redis configuration
 #   hosts: redis

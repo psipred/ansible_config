@@ -4,30 +4,30 @@
     shell: firewall-cmd --list-all
     register: firewalldrules
     check_mode: no
-    become_user: dbuchan
+    become_user: root
     become_method: sudo
 
   - name: Add http firewalld rules
     command: firewall-cmd --zone=public --add-service=http --permanent
-    become_user: dbuchan
+    become_user: root
     become_method: sudo
     when: firewalldrules.stdout.find("http") == -1
 
   - name: Enable firewalld port forwarding
     command: firewall-cmd --zone=public --add-masquerade --permanent
-    become_user: dbuchan
+    become_user: root
     become_method: sudo
     when: firewalldrules.stdout.find("http") == -1
 
   - name: Portforward 80 to 8000
     command: firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8000 --permanent
-    become_user: dbuchan
+    become_user: root
     become_method: sudo
     when: firewalldrules.stdout.find("http") == -1
 
   - name: Portforward 443 to 4433
     command: firewall-cmd --zone=public --add-forward-port=port=443:proto=tcp:toport=4433 --permanent
-    become_user: dbuchan
+    become_user: root
     become_method: sudo
 
     when: firewalldrules.stdout.find("http") == -1

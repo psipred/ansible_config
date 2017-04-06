@@ -7,7 +7,7 @@
   - name: Download BLAST+ tarball
     when: blastp_exist.stat.exists == False
     get_url:
-      url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.2.31+-src.tar.gz
+      url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.31/ncbi-blast-2.2.31+-src.tar.gz
       dest: /opt/
       timeout: 120
     register: get_url_result
@@ -21,15 +21,15 @@
 
   - name: configure blast
     shell: cd /opt/ncbi-blast-2.2.31+-src/c++; ./configure
-    when: get_url_result.changed
+    when: blastp_exist.stat.exists == False
 
   - name: make blast
     shell: cd /opt/ncbi-blast-2.2.31+-src/c++; make
-    when: get_url_result.changed
+    when: blastp_exist.stat.exists == False
 
   - name: install blast
     shell: cd /opt/ncbi-blast-2.2.31+-src/c++; make install
-    when: get_url_result.changed
+    when: blastp_exist.stat.exists == False
 
   - name: Check if we have uniref90
     stat:
