@@ -1,0 +1,197 @@
+---
+
+  - name: "Add {{ blast_cache_user }} user"
+    user:
+      name: "{{ blast_cache_user }}"
+      password: "{{ blast_cache_hashed_password }}"
+      group: apache
+    become_user: root
+    become_method: sudo
+
+  - name: Check pip install
+    shell: pip --version
+    register: pip_install
+    check_mode: no
+    become_user: root
+    become_method: sudo
+
+
+  # - name: Download get-pip.py
+  #   shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+  #   become_user: "{{ django_aa_user }}"
+  #   register: get_url_result
+  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   retries: 2
+  #   delay: 10
+  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  - name: Download get-pip.py
+    become_user: "{{ django_aa_user }}"
+    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+    get_url:
+      url: https://bootstrap.pypa.io/get-pip.py
+      dest: "{{  django_aa_home }}/get-pip.py"
+      timeout: 120
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+
+  - name: Install pip
+    shell: "chdir={{ django_aa_home }} /bin/python3.4 get-pip.py"
+    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+
+  # The virtualenv installed above is broken so we update it here
+  - name: Upgrade virtualenv
+    shell: pip install --upgrade virtualenv
+
+  - name: Check if we have blast_cache env
+    stat: "path={{ blast_cache_home }}/blast_cache_env"
+    become_user: root
+    register: aa_env_exist
+
+  - name: Create the blast_cache virtualenv
+    become_user: "{{ blast_cache_user }}"
+    command: virtualenv aa_env -p /bin/python3.4
+    when: aa_env_exist.stat.exists == False
+    args:
+        chdir: "{{ blast_cache_home }}"
+
+  - name : Check Out blast_cache from git
+    become_user: "{{ blast_cache_user }}"
+    git:
+      repo: https://github.com/psipred/blast_cache.git
+      dest: "{{ blast_cache_home }}analytics_automated"
+      clone: yes
+      force: yes
+
+  - name: Install requirements
+    become_user: "{{ blast_cache_user }}"
+    pip:
+      chdir: "{{ blast_cache_home }}"
+      virtualenv: "{{ blast_cache_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ blast_cache_home }}blast_cache_env/bin/python"
+      requirements: "{{ blast_cache_home }}blast_cache/requirements/staging.txt"
+
+  - name: Copy aa conf
+    become_user: "{{ blast_cache_user }}"
+    copy:
+      src: secrets/bc_staging.py
+      dest: "{{ blast_cache_home }}/blast_cache/ablast_cache/settings/"
+      owner: "{{ blast_cache_user }}"
+
+  - name: Copy bcstaging secrets
+    become_user: "{{ blast_cache_user }}"
+    copy:
+      src: secrets/staging_secrets.json
+      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/"
+      owner: "{{ blast_cache_user }}"
+
+  - name: Copy bc base secrets
+    become_user: "{{ blast_cache_user }}"
+    copy:
+      src: secrets/base_secrets.json
+      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/"
+      owner: "{{ blast_cache_user }}"
+
+  - name: Copy wsgi.py
+    become_user: "{{ blast_cach_user }}"
+    copy:
+      src: files/bc_wsgi.py
+      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/wsgi.py"
+      owner: "{{ blast_cache_user }}"
+  #
+  # - name: Make aa logging dir
+  #   become_user: "{{ django_aa_user }}"
+  #   file:
+  #     path: "{{ django_aa_home }}/analytics_automated/logs"
+  #     state: directory
+  #     owner: "{{ django_aa_user }}"
+  #
+  # - name: Make jointly visible submissions dir on the NFS
+  #   file:
+  #     path: "/webdata/submissions"
+  #     state: directory
+  #     owner: "{{ django_aa_user }}"
+  #     group: apache
+  #     mode: "ug+rw"
+  #
+  # - name: move the files/ dir to submissions
+  #   become_user: "{{ django_aa_user }}"
+  #   command: "mv {{ django_aa_home }}/analytics_automated/submissions/files /webdata/submissions"
+  #
+  # - name: remove the submissions dir
+  #   become_user: "{{ django_aa_user }}"
+  #   file:
+  #     path: "{{ django_aa_home }}/analytics_automated/submissions/"
+  #     state: absent
+  #
+  # - name: symlink submissions to the aa dir
+  #   become_user: "{{ django_aa_user }}"
+  #   file:
+  #     src: /webdata/submissions
+  #     dest: "{{ django_aa_home }}/analytics_automated/submissions"
+  #     state: link
+  #     owner: "{{ django_aa_user }}"
+  #     group: apache
+  #     mode: "ug+rw"
+  #
+  # - name: Run Django migrations
+  #   become_user: "{{ django_aa_user }}"
+  #   django_manage:
+  #     command: migrate
+  #     virtualenv: "{{ django_aa_home }}aa_env/"
+  #     settings: analytics_automated_project.settings.staging
+  #     app_path: "{{ django_aa_home }}/analytics_automated/"
+  #
+  # - name: Run Django collect static
+  #   become_user: "{{ django_aa_user }}"
+  #   django_manage:
+  #     command: collectstatic
+  #     virtualenv: "{{ django_aa_home }}aa_env/"
+  #     settings: analytics_automated_project.settings.staging
+  #     app_path: "{{ django_aa_home }}/analytics_automated/"
+  #
+  # - name: Get the current list of processes
+  #   shell: ps aux | grep httpd
+  #   register: aa_running
+  #   check_mode: no
+  #   become_user: root
+  #   become_method: sudo
+  #
+  # - name: Make the apachedir
+  #   file:
+  #     path: "/opt/aa_httpd/"
+  #     state: directory
+  #     owner: "{{ django_aa_user }}"
+  #     group: apache
+  #
+  # - name : Configure AA/Apache
+  #   shell: "source {{ django_aa_home }}aa_env/bin/activate; python manage.py runmodwsgi --settings=analytics_automated_project.settings.staging --setup-only --user django_aa --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/aa_httpd/"
+  #   args:
+  #     chdir: "{{ django_aa_home }}analytics_automated"
+  #   become_user: "{{ django_aa_user }}"
+  #   register: aa_started
+  #   when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
+  #
+  # - name : Start aa
+  #   shell: "/opt/aa_httpd/apachectl start"
+  #   become_user: "{{ django_aa_user }}"
+  #   when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
+  #   environment:
+  #     DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
+  #     SGE_ROOT: /opt/ogs_src/GE2011.11/
+  #
+  # - name: copy over the aa head service
+  #   become_user: root
+  #   become_method: sudo
+  #   copy:
+  #     src: files/aahead.service
+  #     dest: /etc/systemd/system/
+  #     mode: "uog+x"
+  #
+  # - name: Add service to systemctl
+  #   become_user: root
+  #   become_method: sudo
+  #   shell: systemctl enable aahead.service

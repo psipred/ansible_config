@@ -20,7 +20,7 @@ source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate
 source /home/dbuchan/Applications/ansible/hacking/env-setup
 
 # ./Everything
-#ansible-playbook -i staging deploy_staging.yml
+#ansible-playbook -i -K staging deploy_staging.yml
 
 # webservices
-# ansible-playbook -i staging restart_aa.yml
+# ansible-playbook -i -K staging restart_aa.yml

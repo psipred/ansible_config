@@ -68,15 +68,26 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: Create blastmachine
-  hosts: blastmachine
+# - name: Create blastmachine
+#   hosts: blastmachine
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - djangomachine
+#     - blastmachine
+#     - blastworkers
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+
+- name: Create blast_cache machine
+  hosts: cache
   become: true
   become_user: root
   become_method: sudo
   roles:
     - djangomachine
-    - blastmachine
-    - blastworkers
+    - blastcache
   vars_files:
     - secrets/staging_secrets.yaml
 

@@ -83,6 +83,15 @@
     shell: "chdir={{ blast_worker_home }} /bin/python3.4 get-pip.py"
     when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
+  # grab the blast cache to get the submission/blast script
+  - name : Check Out blast_cache from git
+    become_user: "{{ blast_worker_user }}"
+    git:
+      repo: https://github.com/psipred/blast_cache.git
+      dest: "{{ blast_worker_home }}blast_cache"
+      clone: yes
+      force: yes
+
   - name : Check Out AA from git
     become_user: "{{ blast_worker_user }}"
     git:

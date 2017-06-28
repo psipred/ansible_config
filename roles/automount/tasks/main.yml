@@ -1,4 +1,11 @@
 #copy auto mount config
+  - name: Copy auto.master
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/auto.master
+      dest: /etc/auto.master
+
   - name: Copy auto.bioinf
     become_user: root
     become_method: sudo
