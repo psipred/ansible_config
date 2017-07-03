@@ -7,6 +7,9 @@
 [webserver]
 128.16.14.77
 
+[blast_cache]
+128.16.14.80
+
 [sge_head]
 128.16.14.83
 

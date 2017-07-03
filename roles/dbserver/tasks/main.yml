@@ -2,7 +2,7 @@
 
   - name: Install postgreSQL
     yum:
-      pkg: postgresql, postgresql-server
+      pkg: postgresql, postgresql-server, postgresql-contrib
       state: latest
     become_user: root
     become_method: sudo
@@ -135,6 +135,11 @@
       role_attr_flags: CREATEDB
       db: "{{ b_c_db }}"
       priv: ALL
+
+  - name: "Enable hstore for {{ b_c_db }}"
+    postgresql_ext:
+      db: "{{ b_c_db }}"
+      name: hstore
 
   - name: copy over the postgresql systemd service
     copy:

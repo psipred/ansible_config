@@ -9,16 +9,16 @@
     become_method: sudo
 
   - name: Check pip install
-    shell: pip --version
+    ignore_errors: yes
+    shell: which pip
     register: pip_install
     check_mode: no
     become_user: root
     become_method: sudo
 
-
   - name: Download get-pip.py
     become_user: "{{ blast_cache_user }}"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+    when: pip_install.stderr | search("no pip in")
     get_url:
       url: https://bootstrap.pypa.io/get-pip.py
       dest: "{{  blast_cache_home }}/get-pip.py"
@@ -52,7 +52,7 @@
     become_user: "{{ blast_cache_user }}"
     git:
       repo: https://github.com/psipred/blast_cache.git
-      dest: "{{ blast_cache_home }}analytics_automated"
+      dest: "{{ blast_cache_home }}blast_cache"
       clone: yes
       force: yes
 
@@ -63,13 +63,13 @@
       virtualenv: "{{ blast_cache_home }}blast_cache_env"
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ blast_cache_home }}blast_cache_env/bin/python"
-      requirements: "{{ blast_cache_home }}blast_cache/requirements/staging.txt"
+      requirements: "{{ blast_cache_home }}blast_cache/requirements/base.txt"
 
   - name: Copy bc conf
     become_user: "{{ blast_cache_user }}"
     copy:
       src: secrets/bc_staging.py
-      dest: "{{ blast_cache_home }}/blast_cache/ablast_cache/settings/"
+      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/staging.py"
       owner: "{{ blast_cache_user }}"
 
   - name: Copy bcstaging secrets
@@ -87,7 +87,7 @@
       owner: "{{ blast_cache_user }}"
 
   - name: Copy wsgi.py
-    become_user: "{{ blast_cach_user }}"
+    become_user: "{{ blast_cache_user }}"
     copy:
       src: files/bc_wsgi.py
       dest: "{{ blast_cache_home }}/blast_cache/blast_cache/wsgi.py"
@@ -105,7 +105,7 @@
     django_manage:
       command: migrate
       virtualenv: "{{ blast_cache_home }}blast_cache_env/"
-      settings: analytics_automated_project.settings.staging
+      settings: blast_cache.settings.staging
       app_path: "{{ blast_cache_home }}/blast_cache/"
 
   - name: Run bc collect static
@@ -131,9 +131,9 @@
       group: apache
 
   - name : Configure bc/Apache
-    shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; python manage.py runmodwsgi --settings=ablast_cache.settings.staging --setup-only --user blast_cache --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/bc_httpd/"
+    shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; python manage.py runmodwsgi --settings=blast_cache.settings.staging --setup-only --user blast_cache --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/bc_httpd/"
     args:
-      chdir: "{{ blast_cache_home }}analytics_automated"
+      chdir: "{{ blast_cache_home }}blast_cache"
     become_user: "{{ blast_cache_user }}"
     register: bc_started
     when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
