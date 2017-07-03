@@ -14,6 +14,6 @@ import logging
 import sys
 logging.basicConfig(stream=sys.stderr)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "analytics_automated_project.settings.staging")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blast_cache.settings.staging")
 
 application = get_wsgi_application()

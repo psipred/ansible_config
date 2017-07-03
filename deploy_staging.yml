@@ -25,15 +25,15 @@
 #   vars_files:
 #    - secrets/staging_secrets.yaml
 #
-# - name: Apply the postgres configuration
-#   hosts: dbserver
-#   become: true
-#   become_user: dbuchan
-#   become_method: sudo
-#   roles:
-#     - dbserver
-#   vars_files:
-#     - secrets/staging_secrets.yaml
+- name: Apply the postgres configuration
+  hosts: dbserver
+  become: true
+  become_user: dbuchan
+  become_method: sudo
+  roles:
+    - dbserver
+  vars_files:
+    - secrets/staging_secrets.yaml
 #
 # - name: Apply Analytics Automated head node configuration
 #   hosts: aa_head
