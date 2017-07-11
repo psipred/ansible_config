@@ -10,7 +10,7 @@
   - name: Check pip install
     shell: pip --version
     register: pip_install
-    always_run: yes
+    check_mode: no
     become_user: root
     become_method: sudo
 
@@ -37,6 +37,7 @@
 
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
+    become_user: root
 
   - name: Check if we have webserver_env
     stat: "path={{ webserver_home }}/webserver_env"
@@ -68,24 +69,28 @@
       requirements: "{{ webserver_home }}psipred_website/requirements/staging.txt"
 
   - name: Copy psipred_website staging conf
+    become_user: "{{ webserver_user }}"
     copy:
       src: secrets/psipred_staging.py
       dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/staging.py"
       owner: "{{ webserver_user }}"
 
   - name: Copy aa staging secrets
+    become_user: "{{ webserver_user }}"
     copy:
       src: secrets/psipred_staging_secrets.json
       dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
       owner: "{{ webserver_user }}"
 
   - name: Copy base secrets
+    become_user: "{{ webserver_user }}"
     copy:
       src: secrets/base_secrets.json
       dest: "{{ webserver_home }}/psipred_website/psipred_website/settings/"
       owner: "{{ webserver_user }}"
 
   - name: Copy wsgi.py
+    become_user: "{{ webserver_user }}"
     copy:
       src: files/psipred_wsgi.py
       dest: "{{ webserver_home }}/psipred_website/psipred_website/wsgi.py"
@@ -93,6 +98,7 @@
 
   #Logging not yet set up for frontend
   - name: Make aa logging dir
+    become_user: "{{ webserver_user }}"
     file:
       path: "{{ webserver_home }}/psipred_website/logs"
       state: directory
@@ -117,8 +123,8 @@
   - name: Get the current list of processes
     shell: ps aux | grep httpd
     register: webserver_running
-    always_run: yes
-    sudo: yes
+    check_mode: no
+    become_method: sudo
 
   - name: Make the apachedir
     file:
@@ -135,10 +141,16 @@
     register: web_server_started
     when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
-  - name : Start webserver
-    shell: "/opt/webserver_httpd/apachectl start"
+  - name : add wb admin account
+    shell: "source {{ webserver_home }}webserver_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ ws_admin_pass }}')\" | python manage.py shell --settings=psipred_website.settings.staging"
+    args:
+      chdir: "{{ webserver_home }}psipred_website"
     become_user: "{{ webserver_user }}"
-    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
+
+  - name : Start webserver
+    shell: "/opt/webserver_httpd/apachectl restart"
+    become_user: "{{ webserver_user }}"
+    # when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name: copy over the webserver service
     become_user: root

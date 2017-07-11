@@ -138,10 +138,16 @@
     register: bc_started
     when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
-  - name : Start bc
-    shell: "/opt/bc_httpd/apachectl start"
+  - name : add bc admin account
+    shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ bc_admin_pass }}')\" | python manage.py shell --settings=blast_cache.settings.staging"
+    args:
+      chdir: "{{ blast_cache_home }}blast_cache"
     become_user: "{{ blast_cache_user }}"
-    when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
+
+  - name : Start bc
+    shell: "/opt/bc_httpd/apachectl restart"
+    become_user: "{{ blast_cache_user }}"
+    # when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name: copy over the bc head service
     become_user: root
