@@ -128,12 +128,12 @@
     command: "mv {{ django_aa_home }}/analytics_automated/submissions/files /webdata/submissions"
 
   - name: Check aa submissions
-    stat: "path={{ django_aa_home }}/analystics_automated/submissions"
+    stat: "path={{ django_aa_home }}/analytics_automated/submissions/"
     become_user: "{{ django_aa_user }}"
     register: submissions_type
 
   - name: remove the submissions dir
-    when: submissions_type.islink is defined and submissions_type.islink == False
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
     become_user: "{{ django_aa_user }}"
     file:
       path: "{{ django_aa_home }}analytics_automated/submissions/"
@@ -141,7 +141,7 @@
 
   - name: symlink submissions to the aa dir
     become_user: "{{ django_aa_user }}"
-    when: submissions_type.islink is defined and submissions_type.islink == False
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
     file:
       src: /webdata/submissions
       dest: "{{ django_aa_home }}/analytics_automated/submissions"
