@@ -35,16 +35,16 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: Apply Analytics Automated head node configuration
-  hosts: aa_head
-  become: true
-  become_user: dbuchan
-  become_method: sudo
-  roles:
-    # - djangomachine
-    - aahead
-  vars_files:
-    - secrets/staging_secrets.yaml
+# - name: Apply Analytics Automated head node configuration
+#   hosts: aa_head
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
+#   roles:
+#     - djangomachine
+#     - aahead
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
 # - name: Apply Analytics Automated worker node configuration
 #   hosts: aa_workers
@@ -68,17 +68,17 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-# - name: Create blastmachine
-#   hosts: blastmachine
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
-#     - djangomachine
-#     - blastmachine
-#     - blastworkers
-#   vars_files:
-#     - secrets/staging_secrets.yaml
+- name: Create blastmachine
+  hosts: blastmachine
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - djangomachine
+    - blastmachine
+    - blastworkers
+  vars_files:
+    - secrets/staging_secrets.yaml
 
 # - name: Create blast_cache machine
 #   hosts: blast_cache

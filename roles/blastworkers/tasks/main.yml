@@ -152,33 +152,28 @@
       state: directory
       owner: "{{ blast_worker_user }}"
 
-  - name: check submissions/ state
+  - name: Check aa submissions
+    stat: "path={{ blast_worker_home }}/analytics_automated/submissions/"
     become_user: "{{ blast_worker_user }}"
-    stat:
-      path: "{{ blast_worker_home }}/analytics_automated/submissions/"
-    register: sym
+    register: submissions_type
 
-  # - debug:
-  #     msg: "Path exists and isn't a symlink"
-  #   when: sym.stat.islnk is defined and sym.stat.islnk == False
+  - name: remove the submissions dir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
+    become_user: "{{ blast_worker_user }}"
+    file:
+      path: "{{ blast_worker_home }}analytics_automated/submissions/"
+      state: absent
 
-  # - name: remove the submissions dir
-  #   become_user: "{{ blast_worker_user }}"
-  #   file:
-  #     path: "{{ blast_worker_home }}/analytics_automated/submissions"
-  #     state: absent
-  #   when: sym.stat.islnk is defined and sym.stat.islnk == False
-  #
-  # - name: symlink submissions to the aa dir
-  #   become_user: "{{ blast_worker_user }}"
-  #   file:
-  #     src: /webdata/submissions
-  #     dest: "{{ blast_worker_home }}/analytics_automated/submissions"
-  #     state: link
-  #     owner: "{{ blast_worker_user }}"
-  #     group: apache
-  #     mode: "ug+rw"
-  #   when: sym.stat.islnk is defined and sym.stat.islnk == False
+  - name: symlink submissions to the aa dir
+    become_user: "{{ blast_worker_user }}"
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
+    file:
+      src: /webdata/submissions
+      dest: "{{ blast_worker_home }}/analytics_automated/submissions"
+      state: link
+      owner: "{{ blast_worker_user }}"
+      group: apache
+      mode: "ug+rw"
 
   - name: Check Celery running status
     shell: ps aux | grep celery
