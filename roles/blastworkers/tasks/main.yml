@@ -100,7 +100,7 @@
       clone: yes
       force: yes
 
-  - name: Install requirements
+  - name: Install aa requirements
     become_user: "{{ blast_worker_user }}"
     pip:
       state: latest
@@ -109,6 +109,16 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ blast_worker_home }}aa_env/bin/python"
       requirements: "{{ blast_worker_home }}analytics_automated/requirements/staging.txt"
+
+  - name: Install blast cache requirements
+    become_user: "{{ blast_worker_user }}"
+    pip:
+      state: latest
+      chdir: "{{ blast_worker_home }}"
+      virtualenv: "{{ blast_worker_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ blast_worker_home }}aa_env/bin/python"
+      requirements: "{{ blast_worker_home }}blast_cache/requirements/base.txt"
 
   - name: Copy aa staging_conf
     become_user: "{{ blast_worker_user }}"
@@ -158,7 +168,7 @@
     register: submissions_type
 
   - name: remove the submissions dir
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink == false
     become_user: "{{ blast_worker_user }}"
     file:
       path: "{{ blast_worker_home }}analytics_automated/submissions/"
@@ -166,7 +176,7 @@
 
   - name: symlink submissions to the aa dir
     become_user: "{{ blast_worker_user }}"
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink == false
     file:
       src: /webdata/submissions
       dest: "{{ blast_worker_home }}/analytics_automated/submissions"
