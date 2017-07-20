@@ -163,20 +163,20 @@
       owner: "{{ blast_worker_user }}"
 
   - name: Check aa submissions
-    stat: "path={{ blast_worker_home }}/analytics_automated/submissions/"
+    stat: "path={{ blast_worker_home }}/analytics_automated/submissions"
     become_user: "{{ blast_worker_user }}"
     register: submissions_type
 
   - name: remove the submissions dir
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink == false
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     become_user: "{{ blast_worker_user }}"
     file:
-      path: "{{ blast_worker_home }}analytics_automated/submissions/"
+      path: "{{ blast_worker_home }}analytics_automated/submissions"
       state: absent
 
   - name: symlink submissions to the aa dir
     become_user: "{{ blast_worker_user }}"
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink == false
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     file:
       src: /webdata/submissions
       dest: "{{ blast_worker_home }}/analytics_automated/submissions"

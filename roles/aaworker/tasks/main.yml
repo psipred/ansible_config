@@ -129,20 +129,20 @@
       owner: "{{ django_worker_user }}"
 
   - name: Check aa submissions
-    stat: "path={{ django_worker_home }}/analytics_automated/submissions/"
+    stat: "path={{ django_worker_home }}/analytics_automated/submissions"
     become_user: "{{ django_worker_user }}"
     register: submissions_type
 
   - name: remove the submissions dir
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     become_user: "{{ django_worker_user }}"
     file:
-      path: "{{ django_worker_home }}analytics_automated/submissions/"
+      path: "{{ django_worker_home }}analytics_automated/submissions"
       state: absent
 
   - name: symlink submissions to the aa dir
     become_user: "{{ django_worker_user }}"
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     file:
       src: /webdata/submissions
       dest: "{{ django_worker_home }}/analytics_automated/submissions"
@@ -150,7 +150,6 @@
       owner: "{{ djgano_worker_user }}"
       group: apache
       mode: "ug+rw"
-
 
   - name: Check Celery running status
     shell: ps aux | grep celery
