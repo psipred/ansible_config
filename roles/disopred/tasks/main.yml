@@ -34,3 +34,15 @@
       src: /opt/disopred/dso_lib.tar.gz
       dest: /opt/disopred
       remote_src: yes
+
+  - name: clean disopred components
+    when: disopred_exist.stat.exists == False
+    shell: 'cd /opt/disopred/src; make clean'
+
+  - name: make disopred components
+    when: disopred_exist.stat.exists == False
+    shell: 'cd /opt/disopred/src; make'
+
+  - name: install disopred components
+    when: disopred_exist.stat.exists == False
+    shell: 'cd /opt/disopred/src; make install'

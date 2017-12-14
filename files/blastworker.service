@@ -1,5 +1,5 @@
 [Unit]
-Description=Start AA Workers on startup
+Description=Start Blast Workers on startup
 
 [Service]
 Type=oneshot
@@ -7,11 +7,11 @@ KillMode=control-group
 RemainAfterExit=yes
 Restart=no
 StandardOutput=tty
-User=django_worker
-WorkingDirectory=/home/django_worker/analytics_automated/
+User=blast_worker
+WorkingDirectory=/home/blast_worker/analytics_automated/
 Environment=DRMAA_LIBRARY_PATH=/opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
 Environment=SGE_ROOT=/opt/ogs_src/GE2011.11/
-ExecStart=/bin/sh -c "source /home/django_worker/aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q blast,low_blast,high_blast --detach --pidfile=celery.pid"
+ExecStart=/bin/sh -c "source /home/blast_worker/aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q blast,low_blast,high_blast --detach --pidfile=celery.pid"
 
 [Install]
 WantedBy=multi-user.target
