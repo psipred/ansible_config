@@ -1,0 +1,8 @@
+# System default settings live in /usr/lib/sysctl.d/00-system.conf.
+# To override those settings, enter new settings here, or in an /etc/sysctl.d/<name>.conf file
+#
+# For more information, see sysctl.conf(5) and sysctl.d(5).
+# Auto-enabled by xs-tools:install.sh
+net.ipv4.conf.all.arp_notify = 1
+vm.overcommit_memory = 1
+net.core.somaxconn = 65535

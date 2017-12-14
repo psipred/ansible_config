@@ -83,6 +83,15 @@
     shell: "chdir={{ blast_worker_home }} /bin/python3.4 get-pip.py"
     when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
+  # grab the blast cache to get the submission/blast script
+  - name : Check Out blast_cache from git
+    become_user: "{{ blast_worker_user }}"
+    git:
+      repo: https://github.com/psipred/blast_cache.git
+      dest: "{{ blast_worker_home }}blast_cache"
+      clone: yes
+      force: yes
+
   - name : Check Out AA from git
     become_user: "{{ blast_worker_user }}"
     git:
@@ -91,7 +100,7 @@
       clone: yes
       force: yes
 
-  - name: Install requirements
+  - name: Install aa requirements
     become_user: "{{ blast_worker_user }}"
     pip:
       state: latest
@@ -100,6 +109,16 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ blast_worker_home }}aa_env/bin/python"
       requirements: "{{ blast_worker_home }}analytics_automated/requirements/staging.txt"
+
+  - name: Install blast cache requirements
+    become_user: "{{ blast_worker_user }}"
+    pip:
+      state: latest
+      chdir: "{{ blast_worker_home }}"
+      virtualenv: "{{ blast_worker_home }}aa_env"
+      virtualenv_command: /bin/virtualenv
+      virtualenv_python: "{{ blast_worker_home }}aa_env/bin/python"
+      requirements: "{{ blast_worker_home }}blast_cache/requirements/base.txt"
 
   - name: Copy aa staging_conf
     become_user: "{{ blast_worker_user }}"
@@ -143,25 +162,21 @@
       state: directory
       owner: "{{ blast_worker_user }}"
 
-  - name: check submissions/ state
+  - name: Check aa submissions
+    stat: "path={{ blast_worker_home }}/analytics_automated/submissions"
     become_user: "{{ blast_worker_user }}"
-    stat:
-      path: "{{ blast_worker_home }}/analytics_automated/submissions/"
-    register: sym
-
-  # - debug:
-  #     msg: "Path exists and isn't a symlink"
-  #   when: sym.stat.islnk is defined and sym.stat.islnk == False
+    register: submissions_type
 
   - name: remove the submissions dir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     become_user: "{{ blast_worker_user }}"
     file:
-      path: "{{ blast_worker_home }}/analytics_automated/submissions"
+      path: "{{ blast_worker_home }}analytics_automated/submissions"
       state: absent
-    when: sym.stat.islnk is defined and sym.stat.islnk == False
 
   - name: symlink submissions to the aa dir
     become_user: "{{ blast_worker_user }}"
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     file:
       src: /webdata/submissions
       dest: "{{ blast_worker_home }}/analytics_automated/submissions"
@@ -169,7 +184,6 @@
       owner: "{{ blast_worker_user }}"
       group: apache
       mode: "ug+rw"
-    when: sym.stat.islnk is defined and sym.stat.islnk == False
 
   - name: Check Celery running status
     shell: ps aux | grep celery

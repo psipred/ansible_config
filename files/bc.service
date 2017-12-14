@@ -1,0 +1,11 @@
+[Unit]
+Description=Start Blast Cache on startup
+
+[Service]
+Type=forking
+User=blast_cache
+StandardOutput=tty
+ExecStart=/bin/sh -c "/opt/bc_httpd/apachectl start"
+
+[Install]
+WantedBy=multi-user.target

@@ -2,7 +2,7 @@
 
   - name: Install postgreSQL
     yum:
-      pkg: postgresql, postgresql-server
+      pkg: postgresql, postgresql-server, postgresql-contrib
       state: latest
     become_user: root
     become_method: sudo
@@ -11,7 +11,7 @@
   - name: Get the current firewalld rules
     shell: firewall-cmd --list-all
     register: firewalldrules
-    always_run: yes
+    check_mode: no
     become_user: root
     become_method: sudo
 
@@ -20,6 +20,29 @@
     become_user: root
     become_method: sudo
     when: firewalldrules.stdout.find("5432/tcp") == -1
+
+  - name: Add http firewalld rules
+    command: firewall-cmd --zone=public --add-service=http --permanent
+    become_user: root
+    become_method: sudo
+    when: firewalldrules.stdout.find("http") == -1
+
+  - name: Enable firewalld port forwarding
+    command: firewall-cmd --zone=public --add-masquerade --permanent
+    become_user: root
+    become_method: sudo
+    when: firewalldrules.stdout.find("http") == -1
+
+  - name: Portforward 80 to 8000
+    command: firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8000 --permanent
+    become_user: root
+    become_method: sudo
+    when: firewalldrules.stdout.find("http") == -1
+
+  - name: Portforward 443 to 4433
+    command: firewall-cmd --zone=public --add-forward-port=port=443:proto=tcp:toport=4433 --permanent
+    become_user: root
+    become_method: sudo
 
   - name: Reload firewalld
     command: firewall-cmd --reload
@@ -43,7 +66,7 @@
     when: postgresDB_exist.stat.exists == False
 
   # Instead of only doing this once set up we could copy the files whenever
-  # theu change and then restart postgres
+  # then change and then restart postgres
   - name: Copy postgres config
     copy:
       src: files/web_server_postgresql.conf
@@ -61,7 +84,7 @@
   - name: Check postgres status
     shell: ps aux | grep postgres
     register: postgres_running
-    always_run: yes
+    check_mode: no
 
   - name: Start postgresDB
     shell: "pg_ctl start -D {{ postgres_db_path }}"
@@ -101,16 +124,30 @@
       db: "{{ web_db }}"
       priv: ALL
 
+  - name: "Create {{ b_c_db }} db"
+    postgresql_db:
+      name: "{{ b_c_db }}"
+
+  - name: "Add {{ b_c_user }} to postgres"
+    postgresql_user:
+      name: "{{ b_c_user }}"
+      password: "{{ b_c_password }}"
+      role_attr_flags: CREATEDB
+      db: "{{ b_c_db }}"
+      priv: ALL
+
+  - name: "Enable hstore for {{ b_c_db }}"
+    postgresql_ext:
+      db: "{{ b_c_db }}"
+      name: hstore
+
   - name: copy over the postgresql systemd service
-    become_user: root
-    become_method: sudo
     copy:
       src: files/postgresql.service
       dest: /etc/systemd/system/
       mode: "uog+x"
 
   - name: Add postgres to systemctl
-    sudo: root
-    become_user: dbuchan
+    become_user: root
     become_method: sudo
     shell: systemctl enable postgresql.service

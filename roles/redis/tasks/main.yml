@@ -7,6 +7,30 @@
     become_user: root
     become_method: sudo
 
+  - name: copy over rc.local
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/rc.local_redis
+      dest: /etc/rc.d/rc.local
+      mode: "u+rx"
+
+  - name: copy over sysctl.conf
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/sysctl.conf_redis
+      dest: /etc/sysctl.conf
+      mode: "uog+r"
+
+  - name: copy over redis.conf
+    become_user: root
+    become_method: sudo
+    copy:
+      src: secrets/redis.conf
+      dest: /etc/redis.conf
+      mode: "u+rx"
+
   - name: "Add {{ redis_user }} user"
     user: "name={{ redis_user }} password={{ redis_hashed_password }}"
     become_user: root
@@ -35,7 +59,7 @@
     register: redis_running
 
   - name: Start redis
-    command: "/bin/redis-server --daemonize yes"
+    command: "/bin/redis-server /etc/redis.conf --daemonize yes"
     become_user: "{{ redis_user }}"
     when: redis_running.stdout.find("redis-server *:6379") == -1
     become_method: sudo

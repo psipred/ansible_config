@@ -117,18 +117,31 @@
       group: apache
       mode: "ug+rw"
 
+  - name: Check if we have /webdata/submissions/files
+    stat: "path=/webdata/submissions/files"
+    become_user: root
+    register: files_exists
+
   - name: move the files/ dir to submissions
+    when: files_exists.stat.exists == False
     become_user: "{{ django_aa_user }}"
     command: "mv {{ django_aa_home }}/analytics_automated/submissions/files /webdata/submissions"
 
+  - name: Check aa submissions
+    stat: "path={{ django_aa_home }}/analytics_automated/submissions"
+    become_user: "{{ django_aa_user }}"
+    register: submissions_type
+
   - name: remove the submissions dir
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     become_user: "{{ django_aa_user }}"
     file:
-      path: "{{ django_aa_home }}/analytics_automated/submissions/"
+      path: "{{ django_aa_home }}analytics_automated/submissions"
       state: absent
 
   - name: symlink submissions to the aa dir
     become_user: "{{ django_aa_user }}"
+    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     file:
       src: /webdata/submissions
       dest: "{{ django_aa_home }}/analytics_automated/submissions"
@@ -175,10 +188,16 @@
     register: aa_started
     when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
-  - name : Start aa
-    shell: "/opt/aa_httpd/apachectl start"
+  - name : add AA admin account
+    shell: "source {{ django_aa_home }}aa_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ aa_admin_pass }}')\" | python manage.py shell --settings=analytics_automated_project.settings.staging"
+    args:
+      chdir: "{{ django_aa_home }}analytics_automated"
     become_user: "{{ django_aa_user }}"
-    when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
+
+  - name : Start aa
+    shell: "/opt/aa_httpd/apachectl restart"
+    become_user: "{{ django_aa_user }}"
+    # when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
     environment:
       DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
       SGE_ROOT: /opt/ogs_src/GE2011.11/
