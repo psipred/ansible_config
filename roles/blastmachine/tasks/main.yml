@@ -8,28 +8,47 @@
     when: blastp_exist.stat.exists == False
     get_url:
       url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.31/ncbi-blast-2.2.31+-src.tar.gz
-      dest: /data/
+      dest: /opt/
       timeout: 120
     register: get_url_result
 
   - name: unarchive blast
     when: blastp_exist.stat.exists == False
     unarchive:
-      src: /data/ncbi-blast-2.2.31+-src.tar.gz
-      dest: /data/
+      src: /opt/ncbi-blast-2.2.31+-src.tar.gz
+      dest: /opt/
       remote_src: yes
 
   - name: configure blast
-    shell: cd /data/ncbi-blast-2.2.31+-src/c++; ./configure
+    shell: cd /opt/ncbi-blast-2.2.31+-src/c++; ./configure
     when: blastp_exist.stat.exists == False
 
   - name: make blast
-    shell: cd /data/ncbi-blast-2.2.31+-src/c++; make
+    shell: cd /opt/ncbi-blast-2.2.31+-src/c++; make
     when: blastp_exist.stat.exists == False
 
   - name: install blast
-    shell: cd /data/ncbi-blast-2.2.31+-src/c++; make install
+    shell: cd /opt/ncbi-blast-2.2.31+-src/c++; make install
     when: blastp_exist.stat.exists == False
+
+  - name: Check if we the psiblast is installed
+    stat: path=/opt/blast-2.2.26/bin/blastpgp
+    register: blastpgp_exist
+
+  - name: Download BLAST+ tarball
+    when: blastpgp_exist.stat.exists == False
+    get_url:
+      url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+
+  - name: unarchive blast
+    when: blastpgp_exist.stat.exists == False
+    unarchive:
+      src: /opt/blast-2.2.26-x64-linux.tar.gz
+      dest: /opt/
+      remote_src: yes
 
   - name: Check if we have uniref90
     stat:

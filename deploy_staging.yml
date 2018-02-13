@@ -68,53 +68,53 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: Create blastmachine
-  hosts: blastmachine
-  become: true
-  become_user: root
-  become_method: sudo
-  roles:
-    # - djangomachine
-    # - blastmachine
-    - blastworkers
-  vars_files:
-    - secrets/staging_secrets.yaml
-
-- name: Create blast_cache machine
-  hosts: blast_cache
-  become: true
-  become_user: root
-  become_method: sudo
-  roles:
-    # - djangomachine
-    - blastcache
-  vars_files:
-    - secrets/staging_secrets.yaml
-
-# mempack won't compile in OSX
-# domThreader seg faults in OSX
-# - name: Create SGE node
-#   hosts: sge_node
+# - name: Create blastmachine
+#   hosts: blastmachine
 #   become: true
 #   become_user: root
 #   become_method: sudo
 #   roles:
-#     - sgenode
-#     - psipred
-#     - disopred
-#     - memsatsvm
-#     - dompred # installed to /webdata due to space on bioinfstage4
-#     - mempack
-#     - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-#     - bioserf
-#     - ffpred
-#     - metapsicov
-#     - metsite
-#     - hspred
-#     - memembed
-#     - maketdb
+#     # - djangomachine
+#     # - blastmachine
+#     - blastworkers
 #   vars_files:
 #     - secrets/staging_secrets.yaml
+
+# - name: Create blast_cache machine
+#   hosts: blast_cache
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     # - djangomachine
+#     - blastcache
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+
+# mempack won't compile in OSX
+# domThreader seg faults in OSX
+- name: Create SGE node
+  hosts: sge_node
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    # - sgenode
+    # - psipred
+    # - disopred
+    # - memsatsvm
+    # - dompred # installed to /webdata due to space on bioinfstage4
+    # - mempack
+    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+    # - bioserf
+    # - ffpred
+    # - metapsicov
+    # - metsite
+    # - hspred
+    # - memembed
+    # - maketdb
+  vars_files:
+    - secrets/staging_secrets.yaml
 
 # - name: Install webserver
 #   hosts: webserver

@@ -8,7 +8,7 @@
     register: pgenthreader_exist
 
   - name : Check Out pGenTHREADER from git
-    when: pgenthreader_exist.stat.exists == False
+    #when: pgenthreader_exist.stat.exists == False
     git:
       repo: https://github.com/psipred/pGenTHREADER.git
       dest: /opt/pgenthreader
@@ -82,3 +82,11 @@
   - name: install the binaries
     when: pgenthreader_exist.stat.exists == False
     shell: "cd /opt/pgenthreader/src; make install"
+
+  - name: Download CSA
+    #when: pgenthreader_exist.stat.exists == False
+    get_url:
+      url: https://www.ebi.ac.uk/thornton-srv/m-csa/media/flat_files/literature_pdb_residues.csv
+      dest: /opt/pgenthreader/data
+      timeout: 120
+    register: get_url_result
