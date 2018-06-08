@@ -44,7 +44,7 @@
   - name: Download domainlib
     when: pgenthreader_exist.stat.exists == False
     get_url:
-      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/pGenTHREADER/foldlibs/cath_3_5_domainlib.tar.gz
+      url: httpp://bioinfadmin.cs.ucl.ac.uk/downloads/pGenTHREADER/foldlibs/cath_domain_tdb_4_1.tar.gz
       dest: /opt/pgenthreader/
       timeout: 120
     register: get_url_result
@@ -71,7 +71,7 @@
   - name: untar domainlib
     when: pgenthreader_exist.stat.exists == False
     unarchive:
-      src: /opt/pgenthreader/cath_3_5_domainlib.tar.gz
+      src: /opt/pgenthreader/cath_domain_tdb_4_1.tar.gz
       dest: /opt/pgenthreader/
       remote_src: yes
 
