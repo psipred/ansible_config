@@ -64,6 +64,9 @@
       dest: /opt/hhdb/uniprot
       remote_src: yes
 
+  - name: make dbs rw by all
+    shell: "chdir=/opt/hhdb/ chmod -R uog+rw *"
+
   - name: Check if there is a dir for the hmmr3
     stat: path=/opt/hmmer-3.1b2-linux-intel-x86_64/
     register: hmmer_exist
@@ -173,6 +176,27 @@
     shell: "cd /opt/freecontact-1.0.21/; make"
     #run with env LD_LIBRARY_PATH=/opt/OpenBLAS/lib/ src/freecontact
 
+  - name: check we have PSICOV
+    stat: path=/opt/psicov
+    register: psicov_exist
+
+  - name : Check out psicov from GIT
+    when: psicov_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/psicov.git
+      recursive: yes
+      dest: /opt/psicov
+      clone: yes
+      force: yes
+
+  - name: make psicov
+    when: psicov_exist.stat.exists == False
+    shell: "cd /opt/psicov/src/; make"
+
+  - name: install psicov
+    when: psicov_exist.stat.exists == False
+    shell: "cp /opt/psicov/src/psicov /opt/psicov/bin/psicov "
+
   - name: check we have metapsicov
     stat: path=/opt/metapsicov
     register: metapsicov_exist
@@ -192,3 +216,32 @@
   - name: install metapsicov components
     when: metapsicov_exist.stat.exists == False
     shell: "cd /opt/metapsicov/src; make install"
+
+  - name: Move hacked jackhhblits
+    # when: maketdb_exist.stat.exists == False
+    copy:
+      src: files/jack_hhblits
+      dest: /opt/metapsicov/bin/
+      mode: "uog+rwx"
+
+  - name: check we have hhsuite2
+    stat: path=/opt/hhsuite-2.0.16-linux-x86_64
+    register: hh2_exist
+
+  - name: get hhsuite2
+    when: hh2_exist.stat.exists == False
+    get_url:
+      url:  http://wwwuser.gwdg.de/~compbiol/data/hhsuite/releases/all/hhsuite-2.0.16-linux-x86_64.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+
+  - name: unarchive hhsuite2
+    when: hh2_exist.stat.exists == False
+    unarchive:
+      src: /opt/hhsuite-2.0.16-linux-x86_64.tar.gz
+      dest: /opt/hhsuite-2.0.16.tar.gz
+      remote_src: yes
+
+  - name: cp cs translate
+    shell: "cp /opt/hhsuite-2.0.16-linux-x86_64/lib/hh/bin/cstranslate /opt/hhsuite-2.0.16-linux-x86_64/bin/"

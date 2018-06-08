@@ -56,3 +56,22 @@
   - name: install tcoffee
     when: tcoffee_exist.stat.exists == False
     shell: "cd /opt/T-COFFEE_distribution_Version_11.00.05372cb/; ./install tcoffee"
+
+  - name: check cath tdb present
+    stat: path=/opt/data/cath_data/domlib
+    register: cathlib_exist
+
+  - name: cath lib
+    when: cathlib_exist.stat.exists == False
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/pGenTHREADER/foldlibs/cath_domain_tdb_4_1.tar.gz
+      dest: /opt/data/cath_data/
+      timeout: 120
+    register: get_url_result
+
+  - name: untar cathlib
+    when: cahtlib_exist.stat.exists == False
+    unarchive:
+      src: /opt/data/cath_data/cath_domain_tdb_4_1.tar.gz
+      dest: /opt
+      remote_src: yes

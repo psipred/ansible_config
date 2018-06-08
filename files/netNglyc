@@ -37,7 +37,7 @@ else if ( $SYSTEM == "Linux" ) then		# typical Linux
    setenv PERL /usr/bin/perl
    setenv ECHO "/bin/echo -e"
    #setenv GETSPROT /usr/local/bin64/getsprot
-   setenv SIGNALP /opt/signalp-4.1
+   setenv SIGNALP /opt/signalp-4.1/signalp
    setenv GNUPLOT /usr/bin/gnuplot
    setenv PPM2GIF /usr/bin/ppmtogif
 

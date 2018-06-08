@@ -96,6 +96,16 @@
       clone: yes
       force: yes
 
+
+  #just in case we need to upgrade these
+  - name: upgrade all packages
+    yum:
+      name: java, openjdk
+      state: latest
+
+  - name: remove stale java class files
+    shell: /bin/rm /opt/bioserf/src/org/ucl/util/*.class
+
   - name: make bioserf components
     when: bioserf_exist.stat.exists == False
     shell: 'cd /opt/bioserf/src; make'
@@ -103,6 +113,48 @@
   - name: install bioserf components
     when: bioserf_exist.stat.exists == False
     shell: 'cd /opt/bioserf/src; make install'
+
+  - name: Move hacked HHPaths over
+    # when: maketdb_exist.stat.exists == False
+    copy:
+      src: files/HHPaths.pm
+      dest: /opt/hh-suite/scripts/
+      mode: "uog+rwx"
+
+  - name: make cath_data dir
+    shell: "cd /opt/data; mkdir cath_data"
+
+  - name: Move annotated CATH list over
+    # when: maketdb_exist.stat.exists == False
+    copy:
+      src: files/cath-domain-list-v4_2_0_annotated.txt
+      dest: /opt/data/cath_data/
+      mode: "uog+rwx"
+
+  - name: Check cath s100 seqs are present
+    stat: path=/opt/data/cath_data/cath-domain-seqs-S100-v4_1_0.fa.phr
+    register: s100_exist
+
+  - name: Download cath s100
+    when: s100_exist.stat.exists == False
+    shell: "cd /opt/data/cath_data/; wget ftp://orengoftp.biochem.ucl.ac.uk/cath/releases/all-releases/v4_1_0/sequence-data/cath-domain-seqs-S100-v4_1_0.fa"
+
+  - name: build blast db
+    when: s100_exist.stat.exists == False
+    shell: "cd /opt/data/cath_data/; /usr/local/bin/makeblastdb -in cath-domain-seqs-S100-v4_1_0.fa -dbtype prot"
+
+  - name: Check cath dompdb
+    stat: path=/opt/data/cath_data/dompdb
+    register: dompdb_exist
+
+  - name: Download dompdb
+    when: dompdb_exist.stat.exists == False
+    shell: "cd /opt/data/cath_data/; wget ftp://orengoftp.biochem.ucl.ac.uk/cath/releases/all-releases/v4_1_0/non-redundant-data-sets/cath-dataset-nonredundant-S40-v4_1_0.pdb.tgz"
+
+  - name: untar
+    when: dompdb_exist.stat.exists == False
+    shell: "cd /opt/data/cath_data/; tar -xzvf cath-dataset-nonredundant-S40-v4_1_0.pdb.tgz"
+
 
 # get a copy of the pdb
 # run makepdbaa to produce pdb_aa.fasta

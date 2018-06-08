@@ -10,6 +10,9 @@
       clone: yes
       force: yes
 
+  - name: install perl expect
+    shell: "cpan install Expect"
+
   # - name: make metsite components
   #   when: metsite_exist.stat.exists == False
   #   shell: "cd /opt/metsite/src/; make"

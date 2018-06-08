@@ -21,6 +21,8 @@
       name: Math::Round
       mirror: http://cpan.mirror.triple-it.nl/
 
+YO YO GD.pm must be 2.56
+"sudo cpan -i L/LD/LDS/GD-2.56.tar.gz"
   - name: Install GD.pm
     become_user: root
     become_method: sudo

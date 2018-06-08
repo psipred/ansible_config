@@ -12,6 +12,7 @@
 #   become_method: sudo
 #   roles:
 #     - automount
+#     - update nss and curl # yum update -y nss curl libcurl
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
@@ -103,16 +104,18 @@
     # - psipred
     # - disopred
     # - memsatsvm
+    # - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+    # - model_parts # get the bits for the frontend simple modelling
     # - dompred # installed to /webdata due to space on bioinfstage4
-    # - mempack
-    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    # - bioserf
-    # - ffpred
-    # - metapsicov
-    # - metsite
-    # - hspred
-    # - memembed
-    # - maketdb
+
+    - mempack
+    - bioserf
+    - ffpred
+    - metapsicov
+    - metsite
+    - hspred
+    - memembed
+    - maketdb
   vars_files:
     - secrets/staging_secrets.yaml
 

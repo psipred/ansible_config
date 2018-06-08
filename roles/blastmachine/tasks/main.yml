@@ -87,3 +87,26 @@
   - name: Run formatdb
     shell: cd /data/uniref; /usr/local/bin/makeblastdb -in uniref90.fasta -dbtype prot
     when: uniref_exist.stat.exists == False
+
+  - name: Check if we have pdbaa
+    stat:
+      path: /data/uniref/pdbaa.phr
+      get_md5: false
+      get_checksum: false
+    register: pdbaa_exist
+
+  - name: Download pdbaa
+    shell: "chdir=/data/uniref wget --timeout 120 http://dunbrack.fccc.edu/Guoli/culledpdb_hh/pdbaa.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    when: pdbaa_exist.stat.exists == False
+
+  - name: unzip pdbaa
+    shell: cd /data/uniref; /bin/gunzip pdbaa.gz
+    when: pdbaa_exist.stat.exists == False
+
+  - name: Run formatdb
+    shell: cd /data/uniref; /usr/local/bin/makeblastdb -in pdbaa -dbtype prot
+    when: pdbaa_exist.stat.exists == False
