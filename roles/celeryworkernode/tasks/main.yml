@@ -1,0 +1,41 @@
+#export SGE_ROOT=/opt/ogs_src/GE2011.11/
+  - name: Install expect
+    yum:
+      pkg: expect
+      state: latest
+    become_user: root
+    become_method: sudo
+
+#open ports 6444 and 6445
+
+  - name: Get the current firewalld rules
+    shell: firewall-cmd --list-all
+    register: firewalldrules
+    always_run: yes
+    become_user: root
+    become_method: sudo
+
+  - name: Add Postgres firewalld rules
+    command: firewall-cmd --zone=public --add-port=6444/tcp --permanent
+    become_user: root
+    become_method: sudo
+    when: firewalldrules.stdout.find("6444/tcp") == -1
+
+  - name: Add Postgres firewalld rules
+    command: firewall-cmd --zone=public --add-port=6445/tcp --permanent
+    become_user: root
+    become_method: sudo
+    when: firewalldrules.stdout.find("6445/tcp") == -1
+
+  - name: Reload firewalld
+    command: firewall-cmd --reload
+    become_user: root
+    become_method: sudo
+  # we need this user on the nodes as the workers run as this user when submitting
+  # work
+  - name: "Add {{ django_worker_user }} user"
+    user:
+      name: "{{ django_worker_user }}"
+      password: "{{ django_worker_hashed_password }}"
+    become_user: root
+    become_method: sudo

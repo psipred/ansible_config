@@ -58,17 +58,6 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-# - name: Create SGE head
-#   hosts: sge_head
-#   become: true
-#   become_user: dbuchan
-#   become_method: sudo
-#   roles:
-#     #- buildsge
-#     - sgehead
-#   vars_files:
-#     - secrets/staging_secrets.yaml
-
 # - name: Create blastmachine
 #   hosts: blastmachine
 #   become: true
@@ -94,20 +83,20 @@
 
 # mempack won't compile in OSX
 # domThreader seg faults in OSX
-- name: Create SGE node
-  hosts: sge_node
+- name: Create Celery worker node
+  hosts: celery_worker_node
   become: true
   become_user: root
   become_method: sudo
   roles:
-    # - sgenode
-    # - psipred
-    # - disopred
-    # - memsatsvm
-    # - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    # - model_parts # get the bits for the frontend simple modelling
-    # - dompred # installed to /webdata due to space on bioinfstage4
-
+    - djangomachine
+    - aaworker
+    - psipred
+    - disopred
+    - memsatsvm
+    - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+    - model_parts # get the bits for the frontend simple modelling
+    - dompred # installed to /webdata due to space on bioinfstage4
     - mempack
     - bioserf
     - ffpred
