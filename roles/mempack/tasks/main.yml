@@ -51,6 +51,43 @@
     # when: imagemagick_exist.stat.exists == False
     shell: "cd /opt/ImageMagick-6.8.9-10/; ldconfig /usr/local/lib"
 
+  # - name: Download Image::Magick
+  #   when: imagemagick_exist.stat.exists == False
+  #   get_url:
+  #     url: http://search.cpan.org/CPAN/authors/id/J/JC/JCRISTY/PerlMagick-6.89-1.tar.gz
+  #     dest: /opt/
+  #     timeout: 120
+  #   register: get_url_result
+  #
+  # - name: untar Image::Magick
+  #   when: imagemagick_exist.stat.exists == False
+  #   unarchive:
+  #     src: /opt/PerlMagick-6.89-1.tar.gz
+  #     dest: /opt
+  #     remote_src: yes
+  #
+  # - name: configure Image::Magick
+  #   when: imagemagick_exist.stat.exists == False
+  #   shell: "cd /opt/PerlMagick-6.89; perl Makefile.PL"
+  #
+  # - name: make Image::Magick
+  #   when: imagemagick_exist.stat.exists == False
+  #   shell: "cd /opt/PerlMagick-6.89; make"
+  #
+  # - name: configure Image::Magick
+  #   when: imagemagick_exist.stat.exists == False
+  #   shell: "cd /opt/PerlMagick-6.89; make install"
+
+
+
+  - name: make ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/ImageMagick-6.8.9-10/; make"
+
+  - name: install ImageMagick
+    when: imagemagick_exist.stat.exists == False
+    shell: "cd /opt/ImageMagick-6.8.9-10/; make install"
+
   - name: Check if boost is present
     stat: path=/opt/boost_1_38_0
     register: boost_exist

@@ -1,1 +1,1 @@
-# add git update
+# sudo yum update -y git nss curl libcurl

@@ -10,6 +10,10 @@
       clone: yes
       force: yes
 
+  - name: install requests
+    when: simple_modeller_exist.stat.exists == False
+    shell: pip install requests
+
   - name: Check PDB dir exists
     stat: path=/webdata/data/pdb/
     register: pdb_path_exist

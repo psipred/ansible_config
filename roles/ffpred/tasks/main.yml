@@ -202,6 +202,15 @@
       dest: /opt/
       remote_src: yes
 
+  - name: copy over the configured runWold.sh script
+    when: psort_exist.stat.exists == False
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/runWolf.sh
+      dest: /opt/WoLFPSort-master/bin/
+      mode: "uog+x"
+
   - name: Check if coils is installed
     stat: path=/opt/coils
     register: coils_exist
@@ -230,7 +239,15 @@
     shell: "cd /opt/coils; cc -O2 -I. -o ncoils ncoils.c read_matrix.c -lm"
     when: coils_exist.stat.exists == False
 #
-#
+  - name: copy over the coils.sh script
+    when: coils_exist.stat.exists == False
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/coils.sh
+      dest: /opt/coils
+      mode: "uog+x"
+
   - name: Check if EMBOSS is installed
     stat: path=/opt/EMBOSS-6.4.0
     register: emboss_exist

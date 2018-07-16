@@ -140,7 +140,7 @@
 
   - name: Install freecontact dependencies
     yum:
-      pkg: lapack, lapack-devel, lapack64, lapack64-devel
+      pkg: lapack, lapack-devel, lapack64, lapack64-devel, openblas-devel
       state: latest
 
   - name: check we have FreeContact
@@ -169,11 +169,18 @@
     when: freecontact_exist.stat.exists == False
     shell: 'cd /opt/freecontact-1.0.21/; ./configure CFLAGS=-I/opt/OpenBLAS/include LIBS=-L/opt/OpenBLAS/lib LDFLAGS=-L/opt/OpenBLAS/lib CPPFLAGS=-I/opt/OpenBLAS/include'
 
+  - name: configure freecontact
+    when: freecontact_exist.stat.exists == False
+    shell: "cd /opt/freecontact-1.0.21/; ./configure"
+    #run with env LD_LIBRARY_PATH=/opt/OpenBLAS/lib/ src/freecontact
+
+  - name: cheat softlink
+    when: freecontact_exist.stat.exists == False
+    shell: "cd /opt/freecontact-1.0.21/lib; for n in $(ls /usr/include/openblas/); do ln -sv /usr/include/openblas/$n $n; done"
+
   - name: make freecontact
     when: freecontact_exist.stat.exists == False
-    environment:
-      LD_LIBRARY_PATH: /opt/OpenBLAS/lib/
-    shell: "cd /opt/freecontact-1.0.21/; make"
+    shell: "cd /opt/freecontact-1.0.21/; ./make"
     #run with env LD_LIBRARY_PATH=/opt/OpenBLAS/lib/ src/freecontact
 
   - name: check we have PSICOV

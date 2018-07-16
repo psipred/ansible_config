@@ -26,6 +26,7 @@
   # The virtualenv installed above is broken so we update it here
   - name: Upgrade virtualenv
     shell: pip install --upgrade virtualenv
+    become_user: root
 
   - name: Check if we have aa_env
     stat: "path={{ django_worker_home }}/aa_env"
