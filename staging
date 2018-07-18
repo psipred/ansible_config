@@ -13,13 +13,10 @@
 [aa_head]
 128.16.14.83
 
-[aa_workers]
-128.16.14.83
-
 [blastmachine]
 128.16.6.210
 
-[celey_worker_node]
+[celery_worker_node]
 128.16.14.86
 128.16.14.83
 

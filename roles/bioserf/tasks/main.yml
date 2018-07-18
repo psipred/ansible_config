@@ -100,11 +100,11 @@
   #just in case we need to upgrade these
   - name: upgrade all packages
     yum:
-      name: java, openjdk
+      name: java, java-1.8.0-openjdk
       state: latest
 
-  - name: remove stale java class files
-    shell: /bin/rm /opt/bioserf/src/org/ucl/util/*.class
+  # - name: remove stale java class files
+  #   shell: /bin/rm /opt/bioserf/src/org/ucl/util/*.class
 
   - name: make bioserf components
     when: bioserf_exist.stat.exists == False
@@ -121,11 +121,17 @@
       dest: /opt/hh-suite/scripts/
       mode: "uog+rwx"
 
+  - name: Check cmake is present
+    stat: path=/opt/data/cath_data
+    register: cath_exist
+
   - name: make cath_data dir
     shell: "cd /opt/data; mkdir cath_data"
+    when: cath_exist.stat.exists == False
 
   - name: Move annotated CATH list over
     # when: maketdb_exist.stat.exists == False
+    when: cath_exist.stat.exists == False
     copy:
       src: files/cath-domain-list-v4_2_0_annotated.txt
       dest: /opt/data/cath_data/

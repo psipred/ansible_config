@@ -169,9 +169,9 @@
     when: freecontact_exist.stat.exists == False
     shell: 'cd /opt/freecontact-1.0.21/; ./configure CFLAGS=-I/opt/OpenBLAS/include LIBS=-L/opt/OpenBLAS/lib LDFLAGS=-L/opt/OpenBLAS/lib CPPFLAGS=-I/opt/OpenBLAS/include'
 
-  - name: configure freecontact
-    when: freecontact_exist.stat.exists == False
-    shell: "cd /opt/freecontact-1.0.21/; ./configure"
+  # - name: configure freecontact
+  #   when: freecontact_exist.stat.exists == False
+  #   shell: "cd /opt/freecontact-1.0.21/; ./configure"
     #run with env LD_LIBRARY_PATH=/opt/OpenBLAS/lib/ src/freecontact
 
   - name: cheat softlink
@@ -247,8 +247,28 @@
     when: hh2_exist.stat.exists == False
     unarchive:
       src: /opt/hhsuite-2.0.16-linux-x86_64.tar.gz
-      dest: /opt/hhsuite-2.0.16.tar.gz
+      dest: /opt/
       remote_src: yes
 
   - name: cp cs translate
     shell: "cp /opt/hhsuite-2.0.16-linux-x86_64/lib/hh/bin/cstranslate /opt/hhsuite-2.0.16-linux-x86_64/bin/"
+
+  - name: check we have unirefmain
+    stat: path=/opt/uniref/unirefmain.fasta
+    register: unirefmain_exist
+
+  - name: get unirefmaain
+    when: unirefmain_exist.stat.exists == False
+    get_url:
+      url: ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
+      dest: /opt/uniref
+      timeout: 120
+    register: get_url_result
+
+  - name: unzip unirefmain
+    when: unirefmain_exist.stat.exists == False
+    shell: "cd /opt/uniref; mv uniref90.fasta.gz unirefmain.fasta.gz; gunzip unirefmain.fasta.gz"
+
+  - name: run ssi build
+    when: unirefmain_exist.stat.exists == False
+    shell: "cd /opt/uniref; /opt/hmmer-3.1b2-linux-intel-x86_64/binaries/esl-sfetch --index unirefmain"

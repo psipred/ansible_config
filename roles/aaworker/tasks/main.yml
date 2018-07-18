@@ -1,5 +1,13 @@
 ---
 
+    - name: Install Dependencies
+    yum:
+      pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk
+      state: latest
+    become_user: root
+    become_method: sudo
+
+
   - name: "Add {{ django_worker_user }} user"
     user:
       name: "{{ django_worker_user }}"

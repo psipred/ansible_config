@@ -305,25 +305,25 @@
       clone: yes
       force: yes
 
-  - name: Download ffpredSVMs
-    when: ffpred_exist.stat.exists == False
-    get_url:
-      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred/SVMs.tar.gz
-      dest: /opt/
-      timeout: 120
-    register: get_url_result
-
-  - name: untar ffpred SVMs
-    when: ffpred_exist.stat.exists == False
-    unarchive:
-      src: /opt/SVMs.tar.gz
-      dest: /opt/
-      remote_src: yes
-      extra_opts: "-h"
-
-  - name: remove SVM tarball
-    shell: "cd /opt/; rm SVMs.tar.gz"
-    when: ffpred_exist.stat.exists == False
+  # - name: Download ffpredSVMs
+  #   when: ffpred_exist.stat.exists == False
+  #   get_url:
+  #     url: http://bioinfadmin.cs.ucl.ac.uk/downloads/ffpred/SVMs.tar.gz
+  #     dest: /opt/
+  #     timeout: 120
+  #   register: get_url_result
+  #
+  # - name: untar ffpred SVMs
+  #   when: ffpred_exist.stat.exists == False
+  #   unarchive:
+  #     src: /opt/SVMs.tar.gz
+  #     dest: /opt/
+  #     remote_src: yes
+  #     extra_opts: "-h"
+  #
+  # - name: remove SVM tarball
+  #   shell: "cd /opt/; rm SVMs.tar.gz"
+  #   when: ffpred_exist.stat.exists == False
 
   - name: Add SVMs symlink to ffpred dirname
     file:
@@ -334,7 +334,6 @@
   - name: Check if svm_light is installed
     stat: path=/opt/svm_light
     register: svml_exist
-
 
   - name: Download svm_light
     when: svml_exist.stat.exists == False
@@ -361,7 +360,3 @@
       src: files/CONFIG
       dest: /opt/ffpred3
       mode: "uog+x"
-
-
-TO DO unirefmain and build ssi index for jackhmmer
-esl-efect --index unirefmain
