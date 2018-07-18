@@ -12,7 +12,7 @@
 
 # Need to add blast workers here too
 - name: restarts workers
-  hosts: aa_workers
+  hosts: celer_worker_node
   become: true
   become_user: dbuchan
   become_method: sudo

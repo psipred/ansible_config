@@ -1,6 +1,6 @@
 ---
 
-    - name: Install Dependencies
+  - name: Install Dependencies
     yum:
       pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk
       state: latest
@@ -156,7 +156,7 @@
       src: /webdata/submissions
       dest: "{{ django_worker_home }}/analytics_automated/submissions"
       state: link
-      owner: "{{ djgano_worker_user }}"
+      owner: "{{ django_worker_user }}"
       group: apache
       mode: "ug+rw"
 

@@ -90,18 +90,18 @@
   become_user: root
   become_method: sudo
   roles:
-    # - djangomachine
-    # - aaworker
+    - djangomachine
+    - aaworker
     # - psipred
     # - disopred
     # - memsatsvm
     # - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    # # - model_parts # get the bits for the frontend simple modelling
+    # - model_parts # get the bits for the frontend simple modelling
     # - dompred # installed to /webdata due to space on bioinfstage4
     # - mempack
     # - bioserf
     # - ffpred
-    - metapsicov
+    # - metapsicov
     # - metsite
     # - hspred
     # - memembed
