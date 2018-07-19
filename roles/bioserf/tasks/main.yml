@@ -239,5 +239,5 @@
     when: pdbaa_exist.stat.exists == False
 
   - name: Run formatdb
-    shell: cd /opt/data/pdb; /usr/local/bin/makeblastdb -in pdbaa -dbtype prot
+    shell: cd /opt/data/pdb; /opt/ncbi-blast-2.7.1+/bin/makeblastdb -in pdbaa -dbtype prot
     when: pdbaa_exist.stat.exists == False
