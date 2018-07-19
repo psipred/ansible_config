@@ -162,6 +162,45 @@
     shell: "cd /opt/data/cath_data/; tar -xzvf cath-dataset-nonredundant-S40-v4_1_0.pdb.tgz"
 
 
+
+  - name: Check if we the blast is installed
+    stat: path=/opt/ncbi-blast-2.7.1+/
+    register: blastp_exist
+
+  - name: Download BLAST+ tarball
+    when: blastp_exist.stat.exists == False
+    get_url:
+      url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/ncbi-blast-2.7.1+-x64-linux.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+
+  - name: unarchive blast
+    when: blastp_exist.stat.exists == False
+    unarchive:
+      src: /opt/ncbi-blast-2.7.1+-x64-linux.tar.gz
+      dest: /opt/
+      remote_src: yes
+
+  - name: Check if we the psiblast is installed
+    stat: path=/opt/blast-2.2.26/bin/blastpgp
+    register: blastpgp_exist
+
+  - name: Download BLAST+ tarball
+    when: blastpgp_exist.stat.exists == False
+    get_url:
+      url: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz
+      dest: /opt/
+      timeout: 120
+    register: get_url_result
+
+  - name: unarchive blast
+    when: blastpgp_exist.stat.exists == False
+    unarchive:
+      src: /opt/blast-2.2.26-x64-linux.tar.gz
+      dest: /opt/
+      remote_src: yes
+
 # get a copy of the pdb
 # run makepdbaa to produce pdb_aa.fasta
 # run makeblastdb over pdb_aa.fasta
@@ -173,3 +212,32 @@
 # CathDomainSummary_3.5 this is parsed from the http://download.cathdb.info/cath/releases/latest-release/cath-classification-data/cath-domain-list.txt
 #
 #
+
+  - name: Check if we have pdbaa
+    stat:
+      path: /opt/data/pdb/pdbaa.phr
+      get_md5: false
+      get_checksum: false
+    register: pdbaa_exist
+
+  - name: Make pdb dir
+    file:
+      path: /opt/data/pdb/
+      state: directory
+    when: pdbaa_exist.stat.exists == False
+
+  - name: Download pdbaa
+    shell: "chdir=/opt/data/pdb wget --timeout 120 http://dunbrack.fccc.edu/Guoli/culledpdb_hh/pdbaa.gz"
+    register: get_url_result
+    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+    # retries: 2
+    # delay: 10
+    when: pdbaa_exist.stat.exists == False
+
+  - name: unzip pdbaa
+    shell: cd /opt/data/pdb; /bin/gunzip pdbaa.gz
+    when: pdbaa_exist.stat.exists == False
+
+  - name: Run formatdb
+    shell: cd /opt/data/pdb; /usr/local/bin/makeblastdb -in pdbaa -dbtype prot
+    when: pdbaa_exist.stat.exists == False

@@ -53,6 +53,7 @@
     when: pgenthreader_exist.stat.exists == False
     shell: "mkdir /opt/pgenthreader/tdb/"
 
+
   # - name: untar foldlib
   #   when: pgenthreader_exist.stat.exists == False
   #   shell: "cd /opt/pgenthreader; tar -C /webdata/pgenthreader/tdb/ -zxvf foldlib.tar.gz"
@@ -74,6 +75,8 @@
       src: /opt/pgenthreader/cath_domain_tdb_4_1.tar.gz
       dest: /opt/pgenthreader/
       remote_src: yes
+
+COPY PSICHAINS LIST TO CATH_DOM_LIST
 
   - name: make the binaries
     when: pgenthreader_exist.stat.exists == False
