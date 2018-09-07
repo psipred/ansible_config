@@ -26,7 +26,7 @@
       mode: "uog+x"
 
   - name: Check tcoffee is present
-    stat: path=/opt/T-COFFEE_distribution_Version_11.00.05372cb
+    stat: path=/opt/T-COFFEE_distribution_Version*
     register: tcoffee_exist
 
   # - name: Download tcoffee
@@ -41,7 +41,8 @@
   - name: Download tcoffee
     when: tcoffee_exist.stat.exists == False
     get_url:
-      url: http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz
+      #url: http://www.tcoffee.org/Packages/Beta/Version_11.00.05372cb/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz
+      url: http://www.tcoffee.org/Packages/Stable/Version_11.00.8cbe486/T-COFFEE_distribution_Version_11.00.8cbe486.tar.gz
       dest: /opt/
       timeout: 120
     register: get_url_result
@@ -49,13 +50,13 @@
   - name: untar tcoffee
     when: tcoffee_exist.stat.exists == False
     unarchive:
-      src: /opt/T-COFFEE_distribution_Version_11.00.05372cb.tar.gz
+      src: /opt/T-COFFEE_distribution_Version_11.00.8cbe486.tar.gz
       dest: /opt
       remote_src: yes
 
   - name: install tcoffee
     when: tcoffee_exist.stat.exists == False
-    shell: "cd /opt/T-COFFEE_distribution_Version_11.00.05372cb/; ./install tcoffee"
+    shell: "cd /opt/T-COFFEE_distribution_Version_11.00.8cbe486/; ./install tcoffee"
 
   # - name: check cath tdb present
   #   stat: path=/opt/data/cath_data/domlib

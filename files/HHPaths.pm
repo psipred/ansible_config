@@ -1,4 +1,4 @@
-# HHPaths.pm 
+# HHPaths.pm
 
 #     HHsuite version 3.0.0 (15-03-2015)
 #     (C) J. Soeding, A. Hauser 2012
@@ -19,7 +19,7 @@
 #     We are very grateful for bug reports! Please contact us at soeding@mpibpc.mpg.de
 
 # PLEASE INSERT CORRECT PATHS AT POSITIONS INDICATED BY ... BELOW
-# THE ENVIRONMENT VARIABLE HHLIB NEEDS TO BE SET TO YOUR LOCAL HH-SUITE DIRECTORY, 
+# THE ENVIRONMENT VARIABLE HHLIB NEEDS TO BE SET TO YOUR LOCAL HH-SUITE DIRECTORY,
 # AS DESCRIBED IN THE HH-SUITE USER GUIDE AND README FILE
 
 package HHPaths;
@@ -33,13 +33,13 @@ our @ISA     = qw(Exporter);
 our @EXPORT  = qw($VERSION $hhlib $hhdata $hhbin $hhscripts $execdir $datadir $ncbidir $dummydb $pdbdir $dsspdir $dssp $cs_lib $context_lib $v);
 
 ##############################################################################################
-# PLEASE COMPLETE THE PATHS ... TO PSIPRED AND OLD-STYLE BLAST (NOT BLAST+) (NEEDED FOR PSIPRED) 
+# PLEASE COMPLETE THE PATHS ... TO PSIPRED AND OLD-STYLE BLAST (NOT BLAST+) (NEEDED FOR PSIPRED)
 #our $execdir = ".../psipred/bin";         # path to PSIPRED V2 binaries
 #our $datadir = ".../psipred/data";        # path to PSIPRED V2 data files
 #our $ncbidir = ".../blast/bin";           # path to NCBI binaries (for PSIPRED in addss.pl)
 our $execdir = "/opt/psipred/bin";  # path to PSIPRED V2 binaries
 our $datadir = "/opt/psipred/data"; # path to PSIPRED V2 data files
-our $ncbidir = "/home/dbuchan/blast-2.2.26/bin";    # path to NCBI binaries (for PSIPRED in addss.pl)
+our $ncbidir = "/opt/blast-2.2.26/bin";    # path to NCBI binaries (for PSIPRED in addss.pl)
 
 ##############################################################################################
 # PLEASE COMPLETE THE PATHS ... TO YOUR LOCAL PDB FILES, DSSP FILES ETC.
@@ -72,10 +72,10 @@ $ENV{"PATH"} = $hhscripts.":".$ENV{"PATH"}; # Add hh scripts directory to enviro
 ################################################################################################
 sub System()
 {
-    if ($v>=2) {printf(STDERR "\$ %s\n",$_[0]);} 
+    if ($v>=2) {printf(STDERR "\$ %s\n",$_[0]);}
     system($_[0]);
     if ($? == -1) {
-	die("\nError: failed to execute '$_[0]': $!\n\n");	
+	die("\nError: failed to execute '$_[0]': $!\n\n");
     } elsif ($? != 0) {
 	printf(STDERR "\nError: command '$_[0]' returned error code %d\n\n", $? >> 8);
 	return 1;

@@ -213,6 +213,8 @@
 #
 #
 
+COPY HACKED/FIXED HHMAKEMODEL
+
   - name: Check if we have pdbaa
     stat:
       path: /opt/data/pdb/pdbaa.phr

@@ -84,30 +84,62 @@
 # mempack won't compile in OSX
 # domThreader seg faults in OSX
 
-- name: Create Celery worker node
-  hosts: celery_worker_node
+# - name: Create Celery worker node
+#   hosts: celery_worker_node
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - djangomachine
+#     - aaworker
+#     - psipred
+#     - disopred
+#     - memsatsvm
+#     - pGenTHREADER # installed to /webdata due to space on bioinfstage4
+#     - model_parts # get the bits for the frontend simple modelling
+#     - dompred # installed to /webdata due to space on bioinfstage4
+#     - mempack
+#     - bioserf
+#     - ffpred
+#     - metapsicov
+#     - metsite
+#     - hspred
+#     - memembed
+#     - maketdb
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+
+- name: Update Seq DBs
+  hosts: update_seq
   become: true
   become_user: root
   become_method: sudo
   roles:
-    - djangomachine
-    - aaworker
-    # - psipred
-    # - disopred
-    # - memsatsvm
-    # - pGenTHREADER # installed to /webdata due to space on bioinfstage4
-    # - model_parts # get the bits for the frontend simple modelling
-    # - dompred # installed to /webdata due to space on bioinfstage4
-    # - mempack
-    # - bioserf
-    # - ffpred
-    # - metapsicov
-    # - metsite
-    # - hspred
-    # - memembed
-    # - maketdb
+    - updateseq
   vars_files:
     - secrets/staging_secrets.yaml
+
+- name: build tdb stuff
+  hosts: build_tdb
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - updatetdb
+  vars_files:
+    - secrets/staging_secrets.yaml
+
+- name: Clear db
+  hosts: clear_tmp
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - cleardb
+  vars_files:
+    - secrets/staging_secrets.yaml
+
+
 
 # - name: Install webserver
 #   hosts: webserver

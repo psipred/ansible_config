@@ -2,7 +2,7 @@
 
   - name: Install Dependencies
     yum:
-      pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk, lmdb
+      pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk, lmdb, ghostscript, ghostscript-devel
       state: latest
     become_user: root
     become_method: sudo
