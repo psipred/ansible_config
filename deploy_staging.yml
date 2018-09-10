@@ -119,15 +119,25 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: build tdb stuff
-  hosts: build_tdb
+- name: Update PDB
+  hosts: update_seq
   become: true
   become_user: root
   become_method: sudo
   roles:
-    - updatetdb
+    - updatepdb
   vars_files:
     - secrets/staging_secrets.yaml
+
+# - name: build tdb stuff
+#   hosts: build_tdb
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - updatetdb
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 #
 # - name: Clear db
 #   hosts: clear_tmp

@@ -1,8 +1,8 @@
   - name : Check Out update scripts from GIT
-    become_user: "{{ aa_worker_user }}"
+    become_user: "{{ django_aa_user }}"
     git:
       repo: https://github.com/psipred/server_update.git
-      dest: "{{ aa_worker_home }}server_update"
+      dest: "{{ django_aa_home }}server_update"
       clone: yes
       force: yes
 
@@ -11,10 +11,10 @@
       path: "/opt/pgenthreader/tdb_update"
       state: directory
 
-  - name: Update the TDB
-    cron:
-      name: "update TDB"
-      weekday: 3
-      minute: 0
-      hour: 3
-      job: "{{ aa_worker_home }}server_update/update_tdb_staging.sh"
+  # - name: Update the TDB
+  #   cron:
+  #     name: "update TDB"
+  #     weekday: 3
+  #     minute: 0
+  #     hour: 3
+  #     job: "{{ aa_worker_home }}server_update/update_tdb_staging.sh"
