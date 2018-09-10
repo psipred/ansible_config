@@ -60,6 +60,14 @@
   - name: Make uniref dir
     file:
       path: /data/uniref/
+      mode: uog+rw
+      state: directory
+    when: uniref_exist.stat.exists == False
+
+  - name: Make uniref tmp dir
+    file:
+      path: /data/uniref_tmp/
+      mode: uog+rw
       state: directory
     when: uniref_exist.stat.exists == False
 
@@ -98,6 +106,7 @@
   - name: Make pdbaa dir
     file:
       path: /data/pdbaa/
+      mode: uog+rw
       state: directory
     when: pdbaa_exist.stat.exists == False
 

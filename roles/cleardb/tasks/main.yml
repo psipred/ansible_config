@@ -1,0 +1,22 @@
+  - name : Check Out update scripts from GIT
+    become_user: "{{ django_aa_user }}"
+    git:
+      repo: https://github.com/psipred/server_update.git
+      dest: "{{ django_aa_home }}/server_update"
+      clone: yes
+      force: yes
+
+  - name: Clear tmp of anything more than 10 days old every evening
+    cron:
+      name: "clear tmp files"
+      minute: 0
+      hour: 2
+      job: /usr/bin/find /webdata/ -type d -mtime +10 -name "data" -prune -o -name "SVMs" -prune -o -name "pgenthreader" -prune -regextype posix-egrep -regex ".*/.{8}-.{4}-.{4}-.{4}-.{12}/.*" -exec rm -rf {}  \;
+
+  - name: Delete old db entries
+    become_user: "{{ django_aa_user }}"
+    cron:
+      name: "clear db entries"
+      minute: 0
+      hour: 3
+      job: "{{ django_aa_home}}/analystics_automated/example_scripts/delete_entries.sh > /dev/null 2>&1"
