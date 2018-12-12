@@ -11,6 +11,11 @@
       path: "/opt/pgenthreader/tdb_update"
       state: directory
 
+  - name: Create TDB update dir
+    file:
+      path: "/opt/pgenthreader/tdb_update/dssp"
+      state: directory
+
   # - name: Update the TDB
   #   cron:
   #     name: "update TDB"

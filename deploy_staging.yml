@@ -58,17 +58,17 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-# - name: Create blastmachine
-#   hosts: blastmachine
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
-#     # - djangomachine
-#     # - blastmachine
-#     - blastworkers
-#   vars_files:
-#     - secrets/staging_secrets.yaml
+- name: Create blastmachine
+  hosts: blastmachine
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    # - blastworkers
+    # - djangomachine
+    - blastmachine
+  vars_files:
+    - secrets/staging_secrets.yaml
 
 # - name: Create blast_cache machine
 #   hosts: blast_cache
@@ -119,15 +119,15 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: Update PDB
-  hosts: update_seq
-  become: true
-  become_user: root
-  become_method: sudo
-  roles:
-    - updatepdb
-  vars_files:
-    - secrets/staging_secrets.yaml
+# - name: Update PDB
+#   hosts: update_seq
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - updatepdb
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
 # - name: build tdb stuff
 #   hosts: build_tdb

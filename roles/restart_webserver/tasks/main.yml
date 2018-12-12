@@ -14,7 +14,7 @@
       virtualenv: "{{ webserver_home }}webserver_env"
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ webserver_home }}webserver_env/bin/python"
-      state: latest
+      # state: latest
       requirements: "{{ webserver_home }}psipred_website/requirements/staging.txt"
 
   - name: Copy psipred_website staging conf

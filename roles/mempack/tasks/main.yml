@@ -7,7 +7,7 @@
 # get the datasets
 # unpack the datasets
 # libboost libboost-devel
-  - name: Check if boost is present
+  - name: Check if Imagemagick is present
     stat: path=/opt/ImageMagick-6.8.9-10
     register: imagemagick_exist
 

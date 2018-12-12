@@ -121,7 +121,7 @@
       dest: /opt/hh-suite/scripts/
       mode: "uog+rwx"
 
-  - name: Check cmake is present
+  - name: Check cath_data is present
     stat: path=/opt/data/cath_data
     register: cath_exist
 
