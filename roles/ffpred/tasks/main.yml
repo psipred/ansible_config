@@ -1,4 +1,4 @@
-#SignalP
+cSignalP
 # http://www.cbs.dtu.dk/services/SignalP/
 #NetPhos/ape-1.0
 # http://www.cbs.dtu.dk/services/NetPhos/
@@ -346,7 +346,7 @@
   - name: untar svm_light
     when: svml_exist.stat.exists == False
     unarchive:
-      src: /opt/vm_light.tar.gz
+      src: /opt/svm_light.tar.gz
       dest: /opt/
       remote_src: yes
 

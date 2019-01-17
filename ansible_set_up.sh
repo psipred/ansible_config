@@ -7,6 +7,7 @@
 # export ANSIBLE_INVENTORY=~/ansible_hosts
 
 # ssh-keygen -t rsa
+# ensure /home/dbuchan/.ssh exists on target machine
 # scp ~/.ssh/id_rsa.pub dbuchan@bioinfstageX:/home/dbuchan/.ssh/authorized_keys
 # on target machines add
 # dbuchan ALL=(ALL) NOPASSWD: ALL
