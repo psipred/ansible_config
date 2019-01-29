@@ -64,9 +64,9 @@
   become_user: root
   become_method: sudo
   roles:
-    # - blastworkers
-    # - djangomachine
-    - blastmachine
+    - blastworkers
+    - djangomachine
+    # - blastmachine
   vars_files:
     - secrets/staging_secrets.yaml
 

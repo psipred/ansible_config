@@ -26,5 +26,8 @@
       mode: 0666
       recurse: yes
 
-  - name: rsync the PDB
-    shell: "cd /webdata/data/pdb; rsync -rlpt -v -z --delete rsync.ebi.ac.uk::pub/databases/msd/pdb_uncompressed/ /webdata/data/pdb/"
+  # - name: rsync the PDB
+  #   shell: "cd /webdata/data/pdb; rsync -rlpt -v -z --delete rsync.ebi.ac.uk::pub/databases/msd/pdb_uncompressed/ /webdata/data/pdb/"
+
+  - name: wget the PDB
+    shell: "cd /webdata/data/pdb; wget -r -nd --tries=10 ftp://ftp.ebi.ac.uk/pub/databases/msd/pdb_uncompressed/"
