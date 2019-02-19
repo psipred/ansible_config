@@ -65,8 +65,8 @@
   become_method: sudo
   roles:
     - blastworkers
-    - djangomachine
-    # - blastmachine
+    # - djangomachine
+    - blastmachine
   vars_files:
     - secrets/staging_secrets.yaml
 
@@ -109,47 +109,16 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
-# - name: Update Seq DBs
-#   hosts: update_seq
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
-#     - updateseq
-#   vars_files:
-#     - secrets/staging_secrets.yaml
 
-# - name: Update PDB
-#   hosts: update_seq
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
-#     - updatepdb
-#   vars_files:
-#     - secrets/staging_secrets.yaml
-
-# - name: build tdb stuff
-#   hosts: build_tdb
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
-#     - updatetdb
-#   vars_files:
-#     - secrets/staging_secrets.yaml
-#
-# - name: Clear db
-#   hosts: clear_tmp
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
-#     - cleardb
-#   vars_files:
-#     - secrets/staging_secrets.yaml
-
-
+- name: Update Seq DBs
+  hosts: updatemachine
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - updates
+  vars_files:
+    - secrets/staging_secrets.yaml
 
 # - name: Install webserver
 #   hosts: webserver

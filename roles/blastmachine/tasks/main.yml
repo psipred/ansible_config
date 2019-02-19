@@ -50,81 +50,81 @@
       dest: /opt/
       remote_src: yes
 
-  - name: Check if we have uniref90
-    stat:
-      path: /data/uniref/uniref90.fasta.00.phr
-      get_md5: false
-      get_checksum: false
-    register: uniref_exist
-
-  - name: Make uniref dir
-    file:
-      path: /data/uniref/
-      mode: uog+rw
-      state: directory
-    when: uniref_exist.stat.exists == False
-
-  - name: Make uniref tmp dir
-    file:
-      path: /data/uniref_tmp/
-      mode: uog+rw
-      state: directory
-    when: uniref_exist.stat.exists == False
-
-  # - name: Download uniref90
-  #   when: uniref_exist.stat.exists == False
-  #   get_url:
-  #     url: ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
-  #     dest: /data/uniref/
-  #     timeout: 120
-  #   register: get_url_result
-
-#we wget this so we don't do it in /tmp incase the disk is too small
-  - name: Download uniref90
-    shell: "chdir=/data/uniref wget --timeout 120 ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz"
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    when: uniref_exist.stat.exists == False
-
-  - name: unzip uniref90
-    shell: cd /data/uniref; /bin/gunzip uniref90.fasta.gz
-    when: uniref_exist.stat.exists == False
-
-  - name: Run formatdb
-    shell: cd /data/uniref; /usr/local/bin/makeblastdb -in uniref90.fasta -dbtype prot
-    when: uniref_exist.stat.exists == False
-
-  - name: Check if we have pdbaa
-    stat:
-      path: /data/pdbaa/pdbaa.phr
-      get_md5: false
-      get_checksum: false
-    register: pdbaa_exist
-
-  - name: Make pdbaa dir
-    file:
-      path: /data/pdbaa/
-      mode: uog+rw
-      state: directory
-    when: pdbaa_exist.stat.exists == False
-
-  - name: Download pdbaa
-    shell: "chdir=/data/pdbaa wget --timeout 120 http://dunbrack.fccc.edu/Guoli/culledpdb_hh/pdbaa.gz"
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    when: pdbaa_exist.stat.exists == False
-
-  - name: unzip pdbaa
-    shell: cd /data/pdbaa; /bin/gunzip pdbaa.gz
-    when: pdbaa_exist.stat.exists == False
-
-  - name: Run formatdb
-    shell: cd /data/pdbaa; /usr/local/bin/makeblastdb -in pdbaa -dbtype prot
-    when: pdbaa_exist.stat.exists == False
+#   - name: Check if we have uniref90
+#     stat:
+#       path: /data/uniref/uniref90.fasta.00.phr
+#       get_md5: false
+#       get_checksum: false
+#     register: uniref_exist
+#
+#   - name: Make uniref dir
+#     file:
+#       path: /data/uniref/
+#       mode: uog+rw
+#       state: directory
+#     when: uniref_exist.stat.exists == False
+#
+#   - name: Make uniref tmp dir
+#     file:
+#       path: /data/uniref_tmp/
+#       mode: uog+rw
+#       state: directory
+#     when: uniref_exist.stat.exists == False
+#
+#   # - name: Download uniref90
+#   #   when: uniref_exist.stat.exists == False
+#   #   get_url:
+#   #     url: ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
+#   #     dest: /data/uniref/
+#   #     timeout: 120
+#   #   register: get_url_result
+#
+# #we wget this so we don't do it in /tmp incase the disk is too small
+#   - name: Download uniref90
+#     shell: "chdir=/data/uniref wget --timeout 120 ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz"
+#     register: get_url_result
+#     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#     # retries: 2
+#     # delay: 10
+#     when: uniref_exist.stat.exists == False
+#
+#   - name: unzip uniref90
+#     shell: cd /data/uniref; /bin/gunzip uniref90.fasta.gz
+#     when: uniref_exist.stat.exists == False
+#
+#   - name: Run formatdb
+#     shell: cd /data/uniref; /usr/local/bin/makeblastdb -in uniref90.fasta -dbtype prot
+#     when: uniref_exist.stat.exists == False
+#
+#   - name: Check if we have pdbaa
+#     stat:
+#       path: /data/pdbaa/pdbaa.phr
+#       get_md5: false
+#       get_checksum: false
+#     register: pdbaa_exist
+#
+#   - name: Make pdbaa dir
+#     file:
+#       path: /data/pdbaa/
+#       mode: uog+rw
+#       state: directory
+#     when: pdbaa_exist.stat.exists == False
+#
+#   - name: Download pdbaa
+#     shell: "chdir=/data/pdbaa wget --timeout 120 http://dunbrack.fccc.edu/Guoli/culledpdb_hh/pdbaa.gz"
+#     register: get_url_result
+#     # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#     # retries: 2
+#     # delay: 10
+#     when: pdbaa_exist.stat.exists == False
+#
+#   - name: unzip pdbaa
+#     shell: cd /data/pdbaa; /bin/gunzip pdbaa.gz
+#     when: pdbaa_exist.stat.exists == False
+#
+#   - name: Run formatdb
+#     shell: cd /data/pdbaa; /usr/local/bin/makeblastdb -in pdbaa -dbtype prot
+#     when: pdbaa_exist.stat.exists == False
 
   - name: Check HHSuite is present
     stat: path=/opt/hh-suite
@@ -149,39 +149,39 @@
     shell: cd /opt; mv hhsuite-3.0-beta.3-Linux hh-suite
     when: hhsuite_exist.stat.exists == False
 
-  - name: Check if there is a dir for the HHpdb db
-    stat: path=/data/hhdb
-    register: hhdb_exist
-
-  - name : Create db dir
-    when: hhdb_exist.stat.exists == False
-    file:
-      state: directory
-      path: /data/hhdb/
-      mode: ug+rwx
-
-  - name: Check if there is a file for the HHuniprot
-    stat:
-      path: /data/hhdb/uniclust30_2018_08_hhsuite.tar.gz
-      get_md5: false
-      get_checksum: false
-    register: hhuniprot_exist
-
-  - name: Download uniclust30 db
-    when: hhuniprot_exist.stat.exists == False
-    shell: "chdir=/data/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/uniclust/2018_08/uniclust30_2018_08_hhsuite.tar.gz"
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-    # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-  - name: unpack HHSeach uniclust30 db
-    when: hhuniprot_exist.stat.exists == False
-    unarchive:
-      src: /data/hhdb/uniclust30_2018_08_hhsuite.tar.gz
-      dest: /data/hhdb/
-      remote_src: yes
-
-  - name: change hhdb permissions
-    shell: cd /data/hhdb/uniclust30_2018_08; chmod uog+rw *
-    when: hhsuite_exist.stat.exists == False
+  # - name: Check if there is a dir for the HHpdb db
+  #   stat: path=/data/hhdb
+  #   register: hhdb_exist
+  #
+  # - name : Create db dir
+  #   when: hhdb_exist.stat.exists == False
+  #   file:
+  #     state: directory
+  #     path: /data/hhdb/
+  #     mode: ug+rwx
+  #
+  # - name: Check if there is a file for the HHuniprot
+  #   stat:
+  #     path: /data/hhdb/uniclust30_2018_08_hhsuite.tar.gz
+  #     get_md5: false
+  #     get_checksum: false
+  #   register: hhuniprot_exist
+  #
+  # - name: Download uniclust30 db
+  #   when: hhuniprot_exist.stat.exists == False
+  #   shell: "chdir=/data/hhdb/ wget --timeout 120 http://wwwuser.gwdg.de/~compbiol/uniclust/2018_08/uniclust30_2018_08_hhsuite.tar.gz"
+  #   register: get_url_result
+  #   # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+  #   # retries: 2
+  #   # delay: 10
+  #   # when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+  # - name: unpack HHSeach uniclust30 db
+  #   when: hhuniprot_exist.stat.exists == False
+  #   unarchive:
+  #     src: /data/hhdb/uniclust30_2018_08_hhsuite.tar.gz
+  #     dest: /data/hhdb/
+  #     remote_src: yes
+  #
+  # - name: change hhdb permissions
+  #   shell: cd /data/hhdb/uniclust30_2018_08; chmod uog+rw *
+  #   when: hhsuite_exist.stat.exists == False
