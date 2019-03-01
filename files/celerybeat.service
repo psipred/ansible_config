@@ -1,0 +1,15 @@
+[Unit]
+Description=Start AA Workers on startup
+
+[Service]
+Type=oneshot
+KillMode=control-group
+RemainAfterExit=yes
+Restart=no
+StandardOutput=tty
+User=django_worker
+WorkingDirectory=/home/blast_worker/analytics_automated/
+ExecStart=/bin/sh -c "source /home/blast_worker/aa_env/bin/activate; celery -A analytics_automated_project.celery:app beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler --detach"
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,40 @@
+  - name : Check Out update scripts from GIT
+    become_user: "{{ django_worker_user }}"
+    git:
+      repo: https://github.com/psipred/server_update.git
+      dest: "{{ django_worker_home }}/server_update"
+      clone: yes
+      force: yes
+
+  - name: Stop the aa_workers
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=celery.pid"
+    become_user: "{{ django_worker_user }}"
+    #when: celery_running.stdout.find("celery worker") == 1
+
+  - name: start the celery beat service
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler --detach"
+    become_user: "{{ django_worker_user }}"
+
+  - name: Start the aa_workers
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q pdbtdbupdate,sequpdate,low_localhost,localhost,high_localhost,celery,low_R,R,high_R,low_Python,Python,high_Python --detach --pidfile=celery.pid"
+    become_user: "{{ django_worker_user }}"
+    #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
+
+  - name: copy over the aa worker update service
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/update_aaworker.service
+      dest: /etc/systemd/system/aaworker.service
+      mode: "uog+x"
+
+  - name: Add service to systemctl
+    become_user: root
+    become_method: sudo
+    shell: systemctl enable aaworker.service
+
+  - name: make tmp dir
+    shell: mkdir /data/update_tmp; chown blast_worker /data/update_tmp
+
+  - name: make tmp dir
+    shell: mkdir /data/update_tdb; chown blast_worker /data/update_tdb

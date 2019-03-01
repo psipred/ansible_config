@@ -1,7 +1,0 @@
-  - name : Check Out update scripts from GIT
-    become_user: "{{ django_aa_user }}"
-    git:
-      repo: https://github.com/psipred/server_update.git
-      dest: "{{ django_aa_home }}/server_update"
-      clone: yes
-      force: yes
