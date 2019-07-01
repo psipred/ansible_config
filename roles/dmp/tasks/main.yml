@@ -1,7 +1,28 @@
-
+  
   - name: clone DMP
     git:
       repo: https://github.com/psipred/DeepMetaPSICOV.git
       dest: /opt/DeepMetaPSICOV
       clone: yes
       force: yes
+
+  - name: get Rcpp
+    shell: "chdir=/opt/ wget https://cran.r-project.org/src/contrib/Rcpp_1.0.1.tar.gz"
+
+  - name: install Rcpp
+    shell: "chdir=/opt/ R CMD INSTALL Rcpp_1.0.1.tar.gz"
+    become_user: root
+
+  - name: get bio3d
+    shell:  "chdir=/opt/ wget https://cran.r-project.org/src/contrib/bio3d_2.3-4.tar.gz"
+
+  - name: install bio3d
+    shell: "chdir=/opt/ R CMD INSTALL bio3d_2.3-4.tar.gz"
+    become_user: root
+
+  - name: get colorRamps
+    shell:  "chdir=/opt/ wget https://cran.r-project.org/src/contrib/colorRamps_2.3.tar.gz"
+
+  - name: install colorRamps
+    shell: "chdir=/opt/ R CMD INSTALL colorRamps_2.3.tar.gz"
+    become_user: root
