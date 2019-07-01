@@ -1,0 +1,7 @@
+
+  - name: clone DMP
+    git:
+      repo: https://github.com/psipred/DeepMetaPSICOV.git
+      dest: /opt/DeepMetaPSICOV
+      clone: yes
+      force: yes
