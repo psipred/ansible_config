@@ -1,0 +1,79 @@
+#!/bin/csh
+
+# Set this to point to the DMPfold directory
+set dmpfolddir = /opt/DMPfold
+
+# Set this to point to the legacy BLAST bin directory
+set ncbidir = /opt/blast-2.2.26/bin
+
+# The name of the BLAST data bank
+set dbname = $2
+
+set datadir = $dmpfolddir/data/psipred
+set solvpreddata = $dmpfolddir/data/solvpred
+
+set basename = $1:r
+set rootname = $basename:t
+
+# Generate a "unique" temporary filename root
+set hostid = `hostid`
+set tmproot = psitmp$$$hostid
+
+\cp -f $1 $tmproot.fasta
+
+echo "Running PSI-BLAST with sequence" $1 "..."
+
+$ncbidir/blastpgp -a 12 -b 0 -j 3 -h 0.001 -d $dbname -i $tmproot.fasta -C $tmproot.chk >& $tmproot.blast
+
+if ($status != 0) then
+    cat $tmproot.blast
+    echo "FATAL: Error whilst running blastpgp - script terminated!"
+    exit 1
+endif
+
+echo "Predicting secondary structure..."
+
+echo $tmproot.chk > $tmproot.pn
+echo $tmproot.fasta > $tmproot.sn
+
+$ncbidir/makemat -P $tmproot
+
+if ($status != 0) then
+    echo "FATAL: Error whilst running makemat - script terminated!"
+    exit 1
+endif
+
+echo Pass1 ...
+
+$dmpfolddir/bin/psipred $tmproot.mtx $datadir/weights.dat $datadir/weights.dat2 $datadir/weights.dat3 > $rootname.ss
+
+if ($status != 0) then
+    echo "FATAL: Error whilst running psipred - script terminated!"
+    exit 1
+endif
+
+echo Pass2 ...
+
+$dmpfolddir/bin/psipass2 $datadir/weights_p2.dat 1 1.0 1.0 $rootname.ss2 $rootname.ss > $rootname.horiz
+
+if ($status != 0) then
+    echo "FATAL: Error whilst running psipass2 - script terminated!"
+    exit 1
+endif
+
+echo Solvation pass ...
+
+$dmpfolddir/bin/solvpred $tmproot.mtx $solvpreddata/weights_solv.dat > $rootname.solv
+
+if ($status != 0) then
+    echo "FATAL: Error whilst running solvpred - script terminated!"
+    exit 1
+endif
+
+# Remove temporary files
+
+echo Cleaning up ...
+\rm -f $tmproot.* error.log
+
+echo "Final output files:" $rootname.ss2 $rootname.horiz $rootname.solv
+echo "Finished."

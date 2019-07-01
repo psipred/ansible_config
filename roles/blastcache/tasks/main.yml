@@ -29,8 +29,8 @@
     # delay: 10
 
   - name: Install pip
-    shell: "chdir={{ blast_cache_home }} /bin/python3.4 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+    shell: "chdir={{ blast_cache_home }} /bin/python3 get-pip.py"
+    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
 
   # The virtualenv installed above is broken so we update it here
   - name: Upgrade virtualenv

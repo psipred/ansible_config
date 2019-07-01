@@ -84,12 +84,12 @@
 # mempack won't compile in OSX
 # domThreader seg faults in OSX
 
-# - name: Create Celery worker node
-#   hosts: celery_worker_node
-#   become: true
-#   become_user: root
-#   become_method: sudo
-#   roles:
+- name: Create Celery worker node
+  hosts: celery_worker_node
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
 #     - djangomachine
 #     - aaworker
 #     - psipred
@@ -101,24 +101,25 @@
 #     - mempack
 #     - bioserf
 #     - ffpred
-#     - metapsicov
 #     - metsite
 #     - hspred
 #     - memembed
 #     - maketdb
-#   vars_files:
-#     - secrets/staging_secrets.yaml
-#
-
-- name: configure blast update machine
-  hosts: blastupdate
-  become: true
-  become_user: root
-  become_method: sudo
-  roles:
-    - blastupdates
+      - dmp
+      - dmpfold
   vars_files:
     - secrets/staging_secrets.yaml
+#
+
+# - name: configure blast update machine
+#   hosts: blastupdate
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - blastupdates
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
 # - name: Install webserver
 #   hosts: webserver
