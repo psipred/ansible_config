@@ -11,7 +11,7 @@ set dmpfolddir = /opt/DMPfold
 
 # Set the following to point to the relevant HH-suite locations
 setenv HHLIB /opt/hh-suite
-setenv HHBIN /opt/hh-suite/bin
+setenv HHBIN /opt/hh-suite/build/bin
 setenv HHDB /webdata/hhdata/uniprot/uniprot20_2016_02/uniprot20_2016_02
 
 # Set this to point to the CCMpred bin directory

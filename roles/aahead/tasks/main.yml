@@ -102,6 +102,13 @@
       dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/"
       owner: "{{ django_aa_user }}"
 
+  - name: copy over the celery file
+    become_user: "{{ django_aa_user }}"
+    copy:
+      src: files/celery.py
+      dest: "{{ django_aa_home }}/analytics_automated/analytics_automated_project/"
+      owner: "{{ django_aa_user }}"
+
   - name: Make aa logging dir
     become_user: "{{ django_aa_user }}"
     file:

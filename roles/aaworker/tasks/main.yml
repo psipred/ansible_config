@@ -33,7 +33,7 @@
 
   # The virtualenv installed above is broken so we update it here
   - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
+    shell: /usr/local/bin/pip install --upgrade virtualenv
     become_user: root
 
   - name: Check if we have aa_env
@@ -49,7 +49,7 @@
         chdir: "{{ django_worker_home }}"
 
   - name: Check pip install
-    shell: pip --version
+    shell: /usr/local/bin/pip --version
     register: pip_install
     check_mode: no
     become_user: root

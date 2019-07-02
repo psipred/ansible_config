@@ -10,7 +10,7 @@
   vars_files:
    - secrets/staging_secrets.yaml
 #
-# #Need to add blast workers here too
+#Need to add blast workers here too
 # - name: restarts workers
 #   hosts: celery_worker_node
 #   become: true
@@ -21,15 +21,15 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 
-- name: Restart Webserver
-  hosts: webserver
-  become: true
-  become_user: dbuchan
-  become_method: sudo
-  roles:
-    - restart_webserver
-  vars_files:
-    - secrets/staging_secrets.yaml
+# - name: Restart Webserver
+#   hosts: webserver
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
+#   roles:
+#     - restart_webserver
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 
 # - name: configure blast update machine
 #   hosts: blastupdate

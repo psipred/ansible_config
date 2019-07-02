@@ -105,8 +105,8 @@
 #     - hspred
 #     - memembed
 #     - maketdb
-#     - dmpfold
-     - dmp
+     - dmpfold
+#     - dmp
   vars_files:
     - secrets/staging_secrets.yaml
 #
