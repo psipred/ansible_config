@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # DMPfold
 # Iteratively generate models using CNS and deep neural nets to
 #  generate updated constraints

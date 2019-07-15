@@ -1,92 +1,125 @@
-  # - name: Check pip3 install
-  #   shell: /usr/local/bin/pip3 --version
-  #   register: pip_install
-  #   check_mode: no
-  #   become_user: root
-  #   become_method: sudo
-  #
-  # - name: get get-pip.py
-  #   become_user: root
-  #   get_url:
-  #     url: https://bootstrap.pypa.io/get-pip.py
-  #     dest: "/root/get-pip.py"
-  #     timeout: 120
-  #   register: get_url_result
-  #
-  # - name: Install pip
-  #   shell: "chdir=/root /bin/python3 get-pip.py"
-  #   when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
-  #
-  # - name: pip3 install packages
-  #   shell: /usr/bin/python3 /usr/local/bin/pip3 install torch torchvision scipy
-  #   check_mode: no
-  #   become_user: root
-  #   become_method: sudo
-  #
-  # - name: clone DMPfold
-  #   git:
-  #     repo: https://github.com/psipred/DMPfold.git
-  #     dest: /opt/DMPfold
-  #     clone: yes
-  #     force: yes
-  #
-  # - name: copy over CNS
-  #   become_user: root
-  #   become_method: sudo
-  #   copy:
-  #     src: secrets/cns_solve_1.3_all.tar.gz
-  #     dest: /opt/cns_solve_1.3_all.tar.gz
-  #     mode: "uog+x"
-  #
-  # - name: untar cns
-  #   shell: "chdir=/opt tar -zxvf cns_solve_1.3_all.tar.gz"
-  #
-  # - name: copy over readdata
-  #   become_user: root
-  #   become_method: sudo
-  #   copy:
-  #     src: files/readdata
-  #     dest: /opt/cns_solve_1.3/modules/nmr/readdata
-  #     mode: "uog+x"
-  #
-  # - name: Install flex-devel
-  #   yum:
-  #     pkg: flex-devel
-  #     state: latest
-  #   become_user: root
-  #
-  # - name: copy over readdata
-  #   become_user: root
-  #   become_method: sudo
-  #   copy:
-  #     src: files/cns_solve_env
-  #     dest: /opt/cns_solve_1.3/
-  #     mode: "uog+x"
-  #
-  # - name: copy over .cns_solve_env_sh
-  #   become_user: root
-  #   become_method: sudo
-  #   copy:
-  #     src: files/.cns_solve_env_sh
-  #     dest: /opt/cns_solve_1.3/.cns_solve_env_sh
-  #     mode: "uog+x"
-  # - name: make CNS
-  #   shell: "chdir=/opt/cns_solve_1.3 make"
-  #
-  # - name: install CNS
-  #   shell: "chdir=/opt/cns_solve_1.3 make install"
-  #   become_user: root
-  #
-  # - name: patch files
-  #   shell: "chdir=/opt/DMPfold/cnsfiles sh installscripts.sh"
-  #   become_user: root
-  #
-  # - name: make DMPfold
-  #   shell: "chdir=/opt/DMPfold/src make"
-  #
-  # - name: install CNS
-  #   shell: "chdir=/opt/DMPfold/src make install"
-  #   become_user: root
+  - name: Check pip3 install
+    shell: /usr/local/bin/pip3 --version
+    register: pip_install
+    check_mode: no
+    become_user: root
+    become_method: sudo
+
+  - name: get get-pip.py
+    become_user: root
+    get_url:
+      url: https://bootstrap.pypa.io/get-pip.py
+      dest: "/root/get-pip.py"
+      timeout: 120
+    register: get_url_result
+
+  - name: Install pip
+    shell: "chdir=/root /bin/python3 get-pip.py"
+    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+
+  - name: pip3 install packages
+    shell: "source /home/{{ django_worker_user }}/aa_env/bin/activate; pip install torch torchvision scipy"
+    check_mode: no
+    become_user: root
+    become_method: sudo
+
+  - name: clone DMPfold
+    git:
+      repo: https://github.com/psipred/DMPfold.git
+      dest: /opt/DMPfold
+      clone: yes
+      force: yes
+
+  - name: clone CD-HIT
+    git:
+      repo: https://github.com/weizhongli/cdhit.git
+      dest: /data/cdhit
+      clone: yes
+      force: yes
+
+  - name: copy over CNS
+    become_user: root
+    become_method: sudo
+    copy:
+      src: secrets/cns_solve_1.3_all.tar.gz
+      dest: /opt/cns_solve_1.3_all.tar.gz
+      mode: "uog+x"
+
+  - name: untar cns
+    shell: "chdir=/opt tar -zxvf cns_solve_1.3_all.tar.gz"
+
+  - name: copy over readdata
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/readdata
+      dest: /opt/cns_solve_1.3/modules/nmr/readdata
+      mode: "uog+x"
+
+  - name: Install flex-devel
+    yum:
+      pkg: flex-devel
+      state: latest
+    become_user: root
+
+  - name: copy over .cns_solve_env_sh
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/.cns_solve_env_sh
+      dest: /opt/cns_solve_1.3/.cns_solve_env_sh
+      mode: "uog+x"
+
+  - name: copy over machvar.inc
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/machvar.inc
+      dest: /opt/cns_solve_1.3/source/machvar.inc
+      mode: "uog+x"
+
+  - name: copy over machvar.f
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/machvar.f
+      dest: /opt/cns_solve_1.3/source/machvar.f
+      mode: "uog+x"
+
+  - name: copy over rtf.inc
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/rtf.inc
+      dest: /opt/cns_solve_1.3/source/rtf.inc
+      mode: "uog+x"
+
+  - name: install CNS
+    shell: "chdir=/opt/cns_solve_1.3 make install"
+    become_user: root
+
+  - name: copy over Makefile
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/Makefile
+      dest: /opt/cns_solve_1.3/intel-x86_64bit-linux/source/Makefile
+      mode: "uog+x"
+
+  - name: install CNS
+    shell: "chdir=/opt/cns_solve_1.3/intel-x86_64bit-linux/source make install"
+    become_user: root
+
+  - name: patch files
+    shell: "chdir=/opt/DMPfold/cnsfiles sh installscripts.sh"
+    become_user: root
+
+  - name: make DMPfold
+    shell: "chdir=/opt/DMPfold/src make"
+
+  - name: install CNS
+    shell: "chdir=/opt/DMPfold/src make install"
+    become_user: root
 
   - name: copy over seq2maps
     become_user: root
@@ -119,8 +152,3 @@
       src: files/run_dmpfold.sh
       dest: /opt/DMPfold/run_dmpfold.sh
       mode: "uog+x"
-
-# compile bits
-# compile bits
-#
-# move configured script
