@@ -1,5 +1,50 @@
 ---
 
+WARNING WARNING. postgred 9.6 must be installed on remote from now on: DETAILS below
+YML NEEDS EDITING
+
+Adapted from:
+https://altinukshini.wordpress.com/2018/05/03/upgrade-postgres-9-2-to-9-6-in-centos-7-bold-lines/
+https://medium.com/@plashchynski/postgresql-upgrade-on-centos-4c0ddd2f8687
+
+sudo su
+yum install https://yum.postgresql.org/9.6/redhat/rhel-7.3-x86_64/pgdg-redhat96-9.6-3.noarch.rpm
+yum install postgresql96-server postgresql96-contrib
+
+mv /usr/bin/pg_ctl{,-orig}
+echo '#!/bin/bash' > /usr/bin/pg_ctl
+echo '"$0"-orig "${@/unix_socket_directory/unix_socket_directories}"' >> /usr/bin/pg_ctl
+chmod +x /usr/bin/pg_ctl
+
+### /usr/pgsql-9.6/bin/postgresql96-setup initdb --pgdata=/var/postgres9.6/ --lc-collate="en_US.UTF-8"
+mkdir /var/postgres9.6
+chown postgres /var/postgres9.6
+su postgres
+/usr/pgsql-9.6/bin/initdb -D /var/postgres9.6 --locale="en_US.UTF-8"
+
+cd /tmp
+/usr/pgsql-9.6/bin/pg_upgrade -v -b /usr/bin/ -B /usr/pgsql-9.6/bin/ -d /var/postgres/ -D /var/postgres9.6/
+exit
+
+mv -f /usr/bin/pg_ctl{-orig,}
+mk /usr/bin/old_pgsql
+
+mv /bin/postgres /usr/bin/old_pgsql/
+mv /bin/pg_ctl /usr/bin/old_pgsql/
+
+su postgres
+/usr/pgsql-9.6/bin/pg_ctl start -D /var/postgres9.6
+cd /tmp
+./analyze_new_cluster.sh
+
+#update ansible role with new paths
+#update postgresql.service with new paths and copy over
+
+#ensure pg_hba.conf has final line
+# host  all  all 0.0.0.0/0 md5
+# and ensure postgresql.conf listen_addresses = '*' is adde
+
+
   - name: Install postgreSQL
     yum:
       pkg: postgresql, postgresql-server, postgresql-contrib
@@ -87,13 +132,13 @@
     check_mode: no
 
   - name: Start postgresDB
-    shell: "pg_ctl start -D {{ postgres_db_path }}"
+    shell: "/usr/pgsql-9.6/bin/pg_ctl start -D {{ postgres_db_path }}"
     register: postgres_started
     become_user: "{{ postgres_user }}"
     when: postgres_running.stdout.find("/usr/bin/postgres") == -1
 
   - name: Restart postgresDB
-    shell: "pg_ctl restart -D {{ postgres_db_path }}"
+    shell: "/usr/pgsql-9.6/bin/pg_ctl restart -D {{ postgres_db_path }}"
     register: postgres_restarted
     become_user: "{{ postgres_user }}"
     when: postgres_installed.changed == True

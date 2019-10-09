@@ -152,3 +152,11 @@
       src: files/run_dmpfold.sh
       dest: /opt/DMPfold/run_dmpfold.sh
       mode: "uog+x"
+
+  - name: copy over move script
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/move_pdb.sh
+      dest: /opt/DMPfold/move_pdb.sh
+      mode: "uog+x"
