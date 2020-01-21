@@ -8,7 +8,8 @@
 
 # ssh-keygen -t rsa
 # ensure /home/dbuchan/.ssh exists on target machine
-# scp ~/.ssh/id_rsa.pub dbuchan@bioinfstageX:/home/dbuchan/.ssh/authorized_keys
+# cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
+# you need to keep a record of the passphrase 
 # on target machines add
 # dbuchan ALL=(ALL) NOPASSWD: ALL
 # to visudo config
@@ -17,7 +18,7 @@
 ssh-agent bash
 ssh-add ~/.ssh/id_rsa
 # switch to the relevant virtualenv
-source /scratch0/NOT_BACKED_UP/dbuchan/python2/bin/activate
+source /scratch/virtualenvs/python2/bin/activate
 source /home/dbuchan/Applications/ansible/hacking/env-setup
 
 # ./Everything
