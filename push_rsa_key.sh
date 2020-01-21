@@ -1,0 +1,12 @@
+#!/usr/bin/sh
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinfstage1.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinfstage2.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinfstage3.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinfstage4.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinf1.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinf2.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bioinf3.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@blastmonster1.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bm1.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bm2.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh dbuchan@bm3.cs.ucl.ac.uk "cat >> ~/.ssh/authorized_keys"

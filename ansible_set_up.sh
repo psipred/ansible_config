@@ -9,7 +9,8 @@
 # ssh-keygen -t rsa
 # ensure /home/dbuchan/.ssh exists on target machine
 # cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
-# you need to keep a record of the passphrase 
+# you need to keep a record of the passphrase
+# see the push_rsa_key.sh script
 # on target machines add
 # dbuchan ALL=(ALL) NOPASSWD: ALL
 # to visudo config
