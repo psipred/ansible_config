@@ -1,143 +1,146 @@
 ---
-
-  - name: Install Dependencies
-    yum:
-      pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk, lmdb, ghostscript, ghostscript-devel
-      state: latest
-    become_user: root
-    become_method: sudo
-
-
-  - name: "Add {{ django_worker_user }} user"
-    user:
-      name: "{{ django_worker_user }}"
-      password: "{{ django_worker_hashed_password }}"
-      group: apache
-    become_user: root
-    become_method: sudo
-
-  - name: Move bash profile for {{ django_worker_user }}
-    become_user: "{{ django_worker_user }}"
-    copy:
-      src: files/ogs_admin_bash_profile
-      dest: "/home/{{ django_worker_user }}/.bash_profile"
-
-  - name: "give {{ django_worker_user }} permissions on bash_profile"
-    become_user: root
-    become_method: sudo
-    file:
-       path: "/home/{{ django_worker_user }}/.bash_profile"
-       group: apache
-       mode: "g+rw"
-       owner: "{{ django_worker_user }}"
-
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: /usr/local/bin/pip install --upgrade virtualenv
-    become_user: root
-
-  - name: Check if we have aa_env
-    stat: "path={{ django_worker_home }}/aa_env"
-    become_user: root
-    register: aa_env_exist
-
-  - name: Create the aa worker virtualenv
-    become_user: "{{ django_worker_user }}"
-    command: virtualenv -p /bin/python3 aa_env
-    when: aa_env_exist.stat.exists == False
-    args:
-        chdir: "{{ django_worker_home }}"
-
-  - name: Check pip install
-    shell: /usr/local/bin/pip --version
-    register: pip_install
-    check_mode: no
-    become_user: root
-    become_method: sudo
-
-  # - name: Download get-pip.py
-  #   shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
-  #   become_user: "{{ django_worker_user }}"
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 2
-  #   delay: 10
-  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  - name: Download get-pip.py
-    become_user: "{{ django_worker_user }}"
-    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{ django_worker_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
-
-  - name: Install pip
-    shell: "chdir={{ django_worker_home }} /bin/python3.6 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
-    become_user: root
-
-  - name : Check Out AA from git
-    become_user: "{{ django_worker_user }}"
-    git:
-      repo: https://github.com/AnalyticsAutomated/analytics_automated.git
-      dest: "{{ django_worker_home }}analytics_automated"
-      clone: yes
-      force: yes
-
-  - name: Install requirements
-    become_user: "{{ django_worker_user }}"
-    pip:
-      state: latest
-      chdir: "{{ django_worker_home }}"
-      virtualenv: "{{ django_worker_home }}aa_env"
-      virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
-      requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
-
-  - name: Copy aa staging_conf
-    become_user: "{{ django_worker_user }}"
-    copy:
-      src: secrets/staging_worker.py
-      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/staging.py"
-      owner: "{{ django_worker_user }}"
-
-  - name: Copy aa staging secrets
-    become_user: "{{ django_worker_user }}"
-    copy:
-      src: secrets/staging_worker_secrets.json
-      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
-      owner: "{{ django_worker_user }}"
-
-  - name: Copy aa base secrets
-    become_user: "{{ django_worker_user }}"
-    copy:
-      src: secrets/base_secrets.json
-      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
-      owner: "{{ django_worker_user }}"
-
-  - name: Copy celery conf
-    become_user: "{{ django_worker_user }}"
-    copy:
-      src: files/celery_staging.py
-      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/celery.py"
-      owner: "{{ django_worker_user }}"
-
-  - name: Copy wsgi.py
-    become_user: "{{ django_worker_user }}"
-    copy:
-      src: files/wsgi.py
-      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/"
-      owner: "{{ django_worker_user }}"
-
-  - name: Make aa logging dir
-    become_user: "{{ django_worker_user }}"
-    file:
-      path: "{{ django_worker_home }}/analytics_automated/logs"
-      state: directory
-      owner: "{{ django_worker_user }}"
-
+#
+#  - name: Install Dependencies
+#    yum:
+#      pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk, lmdb, ghostscript, ghostscript-devel
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#
+#  - name: "Add {{ django_worker_user }} user"
+#    user:
+#      name: "{{ django_worker_user }}"
+#      password: "{{ django_worker_hashed_password }}"
+#      group: apache
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Move bash profile for {{ django_worker_user }}
+#    become_user: "{{ django_worker_user }}"
+#    copy:
+#      src: files/ogs_admin_bash_profile
+#      dest: "/home/{{ django_worker_user }}/.bash_profile"
+#
+#  - name: "give {{ django_worker_user }} permissions on bash_profile"
+#    become_user: root
+#    become_method: sudo
+#    file:
+#       path: "/home/{{ django_worker_user }}/.bash_profile"
+#       group: apache
+#       mode: "g+rw"
+#       owner: "{{ django_worker_user }}"
+#
+#   The virtualenv installed above is broken so we update it here
+#  - name: Upgrade virtualenv
+#    shell: /usr/local/bin/pip install --upgrade virtualenv
+#    become_user: root
+#
+#  - name: Check if we have aa_env
+#    stat: "path={{ django_worker_home }}/aa_env"
+#    become_user: root
+#    register: aa_env_exist
+#
+#  - name: Create the aa worker virtualenv
+#    become_user: "{{ django_worker_user }}"
+#    command: virtualenv -p /bin/python3 aa_env
+#    when: aa_env_exist.stat.exists == False
+#    args:
+#        chdir: "{{ django_worker_home }}"
+#
+#  - name: Check pip install
+#    shell: /usr/local/bin/pip --version
+#    register: pip_install
+#    check_mode: no
+#    become_user: root
+#    become_method: sudo
+#
+#   - name: Download get-pip.py
+#     shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+#     become_user: "{{ django_worker_user }}"
+#     register: get_url_result
+#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#     retries: 2
+#     delay: 10
+#     when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
+#
+#  - name: Download get-pip.py
+#    become_user: "{{ django_worker_user }}"
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#    get_url:
+#      url: https://bootstrap.pypa.io/get-pip.py
+#      dest: "{{ django_worker_home }}/get-pip.py"
+#      timeout: 120
+#    register: get_url_result
+#
+#  - name: Install pip
+#    become_user: root
+#    become_method: sudo
+#    shell: "chdir={{ django_worker_home }} /bin/python3.6 get-pip.py"
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#
+#  - name : Check Out AA from git
+#    become_user: "{{ django_worker_user }}"
+#    git:
+#      repo: https://github.com/psipred/analytics_automated.git
+#      dest: "{{ django_worker_home }}analytics_automated"
+#      clone: yes
+#      force: yes
+#      version: main
+#
+#  - name: Install requirements
+#    become_user: "{{ django_worker_user }}"
+#    pip:
+#      state: latest
+#      chdir: "{{ django_worker_home }}"
+#      virtualenv: "{{ django_worker_home }}aa_env"
+#      virtualenv_command: /bin/virtualenv
+#      virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
+#      requirements: "{{ django_worker_home }}analytics_automated/requirements/staging.txt"
+#
+#  - name: Copy aa staging_conf
+#    become_user: "{{ django_worker_user }}"
+#    copy:
+#      src: secrets/staging_worker.py
+#      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/staging.py"
+#      owner: "{{ django_worker_user }}"
+#
+#  - name: Copy aa staging secrets
+#    become_user: "{{ django_worker_user }}"
+#    copy:
+#      src: secrets/staging_worker_secrets.json
+#      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
+#      owner: "{{ django_worker_user }}"
+#
+#  - name: Copy aa base secrets
+#    become_user: "{{ django_worker_user }}"
+#    copy:
+#      src: secrets/base_secrets.json
+#      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/settings/"
+#      owner: "{{ django_worker_user }}"
+#
+#  - name: Copy celery conf
+#    become_user: "{{ django_worker_user }}"
+#    copy:
+#      src: files/celery_staging.py
+#      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/celery.py"
+#      owner: "{{ django_worker_user }}"
+#
+#  - name: Copy wsgi.py
+#    become_user: "{{ django_worker_user }}"
+#    copy:
+#      src: files/wsgi.py
+#      dest: "{{ django_worker_home }}/analytics_automated/analytics_automated_project/"
+#      owner: "{{ django_worker_user }}"
+#
+#  - name: Make aa logging dir
+#    become_user: "{{ django_worker_user }}"
+#    file:
+#      path: "{{ django_worker_home }}/analytics_automated/logs"
+#      state: directory
+#      owner: "{{ django_worker_user }}"
+#
   - name: Check aa submissions
     stat: "path={{ django_worker_home }}/analytics_automated/submissions"
     become_user: "{{ django_worker_user }}"
@@ -161,31 +164,21 @@
       group: apache
       mode: "ug+rw"
 
-  - name: Check Celery running status
-    shell: ps aux | grep celery
-    register: celery_running
-    check_mode: no
-
-  - name: Stop the aa_workers
-    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=celery.pid"
-    become_user: "{{ django_worker_user }}"
-    #when: celery_running.stdout.find("celery worker") == 1
-
   - name: Check Celery stopped status
     shell: ps aux | grep celery
     register: celery_running
     check_mode: no
 
-# Here we skip running the django migrations as they are only run by aahead
-# AND this role MUST come after aahead installation runs
-#celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
+##Here we skip running the django migrations as they are only run by aahead
+##AND this role MUST come after aahead installation runs
+##celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
   - name: Start the aa_workers
     shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q low_localhost,localhost,high_localhost,celery,low_R,R,high_R,low_Python,Python,high_Python --detach --pidfile=celery.pid"
     become_user: "{{ django_worker_user }}"
     environment:
       DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
       SGE_ROOT: /opt/ogs_src/GE2011.11/
-    #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
+    when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
 
   - name: copy over the aa worker service
     become_user: root

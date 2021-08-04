@@ -1,56 +1,57 @@
 ---
-  - name: "Add {{ webserver_user }} user"
-    user:
-      name: "{{ webserver_user }}"
-      password: "{{ webserver_hashed_password }}"
-      group: apache
-    become_user: root
-    become_method: sudo
-
-  - name: Check pip install
-    shell: pip --version
-    register: pip_install
-    check_mode: no
-    become_user: root
-    become_method: sudo
-
-  # - name: Download get-pip.py
-  #   shell: "chdir={{ webserver_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
-  #   become_user: "{{ webserver_user }}"
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 2
-  #   delay: 10
-  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  - name: get get-pip.py
-    become_user: "{{ webserver_user }}"
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{ webserver_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
-
-  - name: Install pip
-    shell: "chdir={{ webserver_home }} /bin/python3.4 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
-    become_user: root
-
-  - name: Check if we have webserver_envg
-    stat: "path={{ webserver_home }}/webserver_env"
-    become_user: root
-    register: webserver_env_exist
-
-  - name: Create the webserver virtualenv
-    become_user: "{{ webserver_user }}"
-    command: virtualenv webserver_env -p /bin/python3.4
-    when: webserver_env_exist.stat.exists == False
-    args:
-        chdir: "{{ webserver_home }}"
-
+#  - name: "Add {{ webserver_user }} user"
+#    user:
+#      name: "{{ webserver_user }}"
+#      password: "{{ webserver_hashed_password }}"
+#      group: apache
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Check pip install
+#    shell: pip --version
+#    register: pip_install
+#    check_mode: no
+#    become_user: root
+#    become_method: sudo
+#
+#   - name: Download get-pip.py
+#     shell: "chdir={{ webserver_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+#     become_user: "{{ webserver_user }}"
+#     register: get_url_result
+#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#     retries: 2
+#     delay: 10
+#     when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#  - name: get get-pip.py
+#    become_user: "{{ webserver_user }}"
+#    get_url:
+#      url: https://bootstrap.pypa.io/get-pip.py
+#      dest: "{{ webserver_home }}/get-pip.py"
+#      timeout: 120
+#    register: get_url_result
+#
+#  - name: Install pip
+#    become_user: "{{ webserver_user }}"
+#    shell: "chdir={{ webserver_home }} /bin/python3.6 get-pip.py"
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#  - name: Upgrade virtualenv
+#    shell: pip install --upgrade virtualenv
+#    become_user: root
+#
+#  - name: Check if we have webserver_envg
+#    stat: "path={{ webserver_home }}/webserver_env"
+#    become_user: root
+#    register: webserver_env_exist
+#
+#  - name: Create the webserver virtualenv
+#    become_user: "{{ webserver_user }}"
+#    command: virtualenv webserver_env -p /bin/python3.6
+#    when: webserver_env_exist.stat.exists == False
+#    args:
+#        chdir: "{{ webserver_home }}"
+#
   - name : Check Out PSIPRED website from git
     become_user: "{{ webserver_user }}"
     git:
@@ -58,6 +59,7 @@
       dest: "{{ webserver_home }}psipred_website"
       clone: yes
       force: yes
+      version: main
 
   - name: Install requirements
     become_user: "{{ webserver_user }}"
@@ -96,7 +98,7 @@
       dest: "{{ webserver_home }}/psipred_website/psipred_website/wsgi.py"
       owner: "{{ webserver_user }}"
 
-  #Logging not yet set up for frontend
+##  Logging not yet set up for frontend
   - name: Make aa logging dir
     become_user: "{{ webserver_user }}"
     file:
@@ -133,13 +135,19 @@
       owner: "{{ webserver_user }}"
       group: apache
 
+  - name: refresh current list of processes
+    shell: ps aux | grep httpd
+    register: webserver_running_refreshed
+    check_mode: no
+    become_method: sudo
+
   - name : Configure website and apache
     shell: "source {{ webserver_home }}webserver_env/bin/activate; python manage.py runmodwsgi --settings=psipred_website.settings.staging --setup-only --user webserver --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/webserver_httpd/"
     args:
       chdir: "{{ webserver_home }}psipred_website"
     become_user: "{{ webserver_user }}"
     register: web_server_started
-    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
+#    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name : add wb admin account
     shell: "source {{ webserver_home }}webserver_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ ws_admin_pass }}')\" | python manage.py shell --settings=psipred_website.settings.staging"
@@ -150,7 +158,7 @@
   - name : Start webserver
     shell: "/opt/webserver_httpd/apachectl restart"
     become_user: "{{ webserver_user }}"
-    # when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
+    when: webserver_running_refreshed.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name: copy over the webserver service
     become_user: root

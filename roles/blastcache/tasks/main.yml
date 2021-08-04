@@ -1,163 +1,173 @@
 ---
+#
+#- name: "Add {{ blast_cache_user }} user"
+#  user:
+#    name: "{{ blast_cache_user }}"
+#    password: "{{ blast_cache_hashed_password }}"
+#    group: apache
+#  become_user: root
+#  become_method: sudo
+#
+#- name: Check pip install
+#  ignore_errors: yes
+#  shell: which pip
+#  register: pip_install
+#  check_mode: no
+#  become_user: root
+#  become_method: sudo
+#
+#- name: Download get-pip.py
+#  become_user: "{{ blast_cache_user }}"
+#  when: pip_install.stderr | search("no pip in")
+#  get_url:
+#    url: https://bootstrap.pypa.io/get-pip.py
+#    dest: "{{  blast_cache_home }}/get-pip.py"
+#    timeout: 120
+#  register: get_url_result
+#  # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#  # retries: 2
+#  # delay: 10
+#
+#- name: Install pip
+#  shell: "chdir={{ blast_cache_home }} /bin/python3 get-pip.py"
+#  when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+# The virtualenv installed above is broken so we update it here
+#- name: Upgrade virtualenv
+#  shell: pip install --upgrade virtualenv
+#
+#- name: Check if we have blast_cache env
+#  stat: "path={{ blast_cache_home }}/blast_cache_env"
+#  become_user: root
+#  register: bc_env_exist
+#
+#- name: Create the blast_cache virtualenv
+#  become_user: "{{ blast_cache_user }}"
+#  command: virtualenv blast_cache_env -p /bin/python3.6
+#  when: bc_env_exist.stat.exists == False
+#  args:
+#      chdir: "{{ blast_cache_home }}"
+#
+#- name: remove  blast_cache
+#  become_user: "{{ blast_cache_user }}"
+#  file:
+#    path: "{{ blast_cache_home }}blast_cache/"
+#    state: absent
+#
+- name: Clone blast_cache
+  become_user: "{{ blast_cache_user }}"
+  git:
+    repo: "https://{{ username_password }}@github.com/psipred/blast_cache.git"
+    dest: "{{ blast_cache_home }}blast_cache"
+    force: yes
+    ssh_opts: "-o StrictHostKeyChecking=no"
+    version: main
+  environment:
+    GIT_TERMINAL_PROMPT: 0  reports "terminal prompts disabled" on missing password
 
-  - name: "Add {{ blast_cache_user }} user"
-    user:
-      name: "{{ blast_cache_user }}"
-      password: "{{ blast_cache_hashed_password }}"
-      group: apache
-    become_user: root
-    become_method: sudo
 
-  - name: Check pip install
-    ignore_errors: yes
-    shell: which pip
-    register: pip_install
-    check_mode: no
-    become_user: root
-    become_method: sudo
+- name: Install requirements
+  become_user: "{{ blast_cache_user }}"
+  pip:
+    chdir: "{{ blast_cache_home }}"
+    virtualenv: "{{ blast_cache_home }}blast_cache_env"
+    virtualenv_command: /bin/virtualenv
+    virtualenv_python: "{{ blast_cache_home }}blast_cache_env/bin/python"
+    requirements: "{{ blast_cache_home }}blast_cache/requirements/base.txt"
 
-  - name: Download get-pip.py
-    become_user: "{{ blast_cache_user }}"
-    when: pip_install.stderr | search("no pip in")
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{  blast_cache_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
+- name: Copy bc conf
+  become_user: "{{ blast_cache_user }}"
+  copy:
+    src: secrets/bc_staging.py
+    dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/staging.py"
+    owner: "{{ blast_cache_user }}"
 
-  - name: Install pip
-    shell: "chdir={{ blast_cache_home }} /bin/python3 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+- name: Copy bcstaging secrets
+  become_user: "{{ blast_cache_user }}"
+  copy:
+    src: secrets/staging_secrets.json
+    dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/"
+    owner: "{{ blast_cache_user }}"
 
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
+- name: Copy bc base secrets
+  become_user: "{{ blast_cache_user }}"
+  copy:
+    src: secrets/base_secrets.json
+    dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/"
+    owner: "{{ blast_cache_user }}"
 
-  - name: Check if we have blast_cache env
-    stat: "path={{ blast_cache_home }}/blast_cache_env"
-    become_user: root
-    register: bc_env_exist
+- name: Copy wsgi.py
+  become_user: "{{ blast_cache_user }}"
+  copy:
+    src: files/bc_wsgi.py
+    dest: "{{ blast_cache_home }}/blast_cache/blast_cache/wsgi.py"
+    owner: "{{ blast_cache_user }}"
 
-  - name: Create the blast_cache virtualenv
-    become_user: "{{ blast_cache_user }}"
-    command: virtualenv blast_cache_env -p /bin/python3.4
-    when: bc_env_exist.stat.exists == False
-    args:
-        chdir: "{{ blast_cache_home }}"
+- name: Make logging dir
+  become_user: "{{ blast_cache_user }}"
+  file:
+    path: "{{ blast_cache_home }}/blast_cache/logs"
+    state: directory
+    owner: "{{ blast_cache_user }}"
 
-  - name : Check Out blast_cache from git
-    become_user: "{{ blast_cache_user }}"
-    git:
-      repo: https://github.com/psipred/blast_cache.git
-      dest: "{{ blast_cache_home }}blast_cache"
-      clone: yes
-      force: yes
+- name: Run bc migrations
+  become_user: "{{ blast_cache_user }}"
+  django_manage:
+    command: migrate
+    virtualenv: "{{ blast_cache_home }}blast_cache_env/"
+    settings: blast_cache.settings.staging
+    app_path: "{{ blast_cache_home }}/blast_cache/"
 
-  - name: Install requirements
-    become_user: "{{ blast_cache_user }}"
-    pip:
-      chdir: "{{ blast_cache_home }}"
-      virtualenv: "{{ blast_cache_home }}blast_cache_env"
-      virtualenv_command: /bin/virtualenv
-      virtualenv_python: "{{ blast_cache_home }}blast_cache_env/bin/python"
-      requirements: "{{ blast_cache_home }}blast_cache/requirements/base.txt"
+- name: Run bc collect static
+  become_user: "{{ blast_cache_user }}"
+  django_manage:
+    command: collectstatic
+    virtualenv: "{{ blast_cache_home }}blast_cache_env/"
+    settings: blast_cache.settings.staging
+    app_path: "{{ blast_cache_home }}/blast_cache/"
 
-  - name: Copy bc conf
-    become_user: "{{ blast_cache_user }}"
-    copy:
-      src: secrets/bc_staging.py
-      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/staging.py"
-      owner: "{{ blast_cache_user }}"
+- name: Get the current list of processes
+  shell: ps aux | grep httpd
+  register: bc_running
+  check_mode: no
+  become_user: root
+  become_method: sudo
 
-  - name: Copy bcstaging secrets
-    become_user: "{{ blast_cache_user }}"
-    copy:
-      src: secrets/staging_secrets.json
-      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/"
-      owner: "{{ blast_cache_user }}"
+- name: Make the apachedir
+  file:
+    path: "/opt/bc_httpd/"
+    state: directory
+    owner: "{{ blast_cache_user }}"
+    group: apache
 
-  - name: Copy bc base secrets
-    become_user: "{{ blast_cache_user }}"
-    copy:
-      src: secrets/base_secrets.json
-      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/settings/"
-      owner: "{{ blast_cache_user }}"
+- name : Configure bc/Apache
+  shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; python manage.py runmodwsgi --settings=blast_cache.settings.staging --setup-only --user blast_cache --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/bc_httpd/"
+  args:
+    chdir: "{{ blast_cache_home }}blast_cache"
+  become_user: "{{ blast_cache_user }}"
+  register: bc_started
+#  when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
-  - name: Copy wsgi.py
-    become_user: "{{ blast_cache_user }}"
-    copy:
-      src: files/bc_wsgi.py
-      dest: "{{ blast_cache_home }}/blast_cache/blast_cache/wsgi.py"
-      owner: "{{ blast_cache_user }}"
+- name : add bc admin account
+  shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ bc_admin_pass }}')\" | python manage.py shell --settings=blast_cache.settings.staging"
+  args:
+    chdir: "{{ blast_cache_home }}blast_cache"
+  become_user: "{{ blast_cache_user }}"
 
-  - name: Make logging dir
-    become_user: "{{ blast_cache_user }}"
-    file:
-      path: "{{ blast_cache_home }}/blast_cache/logs"
-      state: directory
-      owner: "{{ blast_cache_user }}"
+- name : Start bc
+  shell: "/opt/bc_httpd/apachectl restart"
+  become_user: "{{ blast_cache_user }}"
+#  when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
-  - name: Run bc migrations
-    become_user: "{{ blast_cache_user }}"
-    django_manage:
-      command: migrate
-      virtualenv: "{{ blast_cache_home }}blast_cache_env/"
-      settings: blast_cache.settings.staging
-      app_path: "{{ blast_cache_home }}/blast_cache/"
+- name: copy over the bc head service
+  become_user: root
+  become_method: sudo
+  copy:
+    src: files/bc.service
+    dest: /etc/systemd/system/
+    mode: "uog+x"
 
-  - name: Run bc collect static
-    become_user: "{{ blast_cache_user }}"
-    django_manage:
-      command: collectstatic
-      virtualenv: "{{ blast_cache_home }}blast_cache_env/"
-      settings: blast_cache.settings.staging
-      app_path: "{{ blast_cache_home }}/blast_cache/"
-
-  - name: Get the current list of processes
-    shell: ps aux | grep httpd
-    register: bc_running
-    check_mode: no
-    become_user: root
-    become_method: sudo
-
-  - name: Make the apachedir
-    file:
-      path: "/opt/bc_httpd/"
-      state: directory
-      owner: "{{ blast_cache_user }}"
-      group: apache
-
-  - name : Configure bc/Apache
-    shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; python manage.py runmodwsgi --settings=blast_cache.settings.staging --setup-only --user blast_cache --group apache --threads=10 --processes=4 --reload-on-changes --server-root=/opt/bc_httpd/"
-    args:
-      chdir: "{{ blast_cache_home }}blast_cache"
-    become_user: "{{ blast_cache_user }}"
-    register: bc_started
-    when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
-
-  - name : add bc admin account
-    shell: "source {{ blast_cache_home }}blast_cache_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ bc_admin_pass }}')\" | python manage.py shell --settings=blast_cache.settings.staging"
-    args:
-      chdir: "{{ blast_cache_home }}blast_cache"
-    become_user: "{{ blast_cache_user }}"
-
-  - name : Start bc
-    shell: "/opt/bc_httpd/apachectl restart"
-    become_user: "{{ blast_cache_user }}"
-    # when: bc_running.stdout.find("httpd (mod_wsgi-express)") == -1
-
-  - name: copy over the bc head service
-    become_user: root
-    become_method: sudo
-    copy:
-      src: files/bc.service
-      dest: /etc/systemd/system/
-      mode: "uog+x"
-
-  - name: Add service to systemctl
-    become_user: root
-    become_method: sudo
-    shell: systemctl enable bc.service
+- name: Add service to systemctl
+  become_user: root
+  become_method: sudo
+  shell: systemctl enable bc.service

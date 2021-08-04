@@ -1,69 +1,73 @@
 ---
-
-  - name: "Add {{ django_aa_user }} user"
-    user:
-      name: "{{ django_aa_user }}"
-      password: "{{ django_aa_hashed_password }}"
-      group: apache
-    become_user: root
-    become_method: sudo
-
-  - name: Check pip install
-    shell: pip --version
-    register: pip_install
-    check_mode: no
-    become_user: root
-    become_method: sudo
-
-
-  # - name: Download get-pip.py
-  #   shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
-  #   become_user: "{{ django_aa_user }}"
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 2
-  #   delay: 10
-  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  - name: Download get-pip.py
-    become_user: "{{ django_aa_user }}"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{  django_aa_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-
-  - name: Install pip
-    shell: "chdir={{ django_aa_home }} /bin/python3.4 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
-
-  - name: Check if we have aa_env
-    stat: "path={{ django_aa_home }}/aa_env"
-    become_user: root
-    register: aa_env_exist
-
-  - name: Create the aa head virtualenv
-    become_user: "{{ django_aa_user }}"
-    command: virtualenv aa_env -p /bin/python3.4
-    when: aa_env_exist.stat.exists == False
-    args:
-        chdir: "{{ django_aa_home }}"
-
+#
+#  - name: "Add {{ django_aa_user }} user"
+#    user:
+#      name: "{{ django_aa_user }}"
+#      password: "{{ django_aa_hashed_password }}"
+#      group: apache
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Check pip install
+#    shell: pip --version
+#    register: pip_install
+#    check_mode: no
+#    become_user: root
+#    become_method: sudo
+#
+#
+#  - name: Download get-pip.py
+#    shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+#    become_user: "{{ django_aa_user }}"
+#    register: get_url_result
+#    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#    retries: 2
+#    delay: 10
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#  - name: Download get-pip.py changed from python3.4 to python3.6
+#    become_user: "{{ django_aa_user }}"
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#    get_url:
+#      url: https://bootstrap.pypa.io/get-pip.py
+#      dest: "{{  django_aa_home }}/get-pip.py"
+#      timeout: 120
+#    register: get_url_result
+#    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#    retries: 2
+#    delay: 10
+#
+#  - name: Install pip
+#    become_user: root
+#    become_method: sudo
+#    shell: "chdir={{ django_aa_home }} /bin/python3.6 get-pip.py" changed from 3.4
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#
+#   The virtualenv installed above is broken so we update it here
+#  - name: Upgrade virtualenv
+#    shell: pip install --upgrade virtualenv
+#
+#  - name: Check if we have aa_env
+#    stat: "path={{ django_aa_home }}/aa_env"
+#    become_user: root
+#    register: aa_env_exist
+#
+#  - name: Create the aa head virtualenv
+#    become_user: "{{ django_aa_user }}"
+#    command: virtualenv aa_env -p /bin/python3.6
+#    when: aa_env_exist.stat.exists == False
+#    args:
+#        chdir: "{{ django_aa_home }}"
+#
   - name : Check Out AA from git
     become_user: "{{ django_aa_user }}"
     git:
-      repo: https://github.com/AnalyticsAutomated/analytics_automated.git
+      repo: https://github.com/psipred/analytics_automated.git
       dest: "{{ django_aa_home }}analytics_automated"
       clone: yes
       force: yes
+      version: main
 
   - name: Install requirements
     become_user: "{{ django_aa_user }}"
@@ -71,6 +75,7 @@
       chdir: "{{ django_aa_home }}"
       virtualenv: "{{ django_aa_home }}aa_env"
       virtualenv_command: /bin/virtualenv
+      extra_args: --upgrade
       virtualenv_python: "{{ django_aa_home }}aa_env/bin/python"
       requirements: "{{ django_aa_home }}analytics_automated/requirements/staging.txt"
 
@@ -202,9 +207,9 @@
     become_user: "{{ django_aa_user }}"
 
   - name : Start aa
-    shell: "/opt/aa_httpd/apachectl restart"
+    shell: "/opt/aa_httpd/apachectl -k restart"
     become_user: "{{ django_aa_user }}"
-    # when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
+    when: aa_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name: copy over the aa head service
     become_user: root

@@ -1,104 +1,98 @@
 ---
-
-  - name: "Add {{ blast_worker_user }} user"
-    user:
-      name: "{{ blast_worker_user }}"
-      password: "{{ blast_worker_hashed_password }}"
-      group: apache
-    become_user: root
-    become_method: sudo
-
-  - name: check we have pip
-    stat:
-      path: /usr/bin/pip3
-    become_user: root
-    register: pip_exist
-  # - name: Download get-pip.py
-  #   shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
-  #   become_user: "{{ django_aa_user }}"
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 2
-  #   delay: 10
-  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  - name: Download get-pip.py
-    become_user: "{{ blast_worker_user }}"
-    when: pip_exist.stat.exists == False
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{  blast_worker_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
-    # until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-    # retries: 2
-    # delay: 10
-
-  - name: Install pip
-    shell: "chdir={{ blast_worker_home }} /bin/python3.4 get-pip.py"
-    when: pip_exist.stat.exists == False
-
-  # The virtualenv installed above is broken so we update it here
-  - name: Upgrade virtualenv
-    shell: pip install --upgrade virtualenv
-
-  - name: Check if we have aa_env
-    stat: "path={{ blast_worker_home }}/aa_env"
-    become_user: root
-    register: aa_env_exist
-
-  - name: Create the blast worker virtualenv
-    become_user: "{{ blast_worker_user }}"
-    command: virtualenv -p /bin/python3.4 aa_env
-    when: aa_env_exist.stat.exists == False
-    args:
-        chdir: "{{ blast_worker_home }}"
-
-  - name: Check pip install
-    shell: pip --version
-    register: pip_install
-    check_mode: no
-    become_user: root
-    become_method: sudo
-
-  # - name: Download get-pip.py
-  #   shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
-  #   become_user: "{{ django_worker_user }}"
-  #   register: get_url_result
-  #   until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
-  #   retries: 2
-  #   delay: 10
-  #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  - name: Download get-pip.py
-    become_user: "{{ blast_worker_user }}"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{ blast_worker_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
-
-  - name: Install pip
-    shell: "chdir={{ blast_worker_home }} /bin/python3.4 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
-
-  # grab the blast cache to get the submission/blast script
-  - name : Check Out blast_cache from git
-    become_user: "{{ blast_worker_user }}"
-    git:
-      repo: https://github.com/psipred/blast_cache.git
-      dest: "{{ blast_worker_home }}blast_cache"
-      clone: yes
-      force: yes
-
+#
+#  - name: "Add {{ blast_worker_user }} user"
+#    user:
+#      name: "{{ blast_worker_user }}"
+#      password: "{{ blast_worker_hashed_password }}"
+#      group: apache
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: check we have pip
+#    stat:
+#      path: /usr/bin/pip
+#    become_user: root
+#    register: pip_exist
+#
+#  - name: Download get-pip.py
+#     shell: "chdir={{ django_aa_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+#     become_user: "{{ django_aa_user }}"
+#     register: get_url_result
+#     until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#     retries: 2
+#     delay: 10
+#     when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#  - name: Download get-pip.py
+#    become_user: "{{ blast_worker_user }}"
+#    when: pip_exist.stat.exists == False
+#    get_url:
+#      url: https://bootstrap.pypa.io/get-pip.py
+#      dest: "{{  blast_worker_home }}/get-pip.py"
+#      timeout: 120
+#    register: get_url_result
+#    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#    retries: 2
+#    delay: 10
+#
+#  - name: Install pip
+#    shell: "chdir={{ blast_worker_home }} /bin/python3.6 get-pip.py"
+#    when: pip_exist.stat.exists == False
+#
+#   The virtualenv installed above is broken so we update it here
+#  - name: Upgrade virtualenv
+#    shell: pip install --upgrade virtualenv
+#
+#  - name: Check if we have aa_env
+#    stat: "path={{ blast_worker_home }}/aa_env"
+#    become_user: root
+#    register: aa_env_exist
+#
+#  - name: Create the blast worker virtualenv
+#    become_user: "{{ blast_worker_user }}"
+#    command: virtualenv -p /bin/python3.6 aa_env
+#    when: aa_env_exist.stat.exists == False
+#    args:
+#        chdir: "{{ blast_worker_home }}"
+#
+#  - name: Check pip install
+#    shell: pip --version
+#    register: pip_install
+#    check_mode: no
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Download get-pip.py
+#    shell: "chdir={{ django_worker_home }} wget --timeout 120 https://bootstrap.pypa.io/get-pip.py -O get-pip.py"
+#    become_user: "{{ django_worker_user }}"
+#    register: get_url_result
+#    until: get_url_result.stdout.find("Unable to establish SSL connection") == -1
+#    retries: 2
+#    delay: 10
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#  - name: Download get-pip.py
+#    become_user: "{{ blast_worker_user }}"
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#    get_url:
+#      url: https://bootstrap.pypa.io/get-pip.py
+#      dest: "{{ blast_worker_home }}/get-pip.py"
+#      timeout: 120
+#    register: get_url_result
+#
+#  - name: Install pip
+#    shell: "chdir={{ blast_worker_home }} /bin/python3.6 get-pip.py"
+#    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+#
+#
   - name : Check Out AA from git
     become_user: "{{ blast_worker_user }}"
     git:
-      repo: https://github.com/AnalyticsAutomated/analytics_automated.git
+      repo: https://github.com/psipred/analytics_automated.git
       dest: "{{ blast_worker_home }}analytics_automated"
       clone: yes
       force: yes
+      version: main
 
   - name: Install aa requirements
     become_user: "{{ blast_worker_user }}"
@@ -109,6 +103,18 @@
       virtualenv_command: /bin/virtualenv
       virtualenv_python: "{{ blast_worker_home }}aa_env/bin/python"
       requirements: "{{ blast_worker_home }}analytics_automated/requirements/staging.txt"
+
+
+  - name: Clone blast_cache
+    become_user: "{{ blast_worker_user }}"
+    git:
+      repo: "https://{{ username_password }}@github.com/psipred/blast_cache.git"
+      dest: "{{ blast_worker_home }}blast_cache"
+      force: yes
+      ssh_opts: "-o StrictHostKeyChecking=no"
+      version: main
+    environment:
+      GIT_TERMINAL_PROMPT: 0  reports "terminal prompts disabled" on missing password
 
   - name: Install blast cache requirements
     become_user: "{{ blast_worker_user }}"
@@ -190,36 +196,23 @@
     register: celery_running
     check_mode: no
 
-  - name: Stop the aa_workers
-    shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=celery.pid"
+  - name: Start the aa_workers
+    shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q blast,low_blast,high_blast --detach --pidfile=celery.pid"
     become_user: "{{ blast_worker_user }}"
-    #when: celery_running.stdout.find("celery worker") == 1
+    environment:
+      DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
+      SGE_ROOT: /opt/ogs_src/GE2011.11/
+#    when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
 
-  - name: Check Celery stopped status
-    shell: ps aux | grep celery
-    register: celery_running
-    check_mode: no
-#
-# # Here we skip running the django migrations as they are only run by aahead
-# # AND this role MUST come after aahead installation runs
-# #celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
-#   - name: Start the aa_workers
-#     shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q blast,low_blast,high_blast --detach --pidfile=celery.pid"
-#     become_user: "{{ blast_worker_user }}"
-#     # environment:
-#     #   DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
-#     #   SGE_ROOT: /opt/ogs_src/GE2011.11/
-#     # #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
-#
-#   - name: copy over the blast worker service
-#     become_user: root
-#     become_method: sudo
-#     copy:
-#       src: files/blastworker.service
-#       dest: /etc/systemd/system/
-#       mode: "uog+x"
-#
-#   - name: Add service to systemctl
-#     become_user: root
-#     become_method: sudo
-#     shell: systemctl enable blastworker.service
+  - name: copy over the blast worker service
+    become_user: root
+    become_method: sudo
+    copy:
+     src: files/blastworker.service
+     dest: /etc/systemd/system/
+     mode: "uog+x"
+
+  - name: Add service to systemctl
+    become_user: root
+    become_method: sudo
+    shell: systemctl enable blastworker.service
