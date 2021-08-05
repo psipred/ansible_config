@@ -79,6 +79,17 @@
 #    shell: "chdir={{ django_worker_home }} /bin/python3.6 get-pip.py"
 #    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
 #
+#  - name : remove aa_analytics
+#    become_user: "{{ django_worker_user }}"
+#    file:
+#      path: "{{ django_worker_home }}analytics_automated"
+#      state: absent
+#
+#  - name : create aa_analytics
+#    become_user: "{{ django_worker_user }}"
+#    file:
+#      path: "{{ django_worker_home }}analytics_automated"
+#      state: directory
 #
 #  - name : Check Out AA from git
 #    become_user: "{{ django_worker_user }}"
@@ -145,7 +156,7 @@
     stat: "path={{ django_worker_home }}/analytics_automated/submissions"
     become_user: "{{ django_worker_user }}"
     register: submissions_type
-
+#
   - name: remove the submissions dir
     when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
     become_user: "{{ django_worker_user }}"
@@ -155,40 +166,38 @@
 
   - name: symlink submissions to the aa dir
     become_user: "{{ django_worker_user }}"
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
+    when: (submissions_type.stat.isdir is not defined) or (submissions_type.stat.islink is not defined)
     file:
       src: /webdata/submissions
       dest: "{{ django_worker_home }}/analytics_automated/submissions"
       state: link
-      owner: "{{ django_worker_user }}"
-      group: apache
       mode: "ug+rw"
 
-  - name: Check Celery stopped status
-    shell: ps aux | grep celery
-    register: celery_running
-    check_mode: no
-
+#  - name: Check Celery stopped status
+#    shell: ps aux | grep celery
+#    register: celery_running
+#    check_mode: no
+#
 ##Here we skip running the django migrations as they are only run by aahead
 ##AND this role MUST come after aahead installation runs
 ##celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
-  - name: Start the aa_workers
-    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q low_localhost,localhost,high_localhost,celery,low_R,R,high_R,low_Python,Python,high_Python --detach --pidfile=celery.pid"
-    become_user: "{{ django_worker_user }}"
-    environment:
-      DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
-      SGE_ROOT: /opt/ogs_src/GE2011.11/
-    when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
-
-  - name: copy over the aa worker service
-    become_user: root
-    become_method: sudo
-    copy:
-      src: files/aaworker.service
-      dest: /etc/systemd/system/
-      mode: "uog+x"
-
-  - name: Add service to systemctl
-    become_user: root
-    become_method: sudo
-    shell: systemctl enable aaworker.service
+#  - name: Start the aa_workers
+#    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q low_localhost,localhost,high_localhost,celery,low_R,R,high_R,low_Python,Python,high_Python --detach --pidfile=celery.pid"
+#    become_user: "{{ django_worker_user }}"
+#    environment:
+#      DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
+#      SGE_ROOT: /opt/ogs_src/GE2011.11/
+#    when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
+#
+#  - name: copy over the aa worker service
+#    become_user: root
+#    become_method: sudo
+#    copy:
+#      src: files/aaworker.service
+#      dest: /etc/systemd/system/
+#      mode: "uog+x"
+#
+#  - name: Add service to systemctl
+#    become_user: root
+#    become_method: sudo
+#    shell: systemctl enable aaworker.service
