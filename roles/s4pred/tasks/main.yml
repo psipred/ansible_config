@@ -1,0 +1,47 @@
+---
+#s4pred relies on python3.7 rather than 3.6.8 which is currently installed, so python will need updating
+  - name: Check if s4pred installed
+    stat: path=/usr/local/s4pred
+    register: s4pred_exist
+
+  - name : Check Out s4pred from GIT
+    when: s4pred_exist.stat.exists == False
+    git:
+      repo: https://github.com/psipred/s4pred.git
+      dest: /opt/s4pred
+      clone: yes
+      force: yes
+
+  - name: Check if s4pred weights directory exists.
+    stat: path=/opt/s4pred/weights
+    register: s4pred_weights
+
+  - name: Make s4pred weights directory
+    path: /opt/s4pred/weights
+    state: directory
+    when: s4pred_weights.stat.exists == False
+
+  - name: Download weights1
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights/weights_1.pt
+      dest: /opt/s4pred/weights/weights_1.pt
+
+  - name: Download weights2
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights/weights_2.pt
+      dest: /opt/s4pred/weights/weights_2.pt
+
+  - name: Download weights3
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights/weights_3.pt
+      dest: /opt/s4pred/weights/weights_3.pt
+
+  - name: Download weights4
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights/weights_4.pt
+      dest: /opt/s4pred/weights/weights_4.pt
+
+  - name: Download weights5
+    get_url:
+      url: http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights/weights_5.pt
+      dest: /opt/s4pred/weights/weights_5.pt

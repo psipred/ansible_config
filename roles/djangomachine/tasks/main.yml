@@ -37,51 +37,51 @@
     become_user: root
     become_method: sudo
 
-  - name: Install Python 3
-    yum:
-      pkg: python34
-      state: latest
-    become_user: root
-    become_method: sudo
-
-  - name: Install Python-devel
-    yum:
-      pkg: python-devel
-      state: latest
-    become_user: root
-    become_method: sudo
-
-  - name: Install Python34-devel
-    yum:
-      pkg: python34-devel
-      state: latest
-    become_user: root
-    become_method: sudo
-
-  - name: Install VirtualEnv
-    yum:
-      pkg: python-virtualenv
-      state: latest
-    become_user: root
-    become_method: sudo
-
-  - name: Install virtualenvwrapper
-    yum:
-      pkg: python-virtualenvwrapper
-      state: latest
-    become_user: root
-    become_method: sudo
-
-  - name: Install R
-    yum:
-      pkg: R-core.x86_64, R-core-devel.x86_64, R-devel.x86_64
-      state: latest
-    become_user: root
-    become_method: sudo
-
-  - name: Install blas/lapack
-    yum:
-      pkg: blas, lapack, blas-devel, lapack-devel
-      state: latest
-    become_user: root
-    become_method: sudo
+#  - name: Install Python 3
+#    yum:
+#      pkg: python34
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Install Python-devel
+#    yum:
+#      pkg: python-devel
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Install Python34-devel
+#    yum:
+#      pkg: python34-devel
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Install VirtualEnv
+#    yum:
+#      pkg: python-virtualenv
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Install virtualenvwrapper
+#    yum:
+#      pkg: python-virtualenvwrapper
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Install R
+#    yum:
+#      pkg: R-core.x86_64, R-core-devel.x86_64, R-devel.x86_64
+#      state: latest
+#    become_user: root
+#    become_method: sudo
+#
+#  - name: Install blas/lapack
+#    yum:
+#      pkg: blas, lapack, blas-devel, lapack-devel
+#      state: latest
+#    become_user: root
+#    become_method: sudo

@@ -62,7 +62,7 @@
      - aaworker
    vars_files:
      - secrets/staging_secrets.yaml
-
+#
 # - name: Create blastmachine
 #   hosts: blastmachine
 #   become: true
@@ -75,28 +75,28 @@
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 #
- - name: Create blast_cache machine
-   hosts: blast_cache
-   become: true
-   become_user: root
-   become_method: sudo
-   roles:
-     - djangomachine
-     - blastcache
-   vars_files:
-     - secrets/staging_secrets.yaml
-
+# - name: Create blast_cache machine
+#   hosts: blast_cache
+#   become: true
+#   become_user: root
+#   become_method: sudo
+#   roles:
+#     - djangomachine
+#     - blastcache
+#   vars_files:
+#     - secrets/staging_secrets.yaml
+#
 # mempack won't compile in OSX
 # domThreader seg faults in OSX
 #
- - name: Create Celery worker node
-   hosts: celery_worker_node
-   become: true
-   become_user: "{{ user }}"
-   become_method: sudo
-   roles:
-     - djangomachine
-     - aaworker
+# - name: Create Celery worker node
+#   hosts: celery_worker_node
+#   become: true
+#   become_user: "{{ user }}"
+#   become_method: sudo
+#   roles:
+#     - djangomachine
+#     - aaworker
 #     - psipred
 #     - disopred
 #     - memsatsvm
@@ -112,8 +112,8 @@
 #     - maketdb
 #     - dmpfold
 #     - dmp
-   vars_files:
-     - secrets/staging_secrets.yaml
+#   vars_files:
+#     - secrets/staging_secrets.yaml
 #
 #
 # - name: configure blast update machine
@@ -127,13 +127,13 @@
 #     - secrets/staging_secrets.yaml
 #
 #
- - name: Install webserver
-   hosts: webserver
-   become: true
-   become_user: "{{ user }}"
-   become_method: sudo
-   roles:
-     - djangomachine
-     - webserver
-   vars_files:
-     - secrets/staging_secrets.yaml
+# - name: Install webserver
+#   hosts: webserver
+#   become: true
+#   become_user: "{{ user }}"
+#   become_method: sudo
+#   roles:
+#     - djangomachine
+#     - webserver
+#   vars_files:
+#     - secrets/staging_secrets.yaml

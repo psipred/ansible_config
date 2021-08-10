@@ -60,6 +60,19 @@
 #    args:
 #        chdir: "{{ django_aa_home }}"
 #
+
+  - name : remove aa_analytics
+    become_user: "{{ django_aa_user }}"
+    file:
+      path: "{{ django_aa_home }}analytics_automated"
+      state: absent
+
+  - name : create aa_analytics
+    become_user: "{{ django_aa_user }}"
+    file:
+      path: "{{ django_aa_home }}analytics_automated"
+      state: directory
+
   - name : Check Out AA from git
     become_user: "{{ django_aa_user }}"
     git:

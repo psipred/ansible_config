@@ -52,6 +52,18 @@
 #    args:
 #        chdir: "{{ webserver_home }}"
 #
+  - name : remove psipred_website
+    become_user: "{{ webserver_user }}"
+    file:
+      path: "{{ webserver_home }}psipred_website"
+      state: absent
+
+  - name : create new psipred_website
+    become_user: "{{ webserver_user }}"
+    file:
+      path: "{{ webserver_home }}psipred_website"
+      state: directory
+
   - name : Check Out PSIPRED website from git
     become_user: "{{ webserver_user }}"
     git:
@@ -147,7 +159,7 @@
       chdir: "{{ webserver_home }}psipred_website"
     become_user: "{{ webserver_user }}"
     register: web_server_started
-#    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
+    when: webserver_running.stdout.find("httpd (mod_wsgi-express)") == -1
 
   - name : add wb admin account
     shell: "source {{ webserver_home }}webserver_env/bin/activate; echo \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'a@b.com', '{{ ws_admin_pass }}')\" | python manage.py shell --settings=psipred_website.settings.staging"
