@@ -191,7 +191,7 @@
     check_mode: no
 
   - name: Stop the aa_workers
-    shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=celery.pid"
+    shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=/home/blast_worker/analytics_automated/celery.pid --logfile=/home/blast_worker/blast_cache/"
     become_user: "{{ blast_worker_user }}"
     #when: celery_running.stdout.find("celery worker") == 1
 
@@ -202,24 +202,24 @@
 #
 # # Here we skip running the django migrations as they are only run by aahead
 # # AND this role MUST come after aahead installation runs
-# #celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
-#   - name: Start the aa_workers
-#     shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q blast,low_blast,high_blast --detach --pidfile=celery.pid"
-#     become_user: "{{ blast_worker_user }}"
-#     # environment:
-#     #   DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
-#     #   SGE_ROOT: /opt/ogs_src/GE2011.11/
-#     # #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
-#
-#   - name: copy over the blast worker service
-#     become_user: root
-#     become_method: sudo
-#     copy:
-#       src: files/blastworker.service
-#       dest: /etc/systemd/system/
-#       mode: "uog+x"
-#
-#   - name: Add service to systemctl
-#     become_user: root
-#     become_method: sudo
-#     shell: systemctl enable blastworker.service
+#celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q localhost,celery
+  - name: Start the aa_workers
+    shell: "chdir={{ blast_worker_home }}/analytics_automated/ source {{ blast_worker_home }}aa_env/bin/activate; celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q blast,low_blast,high_blast --detach --pidfile=celery.pid"
+    become_user: "{{ blast_worker_user }}"
+    # environment:
+    #   DRMAA_LIBRARY_PATH: /opt/ogs_src/GE2011.11/lib/linux-x64/libdrmaa.so
+    #   SGE_ROOT: /opt/ogs_src/GE2011.11/
+    # #when: celery_running.stdout.find("-m celery worker --loglevel=INFO") == -1
+
+  - name: copy over the blast worker service
+    become_user: root
+    become_method: sudo
+    copy:
+      src: files/blastworker.service
+      dest: /etc/systemd/system/
+      mode: "uog+x"
+
+  - name: Add service to systemctl
+    become_user: root
+    become_method: sudo
+    shell: systemctl enable blastworker.service

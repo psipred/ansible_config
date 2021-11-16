@@ -167,7 +167,7 @@
     check_mode: no
 
   - name: Stop the aa_workers
-    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=celery.pid"
+    shell: "chdir={{ django_worker_home }}/analytics_automated/ source {{ django_worker_home }}aa_env/bin/activate; celery multi stop_verify worker --pidfile=/home/django_worker/analytics_automated/celery.pid --logfile=/home/django_worker/analytics_automated/logs/"
     become_user: "{{ django_worker_user }}"
     #when: celery_running.stdout.find("celery worker") == 1
 
