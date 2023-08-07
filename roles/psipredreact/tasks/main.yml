@@ -1,61 +1,61 @@
 
-  - name: Get the current firewalld rules
-    shell: firewall-cmd --list-all
-    register: firewalldrules
-    check_mode: no
-    become_user: root
-    become_method: sudo
+  # - name: Get the current firewalld rules
+  #   shell: firewall-cmd --list-all
+  #   register: firewalldrules
+  #   check_mode: no
+  #   become_user: root
+  #   become_method: sudo
 
-  - name: Add http firewalld rules
-    command: firewall-cmd --zone=public --add-port=80/tcp --permanent
-    become_user: root
-    become_method: sudo
-    when: firewalldrules.stdout.find("http") == -1
+  # - name: Add http firewalld rules
+  #   command: firewall-cmd --zone=public --add-port=80/tcp --permanent
+  #   become_user: root
+  #   become_method: sudo
+  #   when: firewalldrules.stdout.find("http") == -1
 
-  - name: Portforward 80 to 8000
-    command: firewall-cmd --zone=public --remove-forward-port=port=80:proto=tcp:toport=8000 --permanent
-    become_user: root
-    become_method: sudo
-    when: firewalldrules.stdout.find("http") == -1
+  # - name: Portforward 80 to 8000
+  #   command: firewall-cmd --zone=public --remove-forward-port=port=80:proto=tcp:toport=8000 --permanent
+  #   become_user: root
+  #   become_method: sudo
+  #   when: firewalldrules.stdout.find("http") == -1
 
-  - name: Portforward 443 to 4433
-    command: firewall-cmd --zone=public --remove-forward-port=port=443:proto=tcp:toport=4433 --permanent
-    become_user: root
-    become_method: sudo
+  # - name: Portforward 443 to 4433
+  #   command: firewall-cmd --zone=public --remove-forward-port=port=443:proto=tcp:toport=4433 --permanent
+  #   become_user: root
+  #   become_method: sudo
 
-  - name: Add http firewalld rules
-    command: firewall-cmd --zone=public --add-port=80/tcp --permanent
-    become_user: root
-    become_method: sudo
-    when: firewalldrules.stdout.find("http") == -1
+  # - name: Add http firewalld rules
+  #   command: firewall-cmd --zone=public --add-port=80/tcp --permanent
+  #   become_user: root
+  #   become_method: sudo
+  #   when: firewalldrules.stdout.find("http") == -1
 
-  - name: Reload firewalld
-    command: firewall-cmd --reload
-    become_user: root
-    become_method: sudo
+  # - name: Reload firewalld
+  #   command: firewall-cmd --reload
+  #   become_user: root
+  #   become_method: sudo
 
-  - name: Install npm
-    yum:
-      pkg: npm
-      state: latest
-    become_user: root
-    become_method: sudo
+  # - name: Install npm
+  #   yum:
+  #     pkg: npm
+  #     state: latest
+  #   become_user: root
+  #   become_method: sudo
 
-  - name : Check Out PSIPRED React website from git
-    become_user: root
-    git:
-      repo: https://github.com/psipred/psipred_react.git
-      dest: /var/www/psipred_react
-      clone: yes
-      force: yes
+  # - name : Check Out PSIPRED React website from git
+  #   become_user: root
+  #   git:
+  #     repo: https://github.com/psipred/psipred_react.git
+  #     dest: /var/www/psipred_react
+  #     clone: yes
+  #     force: yes
 
-  - name: Install npm packages
-    become_user: root
-    shell: cd /var/www/psipred_react; npm install
+  # - name: Install npm packages
+  #   become_user: root
+  #   shell: cd /var/www/psipred_react; npm install
 
-  - name: build website
-    become_user: root
-    shell: cd /var/www/psipred_react; npm run build
+  # - name: build website
+  #   become_user: root
+  #   shell: cd /var/www/psipred_react; npm run build
 
   - name: Copy httpd conf
     become_user: root
@@ -64,7 +64,7 @@
       dest: /etc/httpd/conf/httpd.conf
       owner: root
 
-  - name: Enable service httpd and ensure it is not masked
+  - name: Enable service httpd
     become_user: root
     ansible.builtin.systemd:
       name: httpd
