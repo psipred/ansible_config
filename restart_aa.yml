@@ -1,14 +1,14 @@
 # ansible-playbook -i staging restart_aa.yml -f 1
 
-- name: Restart django aa on the aahead
-  hosts: aa_head
-  become: true
-  become_user: dbuchan
-  become_method: sudo
-  roles:
-   - restart_aa
-  vars_files:
-   - secrets/staging_secrets.yaml
+# - name: Restart django aa on the aahead
+#   hosts: aa_head
+#   become: true
+#   become_user: dbuchan
+#   become_method: sudo
+#   roles:
+#    - restart_aa
+#   vars_files:
+#    - secrets/staging_secrets.yaml
 #
 #Need to add blast workers here too
 # - name: restarts workers
@@ -27,7 +27,7 @@
 #   become_user: dbuchan
 #   become_method: sudo
 #   roles:
-#     - restart_webserver
+#     - psipredreact
 #   vars_files:
 #     - secrets/staging_secrets.yaml
 

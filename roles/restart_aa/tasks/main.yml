@@ -2,7 +2,7 @@
   - name : Check Out AA from git
     become_user: "{{ django_aa_user }}"
     git:
-      repo: https://github.com/AnalyticsAutomated/analytics_automated.git
+      repo: https://github.com/psipred/analytics_automated.git
       dest: "{{ django_aa_home }}analytics_automated"
       clone: yes
       force: yes
