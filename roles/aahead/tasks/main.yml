@@ -52,7 +52,7 @@
 
   - name: Create the aa head virtualenv
     become_user: "{{ django_aa_user }}"
-    command: virtualenv aa_env -p /bin/python3.4
+    command: virtualenv aa_env -p /bin/python3.9
     when: aa_env_exist.stat.exists == False
     args:
         chdir: "{{ django_aa_home }}"
