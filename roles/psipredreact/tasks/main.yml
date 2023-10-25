@@ -65,6 +65,14 @@
       dest: /etc/httpd/conf/httpd.conf
       owner: root
 
+  - name: index.html in to place
+    become_user: root
+    copy:
+      src: /var/www/psipred_react/public/index_staging.html
+      dest: /var/www/psipred_react/public/index.html
+      owner: root
+      remote_src: yes
+      
   - name: Enable service httpd
     become_user: root
     ansible.builtin.systemd:

@@ -3,8 +3,19 @@
 1. Turn off/move the old httpd/djanog process on bioinf1
 2. Remove any portforwarding rules that the old system needed
 3. Installing s4pred
-4. bioinf3 update python and update the A_A virtualenv
-5. bm2 and bm3, update python and update the A_A virtualenv
+4. bioinf3 update python and update the A_A virtualenv, and update commandRunner 8.12
+5. bm2 and bm3, update python and update the A_A virtualenvand update commandRunner 8.12
+   biopython expected
+6. hspred needs updated for cleanexpect changes
+7. dmpfold2 needs installing correctly with pip and rewrite the job/tasks. Monkey patch 
+   torch.symeig for torch.linalg.eigh
+8. Update hhblits dbs and blast_cache
+9. Double check mogrify is working for dompred plot and add css rotation if needed
+10. Makes sure the timers for polling in results seq, results structure and model as set sensibly
+
+//blast_cache
+
+psipred_react
 
 
 
