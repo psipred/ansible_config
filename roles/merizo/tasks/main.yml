@@ -1,0 +1,22 @@
+# - name: Check merizo is present
+#   stat: path=/opt/merizo
+#   register: merizo_exist
+
+- name: Check out merizo from GIT
+  # when: merizo_exist.stat.exists == False
+  git:
+    repo: https://github.com/psipred/merizo.git
+    dest: /opt/merizo
+    clone: yes
+    force: yes
+
+- name: Install requirements
+  become_user: "{{ django_worker_user }}"
+  pip:
+    state: latest
+    chdir: "{{ django_worker_home }}"
+    virtualenv: "{{ django_worker_home }}aa_env"
+    virtualenv_command: /bin/virtualenv
+    virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
+    requirements: "/opt/merizo/requirements.txt"
+    extra_args: "--index-url https://download.pytorch.org/whl/cpu"
