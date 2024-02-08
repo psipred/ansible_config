@@ -1,12 +1,11 @@
 ---
 
-  - name: Install Dependencies
-    yum:
-      pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk, lmdb, ghostscript, ghostscript-devel
-      state: latest
-    become_user: root
-    become_method: sudo
-
+  # - name: Install Dependencies
+  #   yum:
+  #     pkg: ffmpeg, ffmpeg-devel, java-1.8.0-openjdk, lmdb, ghostscript, ghostscript-devel
+  #     state: latest
+  #   become_user: root
+  #   become_method: sudo
 
   - name: "Add {{ django_worker_user }} user"
     user:
@@ -64,24 +63,24 @@
   #   delay: 10
   #   when: pip_install.stdout.find("from /usr/lib/python3.4/site-packages (python 3.4)") == -1
 
-  - name: Download get-pip.py
-    become_user: "{{ django_worker_user }}"
-    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
-    get_url:
-      url: https://bootstrap.pypa.io/get-pip.py
-      dest: "{{ django_worker_home }}/get-pip.py"
-      timeout: 120
-    register: get_url_result
+  # - name: Download get-pip.py
+  #   become_user: "{{ django_worker_user }}"
+  #   when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+  #   get_url:
+  #     url: https://bootstrap.pypa.io/get-pip.py
+  #     dest: "{{ django_worker_home }}/get-pip.py"
+  #     timeout: 120
+  #   register: get_url_result
 
-  - name: Install pip
-    shell: "chdir={{ django_worker_home }} /bin/python3.6 get-pip.py"
-    when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
-    become_user: root
+  # - name: Install pip
+  #   shell: "chdir={{ django_worker_home }} /bin/python3.6 get-pip.py"
+  #   when: pip_install.stdout.find("from /usr/lib/python3.6/site-packages (python 3.6)") == -1
+  #   become_user: root
 
   - name : Check Out AA from git
     become_user: "{{ django_worker_user }}"
     git:
-      repo: https://github.com/AnalyticsAutomated/analytics_automated.git
+      repo: https://github.com/psipred/analytics_automated.git
       dest: "{{ django_worker_home }}analytics_automated"
       clone: yes
       force: yes
@@ -150,16 +149,15 @@
       path: "{{ django_worker_home }}analytics_automated/submissions"
       state: absent
 
-  - name: symlink submissions to the aa dir
-    become_user: "{{ django_worker_user }}"
-    when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
-    file:
-      src: /webdata/submissions
-      dest: "{{ django_worker_home }}/analytics_automated/submissions"
-      state: link
-      owner: "{{ django_worker_user }}"
-      group: apache
-      mode: "ug+rw"
+  # - name: symlink submissions to the aa dir
+  #   become_user: "{{ django_worker_user }}"
+  #   when: submissions_type.stat.isdir is defined and submissions_type.stat.isdir and submissions_type.stat.islink is not defined
+  #   file:
+  #     src: /webdata/submissions
+  #     dest: "{{ django_worker_home }}/analytics_automated/submissions"
+  #     state: link
+  #     owner: "{{ django_worker_user }}"
+  #     group: apache
 
   - name: Check Celery running status
     shell: ps aux | grep celery
