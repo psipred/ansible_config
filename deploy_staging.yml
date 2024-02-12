@@ -108,6 +108,7 @@
     #     - dmpfold
     #     - dmp
     - merizo
+    - dmpfold2
   vars_files:
     - secrets/staging_secrets.yaml
 # - name: configure blast update machine

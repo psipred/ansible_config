@@ -1,0 +1,9 @@
+- name: Install dependencies
+  become_user: "{{ django_worker_user }}"
+  ansible.builtin.pip:
+    name:
+      - dmpfold
+    chdir: "{{ django_worker_home }}"
+    virtualenv: "{{ django_worker_home }}aa_env"
+    virtualenv_command: /bin/virtualenv
+    virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"

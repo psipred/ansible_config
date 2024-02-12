@@ -7,8 +7,10 @@
 5. bm2 and bm3, update python and update the A_A virtualenvand update commandRunner 8.12
    biopython expected
 6. hspred needs updated for cleanexpect changes
-7. dmpfold2 needs installing correctly with pip and rewrite the job/tasks. Monkey patch 
-   torch.symeig for torch.linalg.eigh
+7. dmpfold2 needs installing correctly with pip and rewrite the job/tasks. Monkey patch aa_env/lib/python3.9/site-packages/dmpfold/network.py at two locations
+w, v = torch.symeig(M.float(), eigenvectors=True)
+or
+w, v = torch.linalg.eigh(M.float())
 8. Update hhblits dbs and blast_cache
 9. Double check mogrify is working for dompred plot and add css rotation if needed
 10. Makes sure the timers for polling in results seq, results structure and model as set sensibly
@@ -40,6 +42,7 @@ Need to change to mirror.centos.org in
 As root build and install python3.9 with shared libs
 ``` bash
 sudo su
+yum install openssl-devel bzip2-devel libffi-devel
 cd ~
 wget https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tgz 
 tar -zxvf Python-3.9.17.tgz
@@ -68,6 +71,8 @@ pip install -r requirements/staging.txt
 
 As a worker install the bits
 probably comment out the mod-wsgi and mod-wsgi-httpd versions
+
+Probably need to find all other pacakges that have a requirements.txt (merizo, s4pred, dmpfold2)
 ``` bash
 su django_worker
 cd ~ 
@@ -75,6 +80,7 @@ source ~/aa_env/bin/activate
 cd analytics_automated
 celery multi stop_verify worker --pidfile=/home/django_worker/analytics_automated/celery.pid --logfile=/home/django_worker/analytics_automated/logs/ 
 cd ../
+deactivate
 mv aa_env aa_env_old
 virtualenv aa_env -p /bin/python3.9
 source ~/aa_env/bin/activate
@@ -84,3 +90,7 @@ vi requirements/base.txt
 pip install -r requirements/staging.txt
 celery --app=analytics_automated_project.celery:app worker --loglevel=INFO -Q low_localhost,localhost,high_localhost,celery,low_R,R,high_R,low_Python,Python,high_Python --pidfile=celery.pid --detach
 ```
+
+s4pred - biopython
+dmpfold - scipy, numpy, torch
+merizo
