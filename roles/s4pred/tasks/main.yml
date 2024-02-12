@@ -1,0 +1,30 @@
+- name: Check out s4pred from GIT
+  # when: merizo_exist.stat.exists == False
+  git:
+    repo: https://github.com/psipred/s4pred.git
+    dest: /opt/s4pred
+    clone: yes
+    force: yes
+
+- name: Install dependencies
+  become_user: "{{ django_worker_user }}"
+  ansible.builtin.pip:
+    name:
+      - torch
+      - biopython
+    chdir: "{{ django_worker_home }}"
+    virtualenv: "{{ django_worker_home }}aa_env"
+    virtualenv_command: /bin/virtualenv
+    virtualenv_python: "{{ django_worker_home }}aa_env/bin/python"
+
+- name: Download s4pred weights
+  become_user: "{{ django_worker_user }}"
+  ansible.builtin.get_url:
+    url: http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights.tar.gz
+    dest: /opt/s4pred/weights.tar.gz
+  
+- name: Extract s4pred weights
+  become_user: "{{ django_worker_user }}"
+  ansible.builtin.unarchive:
+    src: /opt/s4pred/weights.tar.gz
+    dest: /opr/s4pred/
